@@ -77,6 +77,11 @@ nav{display:flex;align-items:center;gap:clamp(10px,2vw,25px);flex-wrap:wrap}nav 
 .who-chips span:nth-child(5n+1){background:#ffe4ef;border-color:#ff7aa8}.who-chips span:nth-child(5n+2){background:#dcefff;border-color:#4facfe}.who-chips span:nth-child(5n+3){background:#dcf6ec;border-color:#2ec4a6}.who-chips span:nth-child(5n+4){background:#fff0c9;border-color:#ffb627}.who-chips span:nth-child(5n+5){background:#efe4ff;border-color:#9b7bff}
 .nn-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 /* כותרת חגיגית לפני כל שלב */
+.group-item.mine{background:#d9f5e3;border-color:#2ec4a6;border-width:2px}.me-tag{color:#178a5a}
+.learn-title{text-align:center;font-size:24px;margin:6px 0 10px;color:var(--navy)}.quick-tip{background:#e3f7e7;border:2px solid #2ec4a6;border-radius:14px;padding:8px 12px;margin:0 0 10px;font-weight:bold;font-size:17px;text-align:center;line-height:1.5}
+.gotit-btn{font:inherit;font-size:24px;font-weight:900;color:#fff;background:linear-gradient(135deg,#2ec4a6,#1fa98d);border:0;border-radius:999px;padding:14px 46px;cursor:pointer;box-shadow:0 5px 14px #1fa98d55}.gotit-btn:hover{filter:brightness(1.05)}
+.gotit{text-align:center;margin:12px 0;padding:12px;border-radius:16px;background:#eaf6ff;border:2px solid #4facfe}.gotit p{margin:0 0 6px;font-weight:bold}.gotit.done{background:#e3f7e7;border-color:#2ec4a6;font-weight:bold;font-size:18px}
+.assoc-many{text-align:center;margin:2px auto 8px;max-width:520px;background:#fff3c4;border:2px solid #ffc34b;border-radius:12px;padding:6px 10px;font-weight:bold;color:var(--navy);line-height:1.5}
 .stages-intro{text-align:center;padding:18px 16px 4px}.stages-intro .game-title{margin:0 0 8px;font-size:36px;background:none;-webkit-text-fill-color:var(--navy);color:var(--navy)}.stages-intro p{margin:0 auto;max-width:680px;font-size:20px;font-weight:bold;color:var(--navy);line-height:1.6}
 .stage-headline{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;padding:16px 12px 14px;margin:0 0 14px;border-radius:22px;color:#fff;box-shadow:0 6px 18px #0002;background:linear-gradient(135deg,#ff7aa8,#ff9f43)}
 .stage-headline.c2{background:linear-gradient(135deg,#4facfe,#7b6cff)}.stage-headline.c3{background:linear-gradient(135deg,#2ec4a6,#8bd346)}
@@ -1441,7 +1446,10 @@ function renderManager() {
     return `<div class="group-item"><span>${gr.index}. ${esc(gr.name)} · ${ps.length === 1 ? 'משתתף אחד' : ps.length + ' משתתפים'}${m.state.stage === 'photos' ? ` (צריך ${need})` : ''}${override}</span><span class="badge ${status[0]}">${status[1]}</span></div>`;
   }).join('') || '<p class="smallnote">עדיין לא הצטרפו קבוצות.</p>';
   let stageHtml = '';
-  if (m.state.stage === 'photos') {
+  if (m.state.stage === 'photos' && !m.state.photosOpen) {
+    stageHtml = `<div class="info"><h3>👀 שלב 1 — הקבוצות קוראות את ההוראות</h3><p>כל קבוצה רואה עכשיו את ההוראות ולוחצת ”הבנתי”. כשכולן הבינו — לוחצים ”כולם הבינו”, והמשחק נפתח לכולם.</p>${m.groups.length < MIN_GROUPS ? `<p class="warn">מחכים שלפחות ${MIN_GROUPS} קבוצות יצטרפו (כרגע ${m.groups.length}). המשחק צריך לפחות ${MIN_GROUPS} קבוצות.</p>` : ''}${gotItStatusHtml(m, 's1')}
+      <button class="buy" type="button" ${m.groups.length ? '' : 'disabled'} onclick="window.managerOpenPhotos()">כולם הבינו — פותחים את המשחק ▶</button></div>`;
+  } else if (m.state.stage === 'photos') {
     // בדיקות תקינות לפני ”המשך”: לפחות 3 קבוצות, כל קבוצה מלאה בדיוק לפי מה שנדרש ולחצה ”מוכנים”, ואין שמות כפולים
     const ready = m.groups.filter(gr => { const ps = per[gr.id] || []; return gr.ready && ps.length === requiredFor(m.state, gr, ps.length); }).length;
     const dups = duplicateNames(m.players, m.groups);
@@ -1671,7 +1679,7 @@ function groupsStatusHtml(c) {
   const firstId = finished.length ? finished[0].id : null;
   const done = all.filter(g => cfg.done(g)).length;
   return `<div class="info" style="margin-top:12px"><h3 style="margin:0 0 4px">📊 לוח התקדמות — ${done} מתוך ${all.length} ${cfg.what}</h3><p class="smallnote" style="margin:0 0 8px">מתעדכן לבד, בזמן אמת. ${cfg.legend}</p><div class="group-list">`
-    + all.map(g => { const ok = cfg.done(g); return `<div class="group-item"><span>${esc(g.name)}${g.id === c.uid ? ' <strong>(אתם)</strong>' : ''}${cfg.extra(g)}${g.id === firstId ? ' · 🥇 סיימה ראשונה' : ''}</span><span class="badge ${ok ? 'paid' : 'pending'}">${ok ? cfg.label[0] : cfg.label[1]}</span></div>`; }).join('')
+    + all.map(g => { const ok = cfg.done(g); return `<div class="group-item${g.id === c.uid ? ' mine' : ''}"><span>${esc(g.name)}${g.id === c.uid ? ' <strong class="me-tag">(אתם)</strong>' : ''}${cfg.extra(g)}${g.id === firstId ? ' · 🥇 סיימה ראשונה' : ''}</span><span class="badge ${ok ? 'paid' : 'pending'}">${ok ? cfg.label[0] : cfg.label[1]}</span></div>`; }).join('')
     + '</div></div>';
 }
 function renderGroup() {
@@ -1684,9 +1692,9 @@ function renderGroup() {
   if (c.state.stage === 'photos') {
     const editable = !c.group.ready, need = requiredFor(c.state, { ...c.group, id: c.uid }, c.players.length), cap = maxFor(c.state, need), missing = need - c.players.length;
     const members = c.players.map(p => `<div class="member"><img src="${esc(p.eyes)}" alt="העיניים של ${esc(p.name)}"><div><strong>${esc(p.name)}</strong>${editable ? ` <button class="game-btn" type="button" onclick="window.renameMember('${esc(p.id)}')">✏️ שינוי שם</button> <button class="game-btn" type="button" onclick="window.removeMember('${esc(p.id)}')">מחיקה</button>` : ''}</div></div>`).join('');
-    if (!c.started && !c.group.ready && !c.players.length) {
-      // מסך פתיחה: לפני שמתחילים — כפתור גדול שמציג את סרטון ההסבר
-      main.innerHTML = stageHeadline(1) + `<div class="now-box" style="text-align:center"><p style="font-size:22px;margin:0 0 6px"><strong>✅ הצטרפתם למשחק בהצלחה!</strong></p><p style="font-size:19px;margin:0 0 6px">אתם <strong>קבוצה מספר ${esc(c.group.index || '')} — ”${esc(c.group.name)}”</strong> 👋</p><p>עכשיו מתכוננים לשלב הראשון: צפו בהסבר קצר, ואז כל אחד מהקבוצה מצטלם בטלפון הזה. את השעון מפעיל מנהל המשחק — כשכל הקבוצות מוכנות.</p><button class="buy start-big" type="button" onclick="window.startGroupGame()">▶ התחל</button></div>`;
+    if (!c.state.photosOpen && !c.group.ready && !c.players.length) {
+      // מסך פתיחה: הוראות + הסבר, ”הבנו”, ומחכים שמנהל המשחק יפתח את הצילום לכולם
+      main.innerHTML = stageHeadline(1) + LEARN_TITLE + `<div class="now-box" style="text-align:center"><p style="font-size:22px;margin:0 0 6px"><strong>✅ הצטרפתם למשחק בהצלחה!</strong></p><p style="font-size:19px;margin:0 0 6px">אתם <strong>קבוצה מספר ${esc(c.group.index || '')} — ”${esc(c.group.name)}”</strong> 👋</p><p>בשלב הראשון כל אחד מהקבוצה מצטלם בטלפון הזה — שם מלא וצילום פנים מקרוב. צפו קודם בהסבר הקצר.</p><button class="game-btn" type="button" onclick="openStage(1,true)">▶ צפייה בהסבר</button></div>` + gotItHtml(c, 's1');
       add.hidden = true; return;
     }
     if (c.group.ready) {
@@ -1697,7 +1705,7 @@ function renderGroup() {
       const readyBtn = missing <= 0
         ? '<button class="buy" type="button" onclick="window.setGroupReady(true)">העלינו ואנחנו מוכנים ✓</button>'
         : `<button class="buy" type="button" disabled>העלינו ואנחנו מוכנים ✓</button><p class="warn" style="margin:4px 0">צריך עוד ${missing === 1 ? 'משתתף אחד' : missing + ' משתתפים'} כדי להמשיך — הקבוצה שלכם צריכה ${need}.</p>`;
-      main.innerHTML = nowBox('מה עושים עכשיו?', ['צופים בסרטון ההסבר.', `כל משתתף בתורו — הקבוצה שלכם צריכה ${need === 1 ? 'משתתף אחד' : need + ' משתתפים'}: כותבים שם מלא — שם פרטי ושם משפחה — ולוחצים ”📸 צילום פנים מקרוב”. מצלמים רק את הפנים, מקרוב — לא את כל הגוף.`, 'בודקים שהעיניים ברורות ולוחצים ”✓ שמירה”. הבא בתור — חוזרים לצעד 2.', `כשכל ה־${need} הצטלמו — לוחצים ”העלינו ואנחנו מוכנים”.`], missing <= 0 ? 3 : c.players.length ? 2 : 1)
+      main.innerHTML = nowBox('מה עושים?', ['כל אחד בתורו כותב שם מלא', 'מצטלם מקרוב ולוחץ ”שמירה”', `כשכל ה־${need} הצטלמו — ”העלינו ואנחנו מוכנים”`], missing <= 0 ? 2 : 0)
         + `<button class="game-btn" type="button" onclick="openStage(1,true)">▶ צפייה חוזרת בהסבר</button><p><strong>משתתפים בקבוצה: ${c.players.length} מתוך ${need}</strong></p>${members || '<p class="smallnote">עדיין לא הצטלם אף אחד.</p>'}${readyBtn}`;
       add.hidden = false;
       if (c.players.length >= cap) add.innerHTML = `<p class="smallnote">✅ הקבוצה מלאה — ${cap === 1 ? 'משתתף אחד' : cap + ' משתתפים'}.</p>`;
@@ -1743,7 +1751,7 @@ function renderGroupEyes(main) {
   c.eyesBuilt = true;
   if (!c.guesses || c.guesses.length !== n) { c.guesses = items.map(it => ({ pid: it.pid, guess: '' })); c.cur = 0; c.review = false; }
   main.innerHTML = eyesTimerBar(c.state)
-    + nowBox('מה עושים עכשיו?', ['העיניים של בני משפחה מהקבוצות האחרות (אף פעם לא שלכם — האתר ערבב בין כל הקבוצות) רצות מהר מהר ועוצרות על זוג אחד.', 'כותבים של מי העיניים (שם פרטי ושם משפחה) ולוחצים ”הבא ▶”. מתייעצים בתוך הקבוצה.', `ככה ${n === 1 ? 'זוג אחד' : n + ' זוגות'}. בסוף בודקים את הכול ולוחצים ”אישור”.`, 'כשהקבוצה האחרונה מאשרת — או כשהזמן נגמר — מגלים לכולם מה נכון.'], 0, 'כל תשובה נכונה = נקודה.')
+    + nowBox('מה עושים?', ['מגיעות תמונות עם עיניים', 'מחליטים יחד של מי העיניים', 'כותבים שם פרטי ושם משפחה ← ”הבא”'], 0, 'כל תשובה נכונה = נקודה.')
     + '<div id="eyesStage"></div>';
   if (c.review) renderEyesReview(); else showSlot(c.cur, true);
 }
@@ -1814,6 +1822,36 @@ window.submitGuesses = async function (auto) {
     updateGroupDoc(c, { eyesDone: true, eyesDoneAt: serverTimestamp() }).catch(e => console.warn(e));
   }
   catch (e) { console.warn(e); const h = document.getElementById('guessHint'); if (h) h.textContent = auto ? 'הזמן נגמר.' : 'השליחה נכשלה — נסו שוב.'; if (btn && !auto) btn.disabled = false; }
+};
+// ”הבנו” לפני כל שלב: כל קבוצה קוראת את ההוראות ולוחצת ”הבנו”; מנהל המשחק רואה מי הבינה ופותח את השלב.
+// groups/{uid}.gotIt = { s1, s2, s3 }. שלב 1 נפתח כש־state.photosOpen; שלבים 2–3 נפתחים ב”התחלה” של מנהל המשחק (כמו קודם).
+const LEARN_TITLE = '<h3 class="learn-title">📖 בואו נבין מה צריך לעשות</h3>';
+// תזכורת קצרה למעלה ברגע שהשלב נפתח
+function quickTip(t) { return `<div class="quick-tip">👉 ${t}</div>`; }
+function gotItHtml(c, k) {
+  return c.group.gotIt && c.group.gotIt[k]
+    ? '<div class="gotit done">✅ מעולה! מחכים שכולם יבינו — כשמנהל המשחק ילחץ ”כולם הבינו”, המשחק ייפתח.</div>'
+    : `<div class="gotit"><p>קראתם את ההוראות? לוחצים:</p><button class="gotit-btn" type="button" onclick="window.groupGotIt('${k}')">✓ הבנתי</button></div>`;
+}
+window.groupGotIt = function (k) {
+  const c = groupCtx; if (!c) return;
+  c.group.gotIt = { ...(c.group.gotIt || {}), [k]: true }; renderGroup();
+  updateGroupDoc(c, { ['gotIt.' + k]: true }).catch(e => console.warn(e));
+};
+// אצל מנהל המשחק: כמה קבוצות הבינו, ומי עוד לא
+function gotItStatusHtml(m, k) {
+  const done = m.groups.filter(gr => gr.gotIt && gr.gotIt[k]), wait = m.groups.filter(gr => !(gr.gotIt && gr.gotIt[k]));
+  return `<p><strong>👍 הבינו: ${done.length} מתוך ${m.groups.length} קבוצות</strong>${m.groups.length && !wait.length ? ' — כולם הבינו! 🎉' : ''}</p>${wait.length && m.groups.length ? `<p class="smallnote">עוד לא לחצו ”הבנתי”: ${wait.map(gr => esc(gr.name)).join(', ')}</p>` : ''}`;
+}
+function allGotIt(m, k) { return m.groups.length > 0 && m.groups.every(gr => gr.gotIt && gr.gotIt[k]); }
+function confirmGotIt(m, k) { return allGotIt(m, k) || confirm('עוד לא כל הקבוצות לחצו ”הבנתי”. לפתוח את השלב בכל זאת?'); }
+window.managerStartAfterGotIt = function (k) {
+  const m = managerCtx; if (!m || !confirmGotIt(m, k)) return;
+  if (k === 's2') window.managerAssocStart(); else window.managerWhoStart();
+};
+window.managerOpenPhotos = async function () {
+  const m = managerCtx; if (!m || !confirmGotIt(m, 's1')) return;
+  try { await updateDoc(liveDoc(m.game.id, 'state'), { photosOpen: true, updatedAt: serverTimestamp() }); } catch (e) { console.warn(e); alert('הפתיחה נכשלה. בדקו את החיבור ונסו שוב.'); }
 };
 window.startGroupGame = function () {
   const c = groupCtx; if (!c) return;
@@ -1986,9 +2024,9 @@ function assocCheckTitle(a) {
 // --- מנהל המשחק ---
 function managerAssocHtml(m) {
   const st = m.state, a = m.assoc || {};
-  if (st.stage === 'assocIntro') return `<div class="info"><h3>💭 שלב 2 — מה זה מזכיר לכם?</h3><p>הקבוצות רואות עכשיו הסבר קצר. כשכולם מוכנים — לוחצים ”התחלה”.</p>
+  if (st.stage === 'assocIntro') return `<div class="info"><h3>💭 שלב 2 — מה זה מזכיר לכם?</h3><p>הקבוצות רואות עכשיו את ההוראות ולוחצות ”הבנתי”. כשכולן הבינו — לוחצים ”כולם הבינו”.</p>${gotItStatusHtml(m, 's2')}
     <label>⏱️ כמה זמן לכל תמונה? <select onchange="window.setAssocSecs(this.value)" style="font:inherit;padding:8px;border-radius:10px">${[40, 60, 90].map(v => `<option value="${v}" ${(m.assocSecs || ASSOC_SECS) === v ? 'selected' : ''}>${v} שניות${v === ASSOC_SECS ? ' (מומלץ)' : ''}</option>`).join('')}</select></label>
-    <p class="smallnote">10 תמונות. התמונות עוברות לבד אחת אחרי השנייה. בסוף בודקים יחד את הקבוצה המובילה.</p><button class="buy" type="button" onclick="window.managerAssocStart()">התחלה ▶ — התמונה הראשונה</button></div>`;
+    <p class="smallnote">10 תמונות. התמונות עוברות לבד אחת אחרי השנייה. בסוף בודקים יחד את הקבוצה המובילה.</p><button class="buy" type="button" onclick="window.managerStartAfterGotIt('s2')">כולם הבינו — התחלה ▶</button></div>`;
   if (st.stage === 'assoc') {
     const r = st.assocRound, landed = Date.now() >= assocLandMs(st);
     return `<div class="info"><h3>💭 תמונה ${r + 1} מתוך ${(st.assocImages || []).length}</h3>${timerBar(assocClock(st), `עד ${secsText((st.assocSeconds || ASSOC_SPIN + ASSOC_SECS) - ASSOC_SPIN)} לכל תמונה`)}
@@ -2086,8 +2124,8 @@ function renderGroupAssoc(main) {
   if (st.stage === 'assocIntro') {
     c.assocBuilt = null;
     const secs = st.assocSecsPlan || ASSOC_SECS;
-    main.innerHTML = stageHeadline(2) + nowBox('שלב 2 — מה זה מזכיר לכם? 💭', ['תמונה רצה מהר מהר — ועוצרת. כל הקבוצות רואות את אותה תמונה.', `⏱️ יש לכם עד ${secsText(secs)} לכל תמונה (השעון רץ למעלה במסך): כותבים בתיבה שמתחת לתמונה כמה שיותר דברים שהיא מזכירה לכם על המשפחה או על החג — כל רעיון בנפרד, ולוחצים ”הוספה”.`, 'תשובה תקינה = קשר אמיתי למשפחה או לחג (למשל לזר פרחים: ”סבא קונה לסבתא כל שישי פרחים לשבת”). ”פרחים יפים” לא נחשב!', 'ככה 10 תמונות. בסוף בודקים יחד את הקבוצה עם הכי הרבה תשובות — עד מקום ראשון, שני ושלישי.'], 0, 'מחכים שמנהל המשחק ילחץ ”התחלה”.')
-      + '<button class="game-btn" type="button" onclick="openStage(2,true)">▶ צפייה בהסבר</button>';
+    main.innerHTML = stageHeadline(2) + LEARN_TITLE + nowBox('שלב 2 — מה זה מזכיר לכם? 💭', ['תמונה רצה מהר מהר — ועוצרת. כל הקבוצות רואות את אותה תמונה.', `⏱️ יש לכם עד ${secsText(secs)} לכל תמונה (השעון רץ למעלה במסך): כותבים בתיבה שמתחת לתמונה כמה שיותר דברים שהיא מזכירה לכם על המשפחה או על החג — כל רעיון בנפרד, ולוחצים ”הוספה”.`, 'תשובה תקינה = קשר אמיתי למשפחה או לחג (למשל לזר פרחים: ”סבא קונה לסבתא כל שישי פרחים לשבת”). ”פרחים יפים” לא נחשב!', 'ככה 10 תמונות. בסוף בודקים יחד את הקבוצה עם הכי הרבה תשובות — עד מקום ראשון, שני ושלישי.'], 0)
+      + '<button class="game-btn" type="button" onclick="openStage(2,true)">▶ צפייה בהסבר</button>' + gotItHtml(c, 's2');
     return;
   }
   if (st.stage === 'assocCheck') {
@@ -2111,7 +2149,8 @@ function renderGroupAssoc(main) {
   main.innerHTML = `${timerBar(assocClock(st), `עד ${secsText((st.assocSeconds || ASSOC_SPIN + ASSOC_SECS) - ASSOC_SPIN)} לכל תמונה`)}
     <p style="text-align:center;margin:6px 0"><strong>תמונה ${r + 1} מתוך ${total}</strong></p>
     <div class="assoc-slot spinning" id="assocSlot"><img id="assocImg" alt="התמונה בסבב הזה"></div>
-    <p style="text-align:center;margin:8px 0 4px"><strong>מה זה מזכיר לכם — על המשפחה או על החג?</strong></p>
+    <p style="text-align:center;margin:8px 0 2px"><strong>מה זה מזכיר לכם — על המשפחה או על החג?</strong></p>
+    <p class="assoc-many">✍️ כתבו כמה שיותר רעיונות! כל רעיון בנפרד — ולוחצים ”הוספה” אחרי כל אחד. מנצחת הקבוצה עם הכי הרבה רעיונות 🏆</p>
     <form class="assoc-form" onsubmit="event.preventDefault();window.assocAdd()"><input id="assocInput" maxlength="80" autocomplete="off" placeholder="רעיון אחד — למשל: סבא קונה לסבתא פרחים לשבת" disabled><button class="buy" type="submit" id="assocAddBtn" disabled>הוספה</button></form>
     <p class="smallnote" id="assocHint" style="text-align:center;margin:4px 0">כל רעיון בנפרד. כפילויות לא נספרות.</p><ol class="assoc-list" id="assocList"></ol>`;
   renderAssocList();
@@ -2234,9 +2273,9 @@ function whoGuessStatus(m, gid) {
 // --- מנהל המשחק ---
 function managerWhoHtml(m) {
   const st = m.state;
-  if (st.stage === 'whoIntro') return `<div class="info"><h3>🎙️ שלב 3 — מי אמר את זה?!</h3><p>הקבוצות רואות עכשיו הסבר קצר ובודקות את המיקרופון. כשכולם מוכנים — לוחצים ”התחלה”.</p>
+  if (st.stage === 'whoIntro') return `<div class="info"><h3>🎙️ שלב 3 — מי אמר את זה?!</h3><p>הקבוצות רואות עכשיו את ההוראות, בודקות את המיקרופון ולוחצות ”הבנתי”. כשכולן הבינו — לוחצים ”כולם הבינו”.</p>${gotItStatusHtml(m, 's3')}
     <label>⏱️ כמה זמן להקלטות? <select onchange="window.setWhoRecMin(this.value)" style="font:inherit;padding:8px;border-radius:10px">${[10, 15, 20].map(v => `<option value="${v}" ${(m.whoRecMin || WHO_REC_MINUTES) === v ? 'selected' : ''}>${v} דקות${v === WHO_REC_MINUTES ? ' (מומלץ)' : ''}</option>`).join('')}</select></label>
-    <p class="smallnote">הקבוצות מקליטות תשובות קצרות ל־${WHO_SAID_QUESTIONS.length} שאלות — על כל שאלה עונה משתתף אחר. אם צריך — אפשר להוסיף זמן תוך כדי.</p><button class="buy" type="button" onclick="window.managerWhoStart()">התחלה ▶ — מקליטים</button></div>`;
+    <p class="smallnote">הקבוצות מקליטות תשובות קצרות ל־${WHO_SAID_QUESTIONS.length} שאלות — על כל שאלה עונה משתתף אחר. אם צריך — אפשר להוסיף זמן תוך כדי.</p><button class="buy" type="button" onclick="window.managerStartAfterGotIt('s3')">כולם הבינו — התחלה ▶</button></div>`;
   if (st.stage === 'whoRecord') {
     const recs = whoRecList(m), problem = whoProblem(recs), done = m.groups.filter(gr => gr.whoDone).length, all = m.groups.length && done === m.groups.length;
     return `<div class="info"><h3>🎙️ הקבוצות מקליטות</h3>${timerBar(fmtClock(whoRecEndMs(st) - Date.now()), `זמן לכל ההקלטות יחד (${Math.round((st.whoRecordSeconds || WHO_REC_MINUTES * 60) / 60)} דקות)`)}
@@ -2384,11 +2423,11 @@ function renderGroupWho(main) {
   if (st.stage !== 'whoRecord') { const w = c.who; if (w.rec) whoStopAll(); w.pend = null; }
   if (st.stage === 'whoIntro') {
     c.whoBuilt = null;
-    if (main.querySelector('#whoIntro')) return;
+    if (main.querySelector('#whoIntro')) { const b = document.getElementById('gotItBox'); if (b) b.innerHTML = gotItHtml(c, 's3'); return; }
     const recMin = st.whoRecMinPlan || WHO_REC_MINUTES;
-    main.innerHTML = `<div id="whoIntro">${stageHeadline(3)}${nowBox('שלב 3 — מי אמר את זה?! 🎙️', [`יש ${WHO_SAID_QUESTIONS.length} שאלות מצחיקות. על כל שאלה עונה משתתף אחד מהקבוצה — כל פעם מישהו אחר. מקליטים בטלפון של הקבוצה, עד 20 שניות לכל תשובה, כמו הודעה קולית. לכל ההקלטות יחד יש ${recMin} דקות.`, 'אחר כך האתר משנה את הקולות 😄 וכל קבוצה שומעת הקלטות של הקבוצות האחרות — שאלה אחרי שאלה, עם שעון.', 'כותבים מי לדעתכם אמר כל תשובה — שם פרטי ושם משפחה. כל זיהוי נכון = נקודה!'], 0, 'מחכים שמנהל המשחק ילחץ ”התחלה”. בינתיים: לוחצים ”🎙️ בדיקת מיקרופון” ומאשרים גישה.')}
+    main.innerHTML = `<div id="whoIntro">${stageHeadline(3)}${LEARN_TITLE}${nowBox('שלב 3 — מי אמר את זה?! 🎙️', [`יש ${WHO_SAID_QUESTIONS.length} שאלות מצחיקות. על כל שאלה עונה משתתף אחד מהקבוצה — כל פעם מישהו אחר. מקליטים בטלפון של הקבוצה, עד 20 שניות לכל תשובה, כמו הודעה קולית. לכל ההקלטות יחד יש ${recMin} דקות.`, 'אחר כך האתר משנה את הקולות 😄 וכל קבוצה שומעת הקלטות של הקבוצות האחרות — שאלה אחרי שאלה, עם שעון.', 'כותבים מי לדעתכם אמר כל תשובה — שם פרטי ושם משפחה. כל זיהוי נכון = נקודה!'], 0, 'לפני שלוחצים ”הבנתי”: לוחצים ”🎙️ בדיקת מיקרופון” ומאשרים גישה.')}
       <button class="buy" type="button" onclick="window.whoMicTest(this)">🎙️ בדיקת מיקרופון</button><p class="smallnote" id="whoMicMsg"></p>
-      <button class="game-btn" type="button" onclick="openStage(3,true)">▶ צפייה בהסבר</button></div>`;
+      <button class="game-btn" type="button" onclick="openStage(3,true)">▶ צפייה בהסבר</button><div id="gotItBox">${gotItHtml(c, 's3')}</div></div>`;
     return;
   }
   if (st.stage === 'whoRecord') {
@@ -2454,11 +2493,7 @@ function renderWhoRec(force) {
     return `<div class="who-q${active ? ' active' : ''}"><div class="who-q-head"><strong>שאלה ${q + 1} מתוך ${total}: ${esc(Q.title)}</strong>${saved ? '<span class="badge paid">✅ הוקלט</span>' : ''}</div>${who}<p class="who-q-text">❓ ${esc(Q.q)}</p>${act}</div>`;
   }).join('');
   const cur = w.pend ? 2 : done === total ? 3 : 1;
-  box.innerHTML = nowBox('מה עושים עכשיו?', [
-    `יש ${total} שאלות. על כל שאלה עונה משתתף אחד — כל פעם מישהו אחר. כבר חילקנו מי עונה על מה (אפשר להחליף ב”מי עונה”).`,
-    'מי שעונה לוחץ ”🎙️ הקלטה” ואומר את התשובה בקול, קרוב לטלפון — עד 20 שניות. כשמסיים — ”⏹ עצירה”.',
-    'לוחצים ”▶ שמיעה” לבדוק שנשמע טוב, ואז ”✓ שמירה”. לא יצא טוב? ”↻ הקלטה מחדש”.',
-    `עוברים לשאלה הבאה. כשכל ${total} השאלות הוקלטו — לוחצים למטה ”סיימנו להקליט ✓”.`], cur, '🤫 לא אומרים את השם בהקלטה! הקבוצות האחרות ישמעו רק את הקול — וגם הוא משונה 😄')
+  box.innerHTML = nowBox('מה עושים?', ['מי שכתוב ב”מי עונה” לוחץ 🎙️ ומדבר', 'לוחצים ”✓ שמירה” ועוברים לשאלה הבאה', 'בסוף: ”סיימנו להקליט ✓”'], cur === 3 ? 2 : cur === 2 ? 1 : 0, '🤫 לא אומרים את השם בהקלטה!')
     + `<p class="who-progress">הוקלטו <strong>${done} מתוך ${total}</strong> שאלות</p>`
     + (w.msg ? `<p class="${/✓/.test(w.msg) ? 'who-ok' : 'warn'}" style="font-weight:700">${esc(w.msg)}</p>` : '') + rows
     + `<button class="buy" type="button" onclick="window.whoSetDone(true)" ${busy ? 'disabled' : ''}>סיימנו להקליט ✓</button>${done < total ? `<p class="smallnote">עוד ${total - done === 1 ? 'שאלה אחת לא הוקלטה' : total - done + ' שאלות לא הוקלטו'}. אפשר לסיים גם ככה — שאלה בלי הקלטה פשוט לא תושמע לאחרים.</p>` : ''}`;
@@ -2551,7 +2586,7 @@ function renderGroupWhoGuess(main) {
   main.innerHTML = `${timerBar(fmtClock(whoEndMs(st) - Date.now()), `עד ${secsText(st.whoSeconds || WHO_GUESS_SECS)} לשאלה הזו`)}
     <p style="text-align:center;margin:6px 0"><strong>שאלה ${r + 1} מתוך ${qs.length}</strong></p>
     <div class="who-q active"><strong>🎙️ ${esc(Q.title || '')}</strong><p>${esc(Q.q || '')}</p></div>
-    ${items.length ? nowBox('מה עושים עכשיו?', [`יש ${items.length === 1 ? 'הקלטה אחת' : items.length + ' הקלטות'} של משתתפים מקבוצות אחרות שענו על השאלה למעלה. לוחצים ▶ ושומעים (הקול משונה בכוונה 😄).`, 'בתיבה שליד כל הקלטה כותבים מי לדעתכם אמר — שם פרטי ושם משפחה.', `⏱️ יש לכם עד ${secsText(st.whoSeconds || WHO_GUESS_SECS)} לשאלה הזו. הכול נשמר לבד — כשהזמן נגמר עוברים לשאלה הבאה.`], 0, '🔊 הגבירו את הווליום!') : ''}
+    ${items.length ? nowBox('מה עושים?', ['מקשיבים להקלטות ▶', 'מחליטים יחד מי אמר', 'כותבים שם פרטי ושם משפחה'], 0, '🔊 הגבירו את הווליום!') : ''}
     <div id="whoGuessBox">${items.length ? items.map((it, i) => `<div class="who-item"><button class="game-btn who-play" type="button" data-label="▶ הקלטה ${i + 1}" onclick="window.whoPlay('${esc(it.rid)}', ${Number(it.pitch) || 1}, this)">▶ הקלטה ${i + 1}</button><label class="who-guess">✍️ מי אמר את הקלטה ${i + 1}?<input data-rid="${esc(it.rid)}" maxlength="40" autocomplete="off" placeholder="שם פרטי + שם משפחה" oninput="window.whoGuessInput()"></label></div>`).join('')
       : '<div class="now-box"><p style="margin:0"><strong>בשאלה הזו אין לכם הקלטות לנחש</strong> — כל ההקלטות שנבחרו הן של הקבוצה שלכם 🙂 מחכים לשאלה הבאה.</p></div>'}</div>
     <p class="smallnote" id="whoHint" style="text-align:center"></p>`;
