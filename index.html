@@ -122,7 +122,7 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
 .start-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .start-option{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:150px;padding:22px 16px;border-radius:18px;border:1px solid #e5d6b7;background:#fff;color:var(--navy);font:inherit;cursor:pointer;transition:transform .15s,box-shadow .15s}
 .start-option:hover{transform:translateY(-2px);box-shadow:0 8px 20px #17345b12}
-.start-option.explain{background:#cfe9fb;border-color:#7cc4f2}.start-option.primary{background:#5cb87c;border-color:#319c68;color:#fff}.start-option.primary small{color:#fff}
+.start-option.explain{background:#cfe9fb;border-color:#7cc4f2}.start-option.primary{background:#23794a;border-color:#1b5e39;color:#fff}.start-option.primary small{color:#fff}
 .start-option .start-icon{font-size:32px;line-height:1}
 .start-option strong{font-size:19px}
 .start-option small{font-size:14px;line-height:1.5;max-width:270px}
@@ -267,15 +267,44 @@ document.addEventListener('DOMContentLoaded', () => {
 <label for="phone"><strong>טלפון נייד</strong></label><input id="phone" type="tel" inputmode="tel" placeholder="050-1234567" required autocomplete="tel" oninput="this.setCustomValidity('')">
 <label for="email"><strong>כתובת אימייל לקבלת פרטי הכניסה</strong></label><input id="email" type="email" placeholder="name@example.com" required maxlength="100" autocomplete="email">
 <label for="coupon"><strong>קוד קופון (אם יש)</strong></label><div class="order-actions"><input id="coupon" maxlength="30" autocomplete="off" placeholder="קוד הנחה" style="flex:1;min-width:140px" oninput="couponPercent=0;document.getElementById('couponMsg').textContent='';updateGroups()"><button class="game-btn" type="button" onclick="applyCoupon()">הפעלת הקופון</button></div><p id="couponMsg" class="smallnote" role="status"></p>
+<p class="smallnote">בשליחת ההזמנה את/ה מאשר/ת את <a href="#" onclick="famOpenDoc('termsModal');return false">התקנון ומדיניות הביטול</a> ואת <a href="#" onclick="famOpenDoc('privacyModal');return false">מדיניות הפרטיות</a>.</p>
 <button class="buy" type="submit" id="orderButton">שליחת הזמנה ומעבר לתשלום בביט</button><p id="purchaseMsg" aria-live="polite"></p>
 </form><div class="bit-box" id="bitBox" hidden></div><p class="smallnote">התשלום בביט. שם המשתמש והסיסמה נשלחים רק אחרי שהתשלום מתקבל.</p></div></section>
-</main><footer><a href="#admin" title="משחק משפחתי" style="color:inherit;text-decoration:none;font-weight:900">משחק משפחתי 🕎</a><span>מכירים, מתחברים, משחקים.</span><span data-contact></span></footer>
+</main><footer><a href="#admin" title="משחק משפחתי" style="color:inherit;text-decoration:none;font-weight:900">משחק משפחתי 🕎</a><span>מכירים, מתחברים, משחקים.</span><span data-contact></span><span class="fam-legal-links"><button type="button" onclick="famOpenDoc('termsModal')">תקנון ומדיניות ביטול</button> · <button type="button" onclick="famOpenDoc('privacyModal')">מדיניות פרטיות</button> · <button type="button" onclick="famOpenA11y()">הצהרת נגישות</button></span></footer>
+<style>.fam-legal-links button{background:none;border:0;color:inherit;font:inherit;text-decoration:underline;cursor:pointer;padding:0}</style>
 </div>
 <!-- אזור ניהול הזמנות — נפתח בכתובת האתר עם #admin בסוף -->
 <section class="section" id="adminScreen" hidden><div class="head"><h2>ניהול הזמנות</h2><p>אזור למנהלת האתר בלבד</p></div><div id="adminContent"></div></section>
 <!-- המשחק עצמו: מסך מנהל המשחק ומסך הטלפון של כל קבוצה -->
 <section id="playScreen" hidden></section>
 <div class="modal" id="gameAccessModal" role="dialog" aria-modal="true"><div class="dialog"><button class="close" onclick="closeGameAccess()" aria-label="סגירה">×</button><span class="pill">כניסה למשחק</span><h2 id="gameAccessTitle">התחלת משחק</h2><p id="gameAccessIntro">מנהל המשחק נכנס עם פרטי הגישה שקיבל לאחר הרכישה.</p><div id="gameAccessContent"></div></div></div>
+<!-- Ayelet 08.11.26 - accessibility statement (IS 5568) -->
+<div class="modal" id="a11yModal" role="dialog" aria-modal="true" aria-labelledby="a11yTitle"><div class="dialog"><button class="close" onclick="famCloseA11y()" aria-label="סגירה">×</button><span class="pill">נגישות</span><h2 id="a11yTitle">הצהרת נגישות</h2>
+<p>אנחנו רוצים שכל המשפחה תוכל ליהנות מהמשחק, כולל אנשים עם מוגבלות. האתר מותאם ככל האפשר לתקן הישראלי ת"י 5568 (לפי WCAG 2.0, רמה AA).</p>
+<h3>מה עשינו</h3><ul><li>כפתור נגישות כחול בצד המסך: הגדלת טקסט, ניגודיות גבוהה, גווני אפור, הדגשת קישורים וכותרות, גופן קריא, ריווח טקסט, עצירת אנימציות וסמן עכבר גדול.</li><li>אפשר לעבור על האתר במקלדת, ויש קישור "דלג לתוכן הראשי".</li><li>לתמונות יש תיאור, ולכפתורים ולשדות יש שמות לקוראי מסך.</li><li>האתר מתאים לטלפון ולמחשב, ואפשר להגדיל את התצוגה.</li></ul>
+<h3>מה לא נגיש במלואו, ומה החלופה</h3><ul><li>בשלב 1 מנחשים לפי תמונות, ובשלב 3 לפי הקלטות קול. מי שמתקשה לראות או לשמוע יכול לשחק יחד עם בן משפחה מהקבוצה שלו, ומנהל המשחק יכול להקריא או לתאר.</li><li>במשחק יש טיימרים. מנהל המשחק יכול לבחור זמן ארוך יותר.</li><li>אפשר לעצור את סרטוני ההסבר הקצרים בכפתור ההשהיה.</li></ul>
+<h3>נתקלתם בבעיה?</h3><p>נשמח לשמוע ולעזור. כתבו לנו מה לא עבד ובאיזה מסך, ונחזור אליכם בהקדם.</p><p data-contact></p>
+<p class="smallnote">ההצהרה עודכנה ב-8.11.2026.</p></div></div>
+<!-- Ayelet 08.11.26 - privacy policy (Amendment 13) -->
+<div class="modal" id="privacyModal" role="dialog" aria-modal="true" aria-labelledby="privacyTitle"><div class="dialog"><button class="close" onclick="famCloseDoc()" aria-label="סגירה">×</button><span class="pill">פרטיות</span><h2 id="privacyTitle">מדיניות פרטיות</h2>
+<p>אנחנו שומרים רק את מה שצריך כדי שהמשחק יעבוד, ומוחקים את תוכן המשחק מהר ככל האפשר.</p>
+<h3>מה נאסף ולמה</h3><ul><li><strong>בהזמנה:</strong> שם, טלפון, אימייל, מספר משתתפים, תאריך המשחק וקוד קופון. כדי לטפל בהזמנה ובתשלום, לשלוח את פרטי הכניסה ולחזור אליכם אם יש שאלה.</li><li><strong>במשחק:</strong> שמות הקבוצות והמשתתפים, תמונות, תשובות כתובות והקלטות קול. רק כדי לשחק, והן מוצגות רק למשתתפי אותו משחק.</li><li><strong>יומן תקלות:</strong> כשמשהו לא עובד נשמר תיאור טכני של התקלה (סוג המכשיר, הדפדפן ומה קרה), כדי שנוכל לתקן.</li></ul>
+<h3>כמה זמן שומרים</h3><ul><li>כל תוכן המשחק (תמונות, הקלטות, שמות ותשובות) נמחק אוטומטית יום אחרי המשחק.</li><li>ההזמנות נשמרות לרישום התשלומים.</li><li>יומן התקלות נמחק אחרי 30 יום.</li></ul>
+<h3>מי עוד מקבל מידע</h3><ul><li><strong>Google Firebase</strong>: שם נשמרים הנתונים ופרטי הכניסה.</li><li><strong>EmailJS</strong>: דרכו נשלחים המיילים על ההזמנה ופרטי הכניסה.</li><li><strong>ביט</strong>: התשלום נעשה באפליקציה של ביט, ואנחנו לא רואים ולא שומרים פרטי אשראי.</li></ul><p>אנחנו לא מוכרים ולא מעבירים מידע לאף אחד אחר.</p>
+<h3>ילדים</h3><p>במשחק משתתפים לפעמים ילדים. מנהל המשחק אחראי לקבל את הסכמת ההורים לפני שמצלמים או מקליטים ילד.</p>
+<h3>עוגיות</h3><p>אין באתר עוגיות מעקב או פרסום. הדפדפן שומר רק הגדרות שנדרשות להפעלת המשחק (למשל לאיזו קבוצה הצטרפתם, ואת הגדרות הנגישות).</p>
+<h3>הזכויות שלכם</h3><p>אפשר לבקש לראות את המידע שנשמר עליכם, לתקן אותו או למחוק אותו. פנו אלינו ונטפל בהקדם.</p><p data-contact></p>
+<p class="smallnote">המדיניות עודכנה ב-8.11.2026.</p></div></div>
+<!-- Ayelet 08.11.26 - terms and cancellation policy. TODO: seller name, business number and address (Ayelet has not provided them yet) -->
+<div class="modal" id="termsModal" role="dialog" aria-modal="true" aria-labelledby="termsTitle"><div class="dialog"><button class="close" onclick="famCloseDoc()" aria-label="סגירה">×</button><span class="pill">תקנון</span><h2 id="termsTitle">תקנון ומדיניות ביטול</h2>
+<h3>מה קונים</h3><p>גישה למשחק המשפחתי ביום שבחרתם בהזמנה, מ-6:00 בבוקר עד 1:00 בלילה.</p>
+<h3>מחיר ותשלום</h3><p>המחיר מוצג בטופס ההזמנה לפי מספר המשתתפים, ולא יותר מ-320 ₪. התשלום בביט.</p>
+<h3>פרטי הכניסה</h3><p>שם המשתמש והסיסמה נשלחים במייל עד 24 שעות אחרי שהתשלום מתקבל. לא קיבלתם? מחזירים את כל הכסף.</p>
+<h3>ביטול</h3><ul><li>אפשר לבטל תוך 14 יום מההזמנה, כל עוד המשחק עוד לא נפתח. דמי הביטול: 5% מהמחיר או 100 ₪, הנמוך מביניהם.</li><li>אנשים עם מוגבלות, אזרחים ותיקים ועולים חדשים יכולים לבטל עד 4 חודשים מההזמנה, כשהחוק חל עליהם, כל עוד המשחק עוד לא נפתח.</li><li>הכסף מוחזר תוך 14 יום מהבקשה לביטול.</li></ul>
+<h3>שינוי תאריך</h3><p>רוצים להעביר את המשחק ליום אחר? פנו אלינו לפני היום שנבחר, ונתאם יחד תאריך חדש.</p>
+<h3>תמונות והקלטות</h3><p>מי שמשתתף במשחק מסכים שיצלמו אותו ויקליטו אותו במסגרת המשחק. התוכן מוצג רק למשתתפי אותו משחק, ונמחק יום אחרי המשחק. מנהל המשחק אחראי לקבל את הסכמת ההורים לילדים.</p>
+<h3>יצירת קשר</h3><p data-contact></p>
+<p class="smallnote">התקנון עודכן ב-8.11.2026.</p></div></div>
 <div class="modal" id="modal" role="dialog" aria-modal="true"><div class="dialog"><button class="close" onclick="closeModal()" aria-label="סגירה">×</button><span class="pill" id="pill"></span><h2 id="title"></h2><div class="video" id="video"><strong id="videoTitle">הסבר קצר</strong><div class="clip" id="clip" aria-live="polite"></div><div class="clip-bar" id="clipBar" aria-hidden="true"></div><div class="clip-controls"><button type="button" class="game-btn" id="clipToggle" onclick="toggleClip()">⏸ השהיה</button><button type="button" class="game-btn" onclick="playClip(0)">↻ מההתחלה</button></div></div><p id="desc"></p><ol id="steps"></ol></div></div>
 <script>
 // ההסבר הציבורי של שלב 1 שומר על הסוד (בלי ”עיניים”). את ההסבר המלא רואים רק השחקנים, בתוך המשחק (stagesGame / clipsGame)
@@ -2774,4 +2803,16 @@ window.exitGroupGame = function (thenJoin) {
 if (location.hash.startsWith('#join=')) window.openJoin(location.hash.slice(6));
 if (location.hash === '#admin') window.renderAdmin();
 </script>
+<script>
+/* Ayelet 08.11.26 */
+/* Open/close the accessibility statement, privacy policy and terms; nagish.js calls famOpenA11y */
+var famDocBack = null, famDocOpen = null;
+function famOpenDoc(id){ if (famDocOpen) famCloseDoc(true); famDocBack = document.activeElement; var m = document.getElementById(id); famDocOpen = m; m.classList.add('open'); if (window.fillContact) window.fillContact(); var b = m.querySelector('.close'); if (b) b.focus(); }
+function famCloseDoc(keepFocus){ if (!famDocOpen) return; famDocOpen.classList.remove('open'); famDocOpen = null; if (!keepFocus && famDocBack && famDocBack.focus) famDocBack.focus(); }
+function famOpenA11y(){ famOpenDoc('a11yModal'); }
+function famCloseA11y(){ famCloseDoc(); }
+['a11yModal','privacyModal','termsModal'].forEach(function(id){ document.getElementById(id).addEventListener('click', function(e){ if (e.target.id === id) famCloseDoc(); }); });
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && famDocOpen) famCloseDoc(); });
+</script>
+<script src="nagish.js" defer data-statement-fn="famOpenA11y" data-main="#home"></script>
 </body></html>
