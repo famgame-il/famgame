@@ -295,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <h3>עוגיות</h3><p>אין באתר עוגיות מעקב או פרסום. הדפדפן שומר רק הגדרות שנדרשות להפעלת המשחק (למשל לאיזו קבוצה הצטרפתם, ואת הגדרות הנגישות).</p>
 <h3>הזכויות שלכם</h3><p>אפשר לבקש לראות את המידע שנשמר עליכם, לתקן אותו או למחוק אותו. פנו אלינו ונטפל בהקדם.</p><p data-contact></p>
 <p class="smallnote">המדיניות עודכנה ב-8.11.2026.</p></div></div>
-<!-- Ayelet 08.11.26 - terms and cancellation policy. TODO: seller name, business number and address (Ayelet has not provided them yet) -->
+<!-- Ayelet 08.11.26 - terms and cancellation policy. TODO: business address (not provided yet). Never show a personal name here -->
 <div class="modal" id="termsModal" role="dialog" aria-modal="true" aria-labelledby="termsTitle"><div class="dialog"><button class="close" onclick="famCloseDoc()" aria-label="סגירה">×</button><span class="pill">תקנון</span><h2 id="termsTitle">תקנון ומדיניות ביטול</h2>
 <h3>מה קונים</h3><p>גישה למשחק המשפחתי ביום שבחרתם בהזמנה, מ-6:00 בבוקר עד 1:00 בלילה.</p>
 <h3>מחיר ותשלום</h3><p>המחיר מוצג בטופס ההזמנה לפי מספר המשתתפים, ולא יותר מ-320 ₪. התשלום בביט.</p>
@@ -303,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <h3>ביטול</h3><ul><li>אפשר לבטל תוך 14 יום מההזמנה, כל עוד המשחק עוד לא נפתח. דמי הביטול: 5% מהמחיר או 100 ₪, הנמוך מביניהם.</li><li>אנשים עם מוגבלות, אזרחים ותיקים ועולים חדשים יכולים לבטל עד 4 חודשים מההזמנה, כשהחוק חל עליהם, כל עוד המשחק עוד לא נפתח.</li><li>הכסף מוחזר תוך 14 יום מהבקשה לביטול.</li></ul>
 <h3>שינוי תאריך</h3><p>רוצים להעביר את המשחק ליום אחר? פנו אלינו לפני היום שנבחר, ונתאם יחד תאריך חדש.</p>
 <h3>תמונות והקלטות</h3><p>מי שמשתתף במשחק מסכים שיצלמו אותו ויקליטו אותו במסגרת המשחק. התוכן מוצג רק למשתתפי אותו משחק, ונמחק יום אחרי המשחק. מנהל המשחק אחראי לקבל את הסכמת ההורים לילדים.</p>
-<h3>יצירת קשר</h3><p data-contact></p>
+<h3>פרטי העסק ויצירת קשר</h3><p>המשחק נמכר על ידי <strong>הכל בקליק</strong>, עוסק זעיר מס' 207680679.<br>טלפון: <a href="tel:0548920993" dir="ltr">054-8920993</a> · אימייל: <a href="mailto:allclick2027@gmail.com" dir="ltr">allclick2027@gmail.com</a></p>
 <p class="smallnote">התקנון עודכן ב-8.11.2026.</p></div></div>
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="title"><div class="dialog"><button class="close" onclick="closeModal()" aria-label="סגירה">×</button><span class="pill" id="pill"></span><h2 id="title"></h2><div class="video" id="video"><strong id="videoTitle">הסבר קצר</strong><div class="clip" id="clip" aria-live="polite"></div><div class="clip-bar" id="clipBar" aria-hidden="true"></div><div class="clip-controls"><button type="button" class="game-btn" id="clipToggle" onclick="toggleClip()">⏸ השהיה</button><button type="button" class="game-btn" onclick="playClip(0)">↻ מההתחלה</button></div></div><p id="desc"></p><ol id="steps"></ol></div></div>
 <script>
