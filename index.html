@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <section class="section" id="adminScreen" hidden><div class="head"><h2>ניהול הזמנות</h2><p>אזור למנהלת האתר בלבד</p></div><div id="adminContent"></div></section>
 <!-- המשחק עצמו: מסך מנהל המשחק ומסך הטלפון של כל קבוצה -->
 <section id="playScreen" hidden></section>
-<div class="modal" id="gameAccessModal" role="dialog" aria-modal="true"><div class="dialog"><button class="close" onclick="closeGameAccess()" aria-label="סגירה">×</button><span class="pill">כניסה למשחק</span><h2 id="gameAccessTitle">התחלת משחק</h2><p id="gameAccessIntro">מנהל המשחק נכנס עם פרטי הגישה שקיבל לאחר הרכישה.</p><div id="gameAccessContent"></div></div></div>
+<div class="modal" id="gameAccessModal" role="dialog" aria-modal="true" aria-labelledby="gameAccessTitle"><div class="dialog"><button class="close" onclick="closeGameAccess()" aria-label="סגירה">×</button><span class="pill">כניסה למשחק</span><h2 id="gameAccessTitle">התחלת משחק</h2><p id="gameAccessIntro">מנהל המשחק נכנס עם פרטי הגישה שקיבל לאחר הרכישה.</p><div id="gameAccessContent"></div></div></div>
 <!-- Ayelet 08.11.26 - accessibility statement (IS 5568) -->
 <div class="modal" id="a11yModal" role="dialog" aria-modal="true" aria-labelledby="a11yTitle"><div class="dialog"><button class="close" onclick="famCloseA11y()" aria-label="סגירה">×</button><span class="pill">נגישות</span><h2 id="a11yTitle">הצהרת נגישות</h2>
 <p>אנחנו רוצים שכל המשפחה תוכל ליהנות מהמשחק, כולל אנשים עם מוגבלות. האתר מותאם ככל האפשר לתקן הישראלי ת"י 5568 (לפי WCAG 2.0, רמה AA).</p>
@@ -305,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <h3>תמונות והקלטות</h3><p>מי שמשתתף במשחק מסכים שיצלמו אותו ויקליטו אותו במסגרת המשחק. התוכן מוצג רק למשתתפי אותו משחק, ונמחק יום אחרי המשחק. מנהל המשחק אחראי לקבל את הסכמת ההורים לילדים.</p>
 <h3>יצירת קשר</h3><p data-contact></p>
 <p class="smallnote">התקנון עודכן ב-8.11.2026.</p></div></div>
-<div class="modal" id="modal" role="dialog" aria-modal="true"><div class="dialog"><button class="close" onclick="closeModal()" aria-label="סגירה">×</button><span class="pill" id="pill"></span><h2 id="title"></h2><div class="video" id="video"><strong id="videoTitle">הסבר קצר</strong><div class="clip" id="clip" aria-live="polite"></div><div class="clip-bar" id="clipBar" aria-hidden="true"></div><div class="clip-controls"><button type="button" class="game-btn" id="clipToggle" onclick="toggleClip()">⏸ השהיה</button><button type="button" class="game-btn" onclick="playClip(0)">↻ מההתחלה</button></div></div><p id="desc"></p><ol id="steps"></ol></div></div>
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="title"><div class="dialog"><button class="close" onclick="closeModal()" aria-label="סגירה">×</button><span class="pill" id="pill"></span><h2 id="title"></h2><div class="video" id="video"><strong id="videoTitle">הסבר קצר</strong><div class="clip" id="clip" aria-live="polite"></div><div class="clip-bar" id="clipBar" aria-hidden="true"></div><div class="clip-controls"><button type="button" class="game-btn" id="clipToggle" onclick="toggleClip()">⏸ השהיה</button><button type="button" class="game-btn" onclick="playClip(0)">↻ מההתחלה</button></div></div><p id="desc"></p><ol id="steps"></ol></div></div>
 <script>
 // ההסבר הציבורי של שלב 1 שומר על הסוד (בלי ”עיניים”). את ההסבר המלא רואים רק השחקנים, בתוך המשחק (stagesGame / clipsGame)
 const stages={
