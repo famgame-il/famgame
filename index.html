@@ -991,8 +991,9 @@ window.firebaseAdminLogout = async function () {
   if (adminUnsub) { adminUnsub(); adminUnsub = null; }
   await signOut(auth); window.renderAdmin();
 };
+let adminUid = null; // מי התחברה לניהול — כדי לזהות שבאותו דפדפן נכנסו בינתיים כמנהל משחק
 async function showAdminPanel(user) {
-  let isAdmin = false;
+  let isAdmin = false; adminUid = user.uid;
   try { isAdmin = (await getDoc(doc(db, 'admins', user.uid))).exists(); } catch (e) { console.warn(e); }
   const logout = `<button class="game-btn" type="button" onclick="window.firebaseAdminLogout()">יציאה</button>`;
   if (!isAdmin) {
@@ -1033,7 +1034,13 @@ async function showAdminPanel(user) {
   // הרשימה מתעדכנת בזמן אמת — הזמנה חדשה מופיעה מיד בלי לרענן
   adminUnsub = onSnapshot(query(collection(db, 'gameOrders'), orderBy('createdAt', 'desc'), limit(300)),
     snap => { adminOrders = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderOrders(); },
-    err => { console.warn(err); document.getElementById('ordersList').innerHTML = '<p class="warn">לא הצלחנו לטעון הזמנות. ודאי שכללי האבטחה פורסמו ב-Firebase.</p>'; });
+    // ”אין הרשאה” כמעט תמיד = באותו דפדפן נכנסו בינתיים כמנהל משחק (ההתחברות התחלפה), לא כללי האבטחה
+    err => {
+      console.warn(err);
+      document.getElementById('ordersList').innerHTML = err.code === 'permission-denied' && (!auth.currentUser || auth.currentUser.uid !== adminUid)
+        ? '<p class="warn">יצאת מהניהול: בדפדפן הזה נכנסו בינתיים כמנהל משחק. רענני את הדף והתחברי שוב לניהול. טיפ: את מנהלת המשחק כדאי לפתוח בחלון גלישה בסתר (Ctrl+Shift+N).</p>'
+        : '<p class="warn">לא הצלחנו לטעון הזמנות. רענני את הדף והתחברי שוב. אם זה חוזר — ודאי שכללי האבטחה פורסמו ב-Firebase.</p>';
+    });
 }
 window.setAdminFilter = function (f) { adminFilter = f; renderOrders(); };
 function renderOrders() {
@@ -1058,6 +1065,7 @@ function orderCard(o) {
   if (o.status === 'pending') actions += `<button class="buy" type="button" onclick="window.adminApprove('${o.id}')">✅ התשלום התקבל — יצירת משתמש</button><button class="game-btn" type="button" onclick="window.adminCancel('${o.id}')">✖ ביטול הזמנה</button>`;
   if (o.status === 'paid') actions += `<button class="game-btn" type="button" onclick="window.adminNewPassword('${o.id}')">🔑 סיסמה חדשה ללקוח</button>`;
   if (o.status !== 'cancelled') actions += `<span><input type="date" id="date-${o.id}" value="${esc(o.gameDate)}"> <button class="game-btn" type="button" onclick="window.adminChangeDate('${o.id}')">שינוי תאריך</button></span>`;
+  if (o.status !== 'cancelled') actions += `<span><input type="number" id="people-${o.id}" min="${MIN_PARTICIPANTS}" max="${MAX_PARTICIPANTS}" value="${esc(o.participants)}" style="width:70px" aria-label="מספר משתתפים"> <button class="game-btn" type="button" onclick="window.adminChangePeople('${o.id}')">שינוי מספר משתתפים</button></span>`;
   if (o.status === 'paid') actions += `<button class="game-btn" type="button" onclick="window.adminWipeData('${o.id}')">🧹 מחיקת נתוני המשחק</button><button class="game-btn" type="button" onclick="window.adminCancel('${o.id}')">✖ ביטול ההזמנה</button>`;
   if (o.status !== 'paid') actions += `<button class="game-btn danger" type="button" onclick="window.adminDeleteOrder('${o.id}')">🗑️ מחיקת ההזמנה לגמרי</button>`;
   return `<div class="order ${esc(o.status)}"><div class="order-head"><span>הזמנה ${esc(o.code)} · ${esc(o.buyerName)}</span><span class="badge ${esc(o.status)}">${STATUS_LABEL[o.status] || esc(o.status)}</span></div>
@@ -1183,9 +1191,9 @@ async function createJoinCode(gameId, gameDate) {
 async function showCred(o, password, title, opening, joinCode) {
   const credBox = document.getElementById('credBox');
   const codePart = joinCode
-    ? `👥 קוד הצטרפות לקבוצות: ${joinCode}\nכל קבוצה פותחת את האתר בטלפון שלה ← ”אני רוצה לשחק” ← ”אנחנו קבוצה” ← מקלידה את הקוד.\nאו קישור ישיר שאפשר לשלוח לקבוצות: ${SITE_URL}#join=${joinCode}\nהקוד רק מצרף קבוצות למשחק — הוא לא נותן גישה לניהול. את הסיסמה לא מעבירים לקבוצות.`
+    ? `👥 קוד הצטרפות לקבוצות: ${joinCode}\nכל קבוצה פותחת את האתר בטלפון שלה ← ”אני רוצה לשחק” ← ”אנחנו קבוצה” ← מקלידה את הקוד.\n(הקבוצות יכולות להצטרף רק אחרי שמנהל המשחק לחץ ”פתיחת המשחק”.)\nאו קישור ישיר שאפשר לשלוח לקבוצות: ${SITE_URL}#join=${joinCode}\nהקוד רק מצרף קבוצות למשחק — הוא לא נותן גישה לניהול. את הסיסמה לא מעבירים לקבוצות.`
     : '👥 קוד הצטרפות לקבוצות: יופיע למנהל המשחק במסך, כשהוא לוחץ ”פתיחת המשחק” ביום המשחק.';
-  const text = `שלום ${o.buyerName}, ${opening}\n\n📅 יום המשחק: ${formatDateHe(o.gameDate)} — פתוח מ־6:00 בבוקר עד 1:00 בלילה.\n\n🎬 כניסה למנהל המשחק (מסך הניהול):\nאתר: ${SITE_URL}\nאימייל: ${o.email}\nסיסמה: ${password}\nבאתר: ”אני רוצה לשחק” ← ”אני מנהל המשחק”. (לכל הזמנה יש סיסמה משלה — שמרו את המייל הזה.)\n\n${codePart}\n\nמי זה מנהל המשחק? מי שמפעיל את האירוע — מי שרכש או מישהו אחר שבחרתם. יש לו טלפון נפרד, לא אחד מהטלפונים של הקבוצות. רק הוא מתחיל את המשחק ומעביר בין השלבים. אפשר להקרין את המסך שלו על מקרן — לא חובה.\n\nאיך מפעילים ביום המשחק:\n1. מתחלקים לקבוצות של עד 5 משתתפים (לפחות 3 קבוצות). לכל קבוצה טלפון אחד.\n2. מנהל המשחק נכנס עם האימייל והסיסמה ← ”פתיחת המשחק”.\n3. כל קבוצה מצטרפת עם הקוד.\n4. האתר מסביר בכל שלב מה עושים, ומנהל המשחק מעביר הלאה.\nלא צריך להכין שום דבר מראש.\n\nשיהיה בהצלחה ושיהיה כיף!`;
+  const text = `שלום ${o.buyerName}, ${opening}\n\n📅 יום המשחק: ${formatDateHe(o.gameDate)} — פתוח מ־6:00 בבוקר עד 1:00 בלילה.\n\n🎬 כניסה למנהל המשחק (מסך הניהול):\nאתר: ${SITE_URL}\nאימייל: ${o.email}\nסיסמה: ${password}\nבאתר: ”אני רוצה לשחק” ← ”אני מנהל המשחק”. (לכל הזמנה יש סיסמה משלה — שמרו את המייל הזה.)\n\n${codePart}\n\n⚠️ חשוב — הסדר ביום המשחק: קודם מנהל המשחק נכנס ולוחץ ”פתיחת המשחק”, ורק אחרי זה הקבוצות מצטרפות עם הקוד. קבוצה שתנסה להצטרף לפני כן תקבל הודעה ש”מנהל המשחק עוד לא פתח את המשחק” — פשוט מחכים שהוא יפתח ומנסים שוב.\n\nמי זה מנהל המשחק? מי שמפעיל את האירוע — מי שרכש או מישהו אחר שבחרתם. יש לו טלפון נפרד, לא אחד מהטלפונים של הקבוצות. רק הוא מתחיל את המשחק ומעביר בין השלבים. אפשר להקרין את המסך שלו על מקרן — לא חובה.\n\nאיך מפעילים ביום המשחק:\n1. מתחלקים לקבוצות של עד 5 משתתפים (לפחות 3 קבוצות). לכל קבוצה טלפון אחד.\n2. מנהל המשחק נכנס עם האימייל והסיסמה ← ”פתיחת המשחק” (חובה לפני שהקבוצות מצטרפות!).\n3. רק אחרי זה — כל קבוצה מצטרפת עם הקוד.\n4. האתר מסביר בכל שלב מה עושים, ומנהל המשחק מעביר הלאה.\nלא צריך להכין שום דבר מראש.\n\nשיהיה בהצלחה ושיהיה כיף!`;
   window.lastCredText = text;
   const subject = 'פרטי הכניסה למשחק המשפחה';
   window.lastCred = { to: o.email, subject, text };
@@ -1256,6 +1264,27 @@ window.adminChangeDate = async function (id) {
     }
     await batch.commit();
   } catch (e) { console.warn(e); alert('שינוי התאריך נכשל. נסי שוב.'); }
+};
+// שינוי מספר המשתתפים (למשל הלקוח ביקש להוסיף ושילם על ההפרש). במשחק ששולם — גם המכסה במשחק עצמו (השרת אוכף לפיה)
+window.adminChangePeople = async function (id) {
+  const o = adminOrders.find(x => x.id === id), n = parseInt(document.getElementById('people-' + id).value, 10);
+  if (!o || n === Number(o.participants)) return;
+  if (!(n >= MIN_PARTICIPANTS && n <= MAX_PARTICIPANTS)) { alert(`אפשר בין ${MIN_PARTICIPANTS} ל־${MAX_PARTICIPANTS} משתתפים.`); return; }
+  const gameRef = doc(db, 'familyGames', o.gameId || id);
+  try {
+    // אי־אפשר להוריד מתחת למספר המשתתפים שכבר הצטלמו במשחק
+    if (o.status === 'paid') {
+      const pc = await getDoc(doc(db, 'familyGames', o.gameId || id, 'live', 'playerCount'));
+      const already = pc.exists() ? pc.data().count : 0;
+      if (n < already) { alert(`במשחק כבר הצטלמו ${already} משתתפים — אי־אפשר להוריד מתחת לזה.`); return; }
+    }
+    const newTotal = orderPrice({ ...o, participants: n }).total;
+    if (!confirm(`לשנות את מספר המשתתפים של ${o.buyerName} מ־${o.participants} ל־${n}?\nהמחיר לפי המחירון: ${newTotal.toLocaleString('he-IL')} ₪ (שולם/הוצג: ${Number(o.amountPaid || o.total || 0).toLocaleString('he-IL')} ₪).`)) return;
+    const batch = writeBatch(db);
+    batch.update(doc(db, 'gameOrders', id), { participants: n });
+    if (o.status === 'paid') batch.update(gameRef, { purchasedParticipants: n, maxGroups: maxGroupsFor(n) });
+    await batch.commit();
+  } catch (e) { console.warn(e); alert('השינוי נכשל. נסי שוב.'); }
 };
 // הלקוח שכח את הסיסמה — נוצרת סיסמה חדשה למשחק הזה (הקודמת מפסיקה לעבוד)
 window.adminNewPassword = async function (id) {
@@ -1355,7 +1384,7 @@ const MANAGER_ROLE_HTML = `<details class="info" style="margin:0 0 12px" ${(() =
   <ul style="margin:8px 0 0;padding-inline-start:20px;line-height:1.7">
     <li><strong>המכשיר הזה הוא שלט המשחק.</strong> לא משחקים ממנו כקבוצה — לכל קבוצה טלפון משלה.</li>
     <li><strong>הישארו עם המכשיר כל המשחק.</strong> שום שלב לא מתחיל בלעדיכם: אתם לוחצים ”המשך” / ”התחלה” — והמסכים של כל הקבוצות מתחלפים יחד.</li>
-    <li><strong>אתם קובעים כמה זמן יש</strong> — לפני כל חלק בוחרים זמן (למשל 20 שניות לכל זוג עיניים, 60 שניות לכל תמונה). הקבוצות רואות את הזמן מראש.</li>
+    <li><strong>אתם קובעים כמה זמן יש</strong> — לפני כל חלק בוחרים זמן (למשל 15 שניות לכל זוג עיניים, 60 שניות לכל תמונה). הקבוצות רואות את הזמן מראש.</li>
     <li><strong>אפשר לזרז ולדלג:</strong> ”דילוג” לתמונה או לשאלה הבאה, ”➕ עוד 5 דקות” בהקלטות, ומעבר ישר להכרזה על המנצחים.</li>
     <li><strong>בשלב 2 אתם השופטים:</strong> מקריאים בקול את התשובות ולוחצים ”✗ לא תקין” על תשובה בלי קשר למשפחה.</li>
     <li>קבוצה תקועה? בודקים שהיא בקוד הנכון ושהאינטרנט עובד (כפתור הבדיקה למטה). רענון לא מוחק כלום.</li>
@@ -1395,7 +1424,7 @@ window.openManagerPlay = async function () {
 };
 function startManagerPlay(game) {
   stopPlay();
-  managerCtx = { game, state: null, groups: [], players: [], planDoc: null, answers: {}, results: null, plan: null, eyesPerPair: 20, revealing: false, assocAnswers: {}, assocLoaded: false, assoc: null, assocDocLoaded: false, whoPlanDoc: null, whoAnswers: {} };
+  managerCtx = { game, state: null, groups: [], players: [], planDoc: null, answers: {}, results: null, plan: null, eyesPerPair: 15, revealing: false, assocAnswers: {}, assocLoaded: false, assoc: null, assocDocLoaded: false, whoPlanDoc: null, whoAnswers: {} };
   showPlay('<div class="play-wrap"><div class="order-head"><h2>ניהול המשחק</h2><button class="game-btn" type="button" onclick="leavePlay()">← יציאה</button></div>' + MANAGER_ROLE_HTML + '<div id="mgrMain"><p>טוענים…</p></div></div>');
   const m = managerCtx, r = () => renderManager();
   playUnsubs.push(onSnapshot(liveDoc(game.id, 'state'), s => {
@@ -1480,8 +1509,8 @@ window.managerFinale = async function () {
 };
 // זמן כולל = מספר הזוגות הגדול ביותר שקבוצה קיבלה × שניות לכל זוג
 // שלב 1: סך הכול הזמן + כמה שניות לכל זוג
-function eyesTimerBar(st) { return timerBar(fmtClock(eyesEndMs(st) - Date.now()), `סך הכול ${secsText(st.eyesSeconds || 180)} · כ־${secsText(st.eyesPerPair || 20)} לכל זוג עיניים`); }
-function eyesTotalSecs(m) { const most = m.plan ? Math.max(1, ...Object.values(m.plan.sets).map(s => s.length)) : EYES_PER_GROUP; return most * (m.eyesPerPair || 20); }
+function eyesTimerBar(st) { return timerBar(fmtClock(eyesEndMs(st) - Date.now()), `סך הכול ${secsText(st.eyesSeconds || 180)} · כ־${secsText(st.eyesPerPair || 15)} לכל זוג עיניים`); }
+function eyesTotalSecs(m) { const most = m.plan ? Math.max(1, ...Object.values(m.plan.sets).map(s => s.length)) : EYES_PER_GROUP; return most * (m.eyesPerPair || 15); }
 window.setEyesPerPair = function (v) { if (managerCtx) { managerCtx.eyesPerPair = Number(v) || 30; planToState('eyesPerPair', managerCtx.eyesPerPair); } };
 // כמה משתתפים קבוצה חייבת להעלות: המספר שהקבוצה כתבה כשנוצרה (size), אלא אם מנהל המשחק אישר אותה עם פחות.
 // (משחקים ישנים: לפי plannedSizes)
@@ -1536,7 +1565,7 @@ function renderManager() {
     else if (ready < m.groups.length) reason = `מחכים שכל הקבוצות יעלו את כל המשתתפים שלהן וילחצו ”העלינו ואנחנו מוכנים” (${ready} מתוך ${m.groups.length} מוכנות).`;
     else if (dups.length) reason = `יש שמות כפולים — כך אי־אפשר לבדוק תשובות: ${dups.map(esc).join('; ')}. בקשו מאחד מהם למחוק את עצמו ולהצטלם שוב עם כינוי (למשל ”משה כהן הגדול”).`;
     m.plan = reason ? null : assignEyeSets(m.players, m.groups.map(gr => gr.id));
-    const perPair = [20, 30, 45].map(v => `<option value="${v}" ${m.eyesPerPair === v ? 'selected' : ''}>${v} שניות לכל זוג${v === 20 ? ' (מומלץ)' : ''}</option>`).join('');
+    const perPair = [15, 20, 30, 45].map(v => `<option value="${v}" ${m.eyesPerPair === v ? 'selected' : ''}>${v} שניות לכל זוג${v === 15 ? ' (מומלץ)' : ''}</option>`).join('');
     stageHtml = `<div class="info"><h3>👀 שלב 1 — מצטלמים</h3>${reason ? `<p>${reason}</p>` : `<p><strong>כל הקבוצות מוכנות! 🎉</strong></p>${m.plan.problems.map(p => `<p class="warn">⚠ ${esc(p)}</p>`).join('')}`}
       <label>⏱️ כמה זמן לכל זוג עיניים? <select onchange="window.setEyesPerPair(this.value)" style="font:inherit;padding:8px;border-radius:10px">${perPair}</select></label>
       <p class="smallnote">אחרי ”המשך” כל קבוצה מקבלת עד 15 זוגות עיניים של בני משפחה מקבוצות אחרות, והשעון מתחיל אצל כולם יחד${m.plan ? ` (סך הכול ${fmtClock(eyesTotalSecs(m) * 1000)} דקות)` : ''}.</p>
@@ -1596,7 +1625,7 @@ window.managerStartEyes = async function () {
     }
     const batch = writeBatch(db);
     batch.set(liveDoc(m.game.id, 'plan'), { key: Object.fromEntries(m.players.map(p => [p.id, p.name])), sets });
-    batch.update(liveDoc(m.game.id, 'state'), { stage: 'eyes', eyesStartedAt: serverTimestamp(), eyesSeconds: secs, eyesPerPair: m.eyesPerPair || 20, updatedAt: serverTimestamp() });
+    batch.update(liveDoc(m.game.id, 'state'), { stage: 'eyes', eyesStartedAt: serverTimestamp(), eyesSeconds: secs, eyesPerPair: m.eyesPerPair || 15, updatedAt: serverTimestamp() });
     await batch.commit();
   } catch (e) { console.warn(e); alert('החלוקה נכשלה. בדקו את החיבור ונסו שוב.'); }
 };
@@ -1736,6 +1765,8 @@ window.joinGame = async function () {
     if (!mine.exists()) {
       const all = await getDocs(collection(db, 'familyGames', gameId, 'groups'));
       if (all.docs.some(d => String(d.data().name).trim().toLowerCase() === name.toLowerCase())) { msg.textContent = 'כבר יש קבוצה בשם הזה. בחרו שם אחר.'; btn.disabled = false; return; }
+      // הקוד נכון, אבל מנהל המשחק עוד לא לחץ ”פתיחת המשחק” (המונה נוצר רק אז)
+      if (!(await getDoc(liveDoc(gameId, 'groupCount'))).exists()) { msg.textContent = 'הקוד נכון ✓ — אבל מנהל המשחק עוד לא פתח את המשחק. בקשו ממנו ללחוץ ”פתיחת המשחק”, ואז נסו שוב.'; btn.disabled = false; return; }
       // המונה מבטיח שאי־אפשר לפתוח יותר קבוצות ממה שנרכש — גם אם כמה קבוצות מצטרפות באותו רגע
       await retryBusy(() => runTransaction(db, async tx => {
         const counter = await tx.get(liveDoc(gameId, 'groupCount'));
@@ -1832,7 +1863,7 @@ function renderGroup() {
       add.hidden = true; return;
     }
     if (c.group.ready) {
-      main.innerHTML = nowBox('מה עושים עכשיו?', ['כל המשתתפים הצטלמו.', 'לחצתם ”העלינו ואנחנו מוכנים”.', 'מחכים: כשכל הקבוצות יהיו מוכנות, מנהל המשחק ילחץ ”המשך”. אז יתחיל כאן לבד המשחק, עם שעון עצר.'], 2, `⏱️ כשיתחיל: יהיו לכם כ־${secsText(c.state.eyesPerPair || 20)} לכל זוג עיניים, והשעון רץ למעלה במסך. לא צריך לרענן ולא לסגור את המסך.`) + `<p><strong>✅ העליתם ${c.players.length === 1 ? 'משתתף אחד' : c.players.length + ' משתתפים'}:</strong></p>${members}<button class="game-btn" type="button" onclick="window.setGroupReady(false)">רגע, עוד לא — חזרה לצילום (או לתיקון שם)</button>`;
+      main.innerHTML = nowBox('מה עושים עכשיו?', ['כל המשתתפים הצטלמו.', 'לחצתם ”העלינו ואנחנו מוכנים”.', 'מחכים: כשכל הקבוצות יהיו מוכנות, מנהל המשחק ילחץ ”המשך”. אז יתחיל כאן לבד המשחק, עם שעון עצר.'], 2, `⏱️ כשיתחיל: יהיו לכם כ־${secsText(c.state.eyesPerPair || 15)} לכל זוג עיניים, והשעון רץ למעלה במסך. לא צריך לרענן ולא לסגור את המסך.`) + `<p><strong>✅ העליתם ${c.players.length === 1 ? 'משתתף אחד' : c.players.length + ' משתתפים'}:</strong></p>${members}<button class="game-btn" type="button" onclick="window.setGroupReady(false)">רגע, עוד לא — חזרה לצילום (או לתיקון שם)</button>`;
       add.hidden = true; crop.innerHTML = ''; pendingFace = null;
     } else {
       // ”העלינו ואנחנו מוכנים” נפתח רק כשהקבוצה העלתה בדיוק את מספר המשתתפים שלה
