@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>הצהרת נגישות | משחק משפחתי</title>
+<meta name="description" content="הצהרת הנגישות של המשחק המשפחתי: רמת הנגישות, מה הונגש, תפריט הנגישות, מגבלות ידועות ויצירת קשר.">
+<!-- Ayelet 08.11.26 - accessibility statement as a full page (IS 5568) -->
+<style>
+/* Page layout: header, title area, content with side "in this page" menu */
+:root{--navy:#14345d;--cream:#fffaf1;--line:#c9d3e0;--soft:#eef2f7;--link:#0b4f9c}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--cream);color:var(--navy);font-family:Arial,sans-serif;font-size:18px;line-height:1.75}
+a{color:var(--link)}
+a:focus-visible,button:focus-visible{outline:3px solid #ff6f00;outline-offset:2px}
+.top{background:#fff;border-bottom:1px solid var(--line)}
+.top-in{max-width:1180px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{font-weight:900;font-size:22px;color:var(--navy);text-decoration:none}
+.top nav a{margin-inline-start:18px;font-weight:700}
+.hero{background:#fff;padding:26px 16px 34px}
+.hero-in{max-width:1180px;margin:0 auto}
+.crumbs{font-size:15px;margin:0 0 12px}
+.crumbs a{margin-inline-end:6px}
+h1{margin:0 0 14px;font-size:clamp(34px,6vw,58px);line-height:1.15;border:2px solid var(--navy);padding:6px 14px}
+.lead{max-width:760px;margin:0;font-size:19px}
+.wrap{max-width:1180px;margin:0 auto;padding:22px 16px 60px;display:grid;grid-template-columns:260px 1fr;gap:34px;align-items:start}
+.toc{position:sticky;top:16px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 22px}
+.toc h2{font-size:18px;margin:0 0 8px;border:0;padding:0;background:none}
+.toc ul{list-style:none;margin:0;padding:0}
+.toc li{margin:8px 0}
+main{max-width:780px}
+.updated{font-size:15px;margin:0 0 18px}
+main h2{font-size:26px;margin:30px 0 12px;border:2px solid var(--navy);background:var(--soft);padding:4px 12px}
+main ul{padding-inline-start:22px}
+main li{margin:6px 0}
+.contact{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 20px}
+footer{background:var(--navy);color:#fff;padding:22px 16px;text-align:center}
+footer a{color:#fff}
+@media (max-width:860px){.wrap{grid-template-columns:1fr}.toc{position:static}}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="./">משחק משפחתי 🕎</a><nav aria-label="תפריט ראשי"><a href="./">דף הבית</a><a href="./#faq">שאלות נפוצות</a></nav></div></header>
+<div class="hero"><div class="hero-in">
+<nav class="crumbs" aria-label="מיקום באתר"><a href="./">דף הבית</a> ‹ <span aria-current="page">הצהרת נגישות</span></nav>
+<h1>הצהרת נגישות</h1>
+<p class="lead">אנחנו רוצים שכל המשפחה תוכל ליהנות מהמשחק, כולל אנשים עם מוגבלות. האתר נבנה מתוך מחשבה על נגישות, ואנחנו ממשיכים לשפר אותו.</p>
+</div></div>
+<div class="wrap">
+<aside class="toc" aria-labelledby="tocTitle"><h2 id="tocTitle">בעמוד הזה</h2><ul>
+<li><a href="#level">רמת הנגישות</a></li>
+<li><a href="#done">מה הונגש באתר</a></li>
+<li><a href="#menu">תפריט הנגישות</a></li>
+<li><a href="#limits">מגבלות ידועות</a></li>
+<li><a href="#contact">פנייה בנושא נגישות</a></li>
+</ul></aside>
+<main id="main">
+<p class="updated" id="lastUpdated">עודכן לאחרונה: 11 בנובמבר 2026</p>
+
+<h2 id="level">רמת הנגישות</h2>
+<p>האתר מותאם להנחיות התקן הישראלי ת"י 5568, המבוסס על הנחיות WCAG 2.0 ברמה AA, ולתקנות שוויון זכויות לאנשים עם מוגבלות (התאמות נגישות לשירות), התשע"ג–2013. האתר נבדק בכלי הבדיקה axe ו-IBM Equal Access, במחשב ובטלפון.</p>
+
+<h2 id="done">מה הונגש באתר</h2>
+<ul>
+<li>אפשר לעבור על כל האתר במקלדת. יש סימון ברור של המקום שבו נמצאים, וקישור "דלג לתוכן הראשי".</li>
+<li>לתמונות יש תיאור, ולכפתורים, לשדות ולחלונות יש שמות לקוראי מסך.</li>
+<li>ניגודיות צבעים מספקת, וגופן קריא.</li>
+<li>האתר מתאים לטלפון ולמחשב, ואפשר להגדיל את הטקסט עד 200% בלי לאבד תוכן.</li>
+<li>אפשר לעצור את סרטוני ההסבר הקצרים ואת האנימציות.</li>
+<li>את המשחק מנחה אלקנה החשמונאי — דמות AI. כל מה שהוא אומר בקול מופיע גם בכתב בבועה, ואפשר לשמוע אותו שוב בכפתור 🔁. את הסרטונים שלו אפשר לעצור, להחזיר 5 שניות אחורה ולראות שוב בכפתור 🎬.</li>
+</ul>
+
+<h2 id="menu">תפריט הנגישות</h2>
+<p>בתחתית המסך יש כפתור נגישות כחול. לחיצה עליו פותחת את "תפריט נגישות", ובו:</p>
+<ul>
+<li>הגדלה והקטנה של הטקסט</li>
+<li>ניגודיות גבוהה וגווני אפור</li>
+<li>הדגשת קישורים והדגשת כותרות</li>
+<li>גופן קריא וריווח טקסט</li>
+<li>עצירת אנימציות וסמן עכבר גדול</li>
+<li>איפוס ההגדרות וקישור להצהרה הזו</li>
+</ul>
+<p>ההגדרות נשמרות בדפדפן שלכם לביקור הבא.</p>
+
+<h2 id="limits">מגבלות ידועות</h2>
+<ul>
+<li>בשלב 1 של המשחק מנחשים לפי תמונות, ובשלב 3 לפי הקלטות קול. מי שמתקשה לראות או לשמוע יכול לשחק יחד עם בן משפחה מהקבוצה שלו, שיקריא או יתאר לו.</li>
+<li>במשחק יש טיימרים קבועים לשלב 1 ולשלב 2. בשלב 3 ההקלטה בלי הגבלת זמן, ואפשר לשמוע כל הקלטה כמה פעמים. אם צריך עוד זמן — כל קבוצה יכולה ללחוץ ”רגע, עוד לא!” לפני שהמשחק מתחיל.</li>
+<li>תמונות שהמשתתפים מעלים במשחק מוצגות בלי תיאור, כי הן חלק מהחידה.</li>
+</ul>
+<p>מצאתם משהו שלא נגיש? נשמח לשמוע ולתקן.</p>
+
+<h2 id="contact">פנייה בנושא נגישות</h2>
+<div class="contact">
+<p>כתבו לנו מה לא עבד ובאיזה מסך, ונחזור אליכם בהקדם.</p>
+<p>טלפון: <a href="tel:0548920993" dir="ltr">054-8920993</a><br>אימייל: <a href="mailto:allclick2027@gmail.com" dir="ltr">allclick2027@gmail.com</a></p>
+</div>
+</main>
+</div>
+<footer><a href="./">חזרה לדף הבית</a></footer>
+<script src="nagish.js" defer data-statement="accessibility.html" data-main="#main" data-mobile="footer" data-mobile-slot="footer"></script>
+</body>
+</html>

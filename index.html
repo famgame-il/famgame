@@ -176,6 +176,7 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
     <div style="font-size:42px;margin-bottom:10px" aria-hidden="true">🏡</div>
     <h1>ברוכים הבאים למשחק המשפחתי!</h1>
     <p>משחק מוכן מראש, בלי שום הכנות: מתחלקים לקבוצות, כל קבוצה משחקת מהטלפון שלה, והאתר מסביר כל שלב.</p>
+    <div id="resumeBox" hidden></div>
     <div class="start-options">
       <button class="start-option explain" type="button" onclick="enterSiteAndExplain()">
         <span class="start-icon" aria-hidden="true">👀</span>
@@ -207,7 +208,7 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
 <section class="section" id="before"><div class="head"><h2>מה צריך כדי לשחק?</h2></div><div class="before-grid">
 <article class="info"><strong>👥 קבוצות של עד 5</strong>מתחלקים במקום לקבוצות של עד 5 משתתפים — לפחות 3 קבוצות. אפשר גם פחות מ־5 בקבוצה.</article>
 <article class="info"><strong>📱 טלפון אחד לכל קבוצה</strong>כל הקבוצה משחקת מטלפון אחד: מצלמים, כותבים ומקליטים בו — רק כשהמשחק מבקש. אפשר גם מחשב עם מצלמה ומיקרופון, אבל טלפון נוח יותר ומומלץ.</article>
-<article class="info"><strong>🤖 אלקנה החשמונאי — דמות AI — מנחה</strong>אין מנהל משחק ואין טלפון נוסף — כולם משחקים! אלקנה, דמות ה־AI המצחיקה שמנחה את המשחק, מסביר כל שלב, מעביר הלאה לבד ומכריז על המנצחים.</article>
+<article class="info"><img src="elkana-heart.jpg" alt="אלקנה החשמונאי, דמות ה־AI שמנחה את המשחק, עושה לב בידיים" width="400" height="400" loading="lazy" style="display:block;width:100%;max-width:220px;height:auto;margin:0 auto 10px;border-radius:50%;border:4px solid #f3c64b;box-shadow:0 6px 18px rgba(0,0,0,.18)"><strong>🤖 אלקנה החשמונאי — דמות AI — מנחה</strong>אין מנהל משחק ואין טלפון נוסף — כולם משחקים! אלקנה, דמות ה־AI המצחיקה שמנחה את המשחק, מסביר כל שלב, מעביר הלאה לבד ומכריז על המנצחים.</article>
 <article class="info"><strong>🔢 קוד הצטרפות</strong>מי שרכש מקבל במייל קישור עם קוד בן 6 ספרות ושולח אותו לכל הקבוצות. כל הקבוצות נכנסות עם אותו קוד — והן במשחק.</article>
 <article class="info"><strong>🔀 כל אחד בטלפון שלו — ומשחקים עם כולם</strong>האתר מערבב בין כל הקבוצות: בשלב 1 ובשלב 3 כל קבוצה מקבלת את התמונות וההקלטות של הקבוצות האחרות — אף פעם לא של עצמה.</article>
 </div>
@@ -337,8 +338,10 @@ const WHO_SAID_QUESTIONS=[
 function goTo(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
 function enterSite(){document.getElementById('startScreen').hidden=true;document.getElementById('siteContent').hidden=false;window.scrollTo({top:0,behavior:'instant'});if(!(history.state&&history.state.screen==='site'))history.pushState({screen:'site'},'');}
 // חזרה למסך הפתיחה — גם מכפתור "חזרה" וגם מכפתור החזרה של הטלפון/הדפדפן
-function showStartScreen(){closeModal();closeGameAccess();document.getElementById('siteContent').hidden=true;document.getElementById('startScreen').hidden=false;window.scrollTo({top:0,behavior:'instant'});}
-window.addEventListener('popstate',()=>{if(!(history.state&&history.state.screen==='site'))showStartScreen();});
+function showStartScreen(){closeModal();closeGameAccess();document.getElementById('siteContent').hidden=true;document.getElementById('startScreen').hidden=false;window.scrollTo({top:0,behavior:'instant'});if(window.showResume)window.showResume();}
+/* Ayelet 11.11.26: the phone's back button in the middle of a game - leave to the start screen, the game stays saved,
+   and "🎮 חזרה למשחק" brings the group back to exactly where the game is now */
+window.addEventListener('popstate',()=>{if(window.inGroupGame&&window.inGroupGame()){window.leavePlay();showStartScreen();return;}if(!(history.state&&history.state.screen==='site'))showStartScreen();});
 function enterSiteAndExplain(){enterSite();window.scrollTo({top:0,behavior:"instant"})}
 function enterSiteAndPurchase(){enterSite();setTimeout(()=>goTo('purchase'),50)}
 function startPlaying(){enterSite();openGameAccess('choose')}
@@ -1920,6 +1923,15 @@ window.joinGame = async function () {
       btn.disabled = false; return;
     }
     const mine = await getDoc(doc(db, 'familyGames', gameId, 'groups', uid));
+    /* this phone already played this game to the end (11.11.26, Ayelet: "it remembered the end, I can't play again") -
+       every game code is one game; say so clearly instead of opening the old finale */
+    if (mine.exists()) {
+      const st = await getDoc(liveDoc(gameId, 'state'));
+      if (st.exists() && st.data().stage === 'final') {
+        msg.innerHTML = `🏁 <strong>המשחק הזה כבר הסתיים</strong> — קבוצת ${esc(mine.data().name || '')} שיחקה בו עד הסוף מהטלפון הזה. כל קוד משחק הוא למשחק אחד. כדי לשחק שוב צריך קוד של משחק חדש.<br><button class="game-btn" type="button" style="margin-top:8px" onclick="window.startGroup('${gameId}')">🏆 לראות שוב את התוצאות</button>`;
+        btn.disabled = false; return;
+      }
+    }
     if (!mine.exists()) {
       const all = await getDocs(collection(db, 'familyGames', gameId, 'groups'));
       if (all.docs.some(d => String(d.data().name).trim().toLowerCase() === name.toLowerCase())) { msg.textContent = 'כבר יש קבוצה בשם הזה. בחרו שם אחר.'; btn.disabled = false; return; }
@@ -1951,6 +1963,8 @@ function startGroup(gameId) {
   groupCtx = { gameId, uid, state: null, group: null, players: [], assignment: null, started, submitted: false, results: null, eyesBuilt: false,
     who: { pick: {}, rec: null, pend: null, saving: false, msg: '' }, whoAssign: null, whoUrl: {}, whoLoads: {} };
   showPlay('<div class="play-wrap"><div class="order-head"><h2 id="grpTitle">הקבוצה שלנו</h2><button class="game-btn" type="button" onclick="window.exitGroupGame(false)">← יציאה לאתר</button></div><div id="hostBox" aria-live="polite"></div><div id="hostAgainBox"></div><div id="grpMain"><p>טוענים…</p></div><div id="grpAdd"></div><div id="cropBox"></div><div id="grpStatus"></div></div>');
+  /* a history step for the game screen, so the phone's back button leaves the game without losing it (11.11.26) */
+  if (!(history.state && history.state.screen === 'play')) history.pushState({ screen: 'play' }, '');
   const c = groupCtx, r = () => renderGroup();
   playUnsubs.push(onSnapshot(liveDoc(gameId, 'state'), s => {
     // המשחק נמחק (יום אחרי המשחק) — מודיעים במקום להיתקע
@@ -3175,7 +3189,28 @@ authReady.then(async user => {
     startGroup(gameId);
   } catch (e) { console.warn(e); }
 });
-function forgetGroupGame() { try { localStorage.removeItem(GROUP_KEY); } catch (e) { } }
+function forgetGroupGame() { try { localStorage.removeItem(GROUP_KEY); } catch (e) { } window.resumeGameId = null; const b = document.getElementById('resumeBox'); if (b) b.hidden = true; }
+/* Ayelet 11.11.26 - "I want to leave, and if I stopped in the middle - continue from where the game stopped":
+   the game lives on the server, so this phone only needs to remember which game it is in.
+   The start screen shows "🎮 חזרה למשחק" while that game is not over. */
+window.inGroupGame = () => !!groupCtx && !document.getElementById('playScreen').hidden;
+window.showResume = async function () {
+  const box = document.getElementById('resumeBox'); if (!box) return;
+  let gameId = null; try { gameId = localStorage.getItem(GROUP_KEY); } catch (e) { }
+  const user = auth.currentUser;
+  if (!gameId || !user || !user.isAnonymous) { box.hidden = true; return; }
+  try {
+    const g = await getDoc(doc(db, 'familyGames', gameId, 'groups', user.uid));
+    if (!g.exists()) { forgetGroupGame(); return; }
+    const st = await getDoc(liveDoc(gameId, 'state'));
+    if (!st.exists() || st.data().stage === 'final') { forgetGroupGame(); return; }
+    window.resumeGameId = gameId;
+    box.innerHTML = `<button class="buy" type="button" style="width:100%;font-size:20px;margin:0 0 14px" onclick="window.resumeGame()">🎮 חזרה למשחק — קבוצת ${esc(g.data().name || '')}</button><p class="smallnote" style="margin:-8px 0 12px">המשחק ממשיך בדיוק מאיפה שהוא עכשיו.</p>`;
+    box.hidden = false;
+  } catch (e) { console.warn(e); box.hidden = true; }
+};
+window.startGroup = id => startGroup(id);
+window.resumeGame = function () { const id = window.resumeGameId; if (!id) return; document.getElementById('resumeBox').hidden = true; startGroup(id); };
 // יציאה מהמשחק לאתר. אחרי שהמשחק נגמר — המכשיר ”שוכח” את המשחק, כדי שבפעם הבאה ייפתח האתר הרגיל
 window.exitGroupGame = function (thenJoin) {
   const c = groupCtx, over = !c || !c.state || c.state.stage === 'final';
