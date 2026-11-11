@@ -274,6 +274,14 @@ document.addEventListener('DOMContentLoaded', () => {
 <style>.fam-legal-links button{background:none;border:0;color:inherit;font:inherit;text-decoration:underline;cursor:pointer;padding:0}</style>
 </div>
 <!-- אזור ניהול הזמנות — נפתח בכתובת האתר עם #admin בסוף -->
+<!-- Ayelet 11.11.26 - AI host proof page (#ai-test): the phone talks only to Firestore, the server answers -->
+<section class="section" id="aiTestScreen" hidden><div class="head"><h2>🤖 בדיקת AI</h2><p>בודקים שהמנחה אלקנה החשמונאי עובד גם בטלפון עם סינון</p></div>
+<div class="info" style="text-align:center"><img src="elkana.jpg" alt="אלקנה החשמונאי, המנחה של המשחק" width="480" height="320" style="max-width:100%;height:auto;border-radius:16px">
+<p>לוחצים על הכפתור ← אלקנה כותב בדיחה ← ואחרי כמה שניות גם אומר אותה בקול.</p>
+<button class="game-btn" type="button" id="aiTestBtn" onclick="window.aiTestAsk()">🤖 בדיקת AI</button>
+<div id="aiTestOut" aria-live="polite" style="margin-top:12px"></div>
+<audio id="aiTestAudio" controls hidden style="width:100%;margin-top:8px"></audio>
+<p><a href="#" onclick="location.hash='';return false">חזרה לאתר</a></p></div></section>
 <section class="section" id="adminScreen" hidden><div class="head"><h2>ניהול הזמנות</h2><p>אזור למנהלת האתר בלבד</p></div><div id="adminContent"></div></section>
 <!-- המשחק עצמו: מסך מנהל המשחק ומסך הטלפון של כל קבוצה -->
 <section id="playScreen" hidden></section>
@@ -654,7 +662,10 @@ document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='
 function backToStart(){if(history.state&&history.state.screen==='site')history.back();else showStartScreen();}
 // אזור הניהול: כתובת האתר + #admin
 function routeFromHash(){
- const admin=document.getElementById('adminScreen');
+ const admin=document.getElementById('adminScreen'),aiTest=document.getElementById('aiTestScreen');
+ /* AI host proof page */
+ if(location.hash==='#ai-test'){closeModal();closeGameAccess();document.getElementById('startScreen').hidden=true;document.getElementById('siteContent').hidden=true;admin.hidden=true;aiTest.hidden=false;return;}
+ if(!aiTest.hidden){aiTest.hidden=true;document.getElementById('startScreen').hidden=false;}
  if(location.hash==='#admin'){closeModal();closeGameAccess();document.getElementById('startScreen').hidden=true;document.getElementById('siteContent').hidden=true;admin.hidden=false;if(window.renderAdmin)window.renderAdmin();}
  else if(location.hash.startsWith('#join=')){if(window.openJoin)window.openJoin(location.hash.slice(6));}
  else if(!admin.hidden){admin.hidden=true;document.getElementById('startScreen').hidden=false;}
@@ -665,7 +676,7 @@ window.addEventListener('hashchange',routeFromHash);routeFromHash();
 // קבצי Firebase יושבים באתר עצמו, ליד index.html — כך הם נטענים גם כשסינון אינטרנט חוסם את gstatic.com
 import { initializeApp } from "./firebase-app.js";
 import { getAuth, initializeAuth, inMemoryPersistence, onAuthStateChanged, signInWithEmailAndPassword, signInAnonymously, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from "./firebase-auth.js";
-import { getFirestore, collection, query, where, getDocs, getDoc, doc, setDoc, updateDoc, writeBatch, runTransaction, onSnapshot, orderBy, limit, serverTimestamp, Timestamp } from "./firebase-firestore.js";
+import { getFirestore, collection, query, where, getDocs, getDoc, doc, setDoc, updateDoc, deleteDoc, writeBatch, runTransaction, onSnapshot, orderBy, limit, serverTimestamp, Timestamp } from "./firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD2RqHxKKtaVNQcSfSmvun88noAr6YhFr8",
@@ -1738,6 +1749,56 @@ window.checkConnection = async function (out) {
         : '<p>אפשר לשחק כרגיל — רק מיילים אוטומטיים לא יישלחו מהמכשיר הזה.</p>')
     : '<p><strong>הכול פתוח — אפשר לשחק! 🎉</strong></p>');
 };
+/* Ayelet 11.11.26 */
+/* AI host proof (#ai-test): write aiTest/{uid}, the server (Cloud Function aiProof) writes {answer, audio} back.
+   Only Firestore is used - the same connection as the game, so filtered internet does not block it. */
+const AI_TEST_ERRORS = {
+  'daily-limit': 'הגענו למספר הבדיקות המקסימלי להיום. נסו שוב מחר.',
+  'anthropic-key': 'המפתח של ה־AI עוד לא הוגדר בשרת (או שהוא לא נכון).',
+  'anthropic-busy': 'ה־AI עמוס כרגע. נסו שוב בעוד דקה.',
+  'refusal': 'אלקנה לא הצליח לענות על זה. נסו שוב.'
+};
+let aiTestStop = null;
+window.aiTestAsk = async function () {
+  const out = document.getElementById('aiTestOut'), btn = document.getElementById('aiTestBtn'), player = document.getElementById('aiTestAudio');
+  if (aiTestStop) { aiTestStop(); aiTestStop = null; }
+  btn.disabled = true; player.hidden = true; player.removeAttribute('src');
+  out.textContent = 'מתחברים…';
+  const started = Date.now();
+  try {
+    if (!auth.currentUser) await withTimeout(signInAnonymously(auth), 15000);
+    const ref = doc(db, 'aiTest', auth.currentUser.uid);
+    /* One question per phone: an old answer is deleted first ("try again") */
+    const old = await withTimeout(getDoc(ref), 15000);
+    if (old.exists()) await deleteDoc(ref);
+    await withTimeout(setDoc(ref, { question: '', createdAt: serverTimestamp() }), 15000);
+    out.textContent = '🤔 אלקנה חושב על בדיחה…';
+    const timer = setTimeout(() => {
+      if (aiTestStop) { aiTestStop(); aiTestStop = null; }
+      out.innerHTML = '<p class="warn">⏳ אלקנה לא ענה תוך דקה. אם זו הפעם הראשונה — כנראה השרת עוד לא הופעל. נסו שוב.</p>';
+      btn.disabled = false;
+    }, 60000);
+    aiTestStop = onSnapshot(ref, snap => {
+      const d = snap.data() || {};
+      if (d.status === 'working') out.textContent = '✍️ אלקנה כותב ומקליט…';
+      if (d.status !== 'done' && d.status !== 'error') return;
+      clearTimeout(timer); if (aiTestStop) { aiTestStop(); aiTestStop = null; }
+      btn.disabled = false; btn.textContent = '🤖 עוד בדיחה';
+      const secs = Math.round((Date.now() - started) / 1000);
+      if (d.status === 'error') { out.innerHTML = `<p class="warn">❌ ${esc(AI_TEST_ERRORS[d.error] || 'משהו השתבש בשרת.')}</p><p class="smallnote" dir="ltr">${esc(d.error || '')}</p>`; return; }
+      out.innerHTML = `<p style="font-size:20px"><strong>🗣️ אלקנה:</strong> ${esc(d.answer || '')}</p>`
+        + `<p class="smallnote">✅ הטקסט הגיע מהשרת דרך Firebase בלבד (${secs} שניות).${d.audio ? ' 🔊 גם הקול הגיע.' : ''}</p>`
+        + (d.audio ? '' : `<p class="warn">🔇 הקול לא נוצר בשרת${d.audioError ? ' (' + esc(d.audioError) + ')' : ''}.</p>`);
+      if (d.audio) { player.src = d.audio; player.hidden = false; player.play().catch(() => { out.insertAdjacentHTML('beforeend', '<p>👆 לחצו ▶ כדי לשמוע את אלקנה.</p>'); }); }
+    }, e => { clearTimeout(timer); console.warn('aiTest', e); out.innerHTML = '<p class="warn">❌ אי־אפשר לקרוא את התשובה (כנראה כללי האבטחה עוד לא פורסמו).</p>'; btn.disabled = false; });
+  } catch (e) {
+    console.warn('aiTest', e);
+    out.innerHTML = e && e.code === 'permission-denied'
+      ? '<p class="warn">❌ אין הרשאה — כנראה כללי האבטחה החדשים (aiTest) עוד לא פורסמו.</p>'
+      : '<p class="warn">❌ אין חיבור למערכת (Firebase). בדקו את האינטרנט ונסו שוב.</p>';
+    btn.disabled = false;
+  }
+};
 window.joinGame = async function () {
   const code = document.getElementById('joinCode').value.trim(), name = document.getElementById('joinGroupName').value.trim();
   const size = parseInt(document.getElementById('joinGroupSize').value, 10);
@@ -2807,7 +2868,7 @@ function whoGuessGroupTick() {
 
 // טלפון של קבוצה שרוענן באמצע המשחק — חוזר ישר למסך הקבוצה. משחק שכבר הסתיים (הכרזה על המנצחים) — לא חוזרים אליו לבד
 authReady.then(async user => {
-  if (!user || !user.isAnonymous || location.hash === '#admin' || location.hash.startsWith('#join=')) return;
+  if (!user || !user.isAnonymous || location.hash === '#admin' || location.hash === '#ai-test' || location.hash.startsWith('#join=')) return;
   let gameId = null; try { gameId = localStorage.getItem(GROUP_KEY); } catch (e) { }
   if (!gameId) return;
   try {
