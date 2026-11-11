@@ -2016,7 +2016,34 @@ window.groupStuck = function (btn) {
 /* a fixed video of Elkana talking (opening; later also before each stage). If filtered internet holds the video,
    it is simply hidden - Elkana's pose + voice still work, the game never waits for a video */
 function hostVideoHtml(src, poster, label) {
-  return `<div class="host-video" style="text-align:center;margin:10px 0"><video src="${src}" poster="${poster}" controls playsinline preload="none" style="width:100%;max-width:420px;border-radius:14px;background:#000" onerror="this.parentNode.hidden=true"></video><p class="smallnote" style="margin:4px 0 0">${label}</p></div>`;
+  return `<div class="host-video" style="text-align:center;margin:10px 0;position:relative"><video id="hostVid" src="${src}" poster="${poster}" controls playsinline preload="auto" style="width:100%;max-width:420px;border-radius:14px;background:#000"></video><button id="hostUnmute" class="buy" type="button" hidden style="position:absolute;left:50%;top:40%;transform:translate(-50%,-50%)">🔊 לחצו לשמוע את אלקנה</button><p class="smallnote" style="margin:4px 0 0">${label}</p></div>`;
+}
+/* the opening video plays by itself; when it ends (or cannot play) the next button opens. Seen once per game on this phone */
+function hostVideoSeen(c) { try { return localStorage.getItem('familyGame.introSeen.' + c.gameId) === '1'; } catch (e) { return false; } }
+function startHostVideo(c) {
+  const v = document.getElementById('hostVid'); if (!v || v.dataset.started) return;
+  v.dataset.started = '1';
+  let opened = false;
+  const open = () => {
+    if (opened) return; opened = true; c.introVideoDone = true;
+    try { localStorage.setItem('familyGame.introSeen.' + c.gameId, '1'); } catch (e) { }
+    const gt = document.getElementById('introGate'); if (gt) gt.hidden = false;
+    const w = document.getElementById('introWait'); if (w) w.remove();
+  };
+  v.addEventListener('ended', open);
+  v.addEventListener('error', () => { v.parentNode.hidden = true; open(); });
+  /* never stuck: filtered internet that holds the video, or a very slow phone */
+  setTimeout(() => { if (v.readyState < 2) { v.parentNode.hidden = true; open(); } }, 8000);
+  setTimeout(open, 60000);
+  /* with sound if the phone allows it (the join tap usually does); otherwise silent + a big "sound" button */
+  v.play().catch(() => {
+    v.muted = true;
+    v.play().then(() => {
+      const b = document.getElementById('hostUnmute'); if (!b) return;
+      b.hidden = false;
+      b.onclick = () => { v.muted = false; v.currentTime = 0; v.play().catch(() => { }); b.hidden = true; };
+    }).catch(() => { /* the phone blocks autoplay: the ▶ on the video plays it */ });
+  });
 }
 function stuckHtml() { return '<p style="text-align:center;margin:14px 0 0"><button class="game-btn" type="button" style="font-size:14px" onclick="window.groupStuck(this)">😕 המשחק תקוע?</button></p>'; }
 /* when a clock on this phone ends, it "wakes" the server (the server checks the time by its own clock) */
@@ -2089,7 +2116,11 @@ function renderGroup() {
     const members = c.players.map(p => `<div class="member"><img src="${esc(p.eyes)}" alt="העיניים של ${esc(p.name)}"><div><strong>${esc(p.name)}</strong>${editable ? ` <button class="game-btn" type="button" onclick="window.renameMember('${esc(p.id)}')">✏️ שינוי שם</button> <button class="game-btn" type="button" onclick="window.removeMember('${esc(p.id)}')">מחיקה</button>` : ''}</div></div>`).join('');
     if (!c.state.photosOpen && !c.group.ready && !c.players.length) {
       // מסך פתיחה: הוראות + הסבר, ”הבנו”, ומחכים שמנהל המשחק יפתח את הצילום לכולם
-      main.innerHTML = stageHeadline(1) + LEARN_TITLE + `<div class="now-box" style="text-align:center"><p style="font-size:22px;margin:0 0 6px"><strong>✅ הצטרפתם למשחק בהצלחה!</strong></p><p style="font-size:19px;margin:0 0 6px">אתם <strong>קבוצה מספר ${esc(c.group.index || '')} — ”${esc(c.group.name)}”</strong> 👋</p><p>בשלב הראשון כל אחד מהקבוצה מצטלם בטלפון הזה — שם מלא וצילום פנים מקרוב. צפו קודם בהסבר הקצר.</p><button class="game-btn" type="button" onclick="openStage(1,true)">▶ צפייה בהסבר</button></div>` + hostVideoHtml('elkana-intro.mp4', 'e-welcome.jpg', '▶ לוחצים — ואלקנה מברך אתכם 🔊') + gotItHtml(c, 's1');
+      /* 11.11.26 (Ayelet): the opening video of Elkana plays by itself; "הבנתי" appears only when the video ends (or if it cannot load - never stuck) */
+      const shown = !!(c.introVideoDone || hostVideoSeen(c) || (c.group.gotIt && c.group.gotIt.s1));
+      if (main.querySelector('#hostVid')) { const gt = document.getElementById('introGate'); if (gt) { gt.innerHTML = gotItHtml(c, 's1'); gt.hidden = !shown; } add.hidden = true; return; }
+      main.innerHTML = hostVideoHtml('elkana-intro.mp4', 'e-welcome.jpg', 'אלקנה מברך אתכם 🔊') + stageHeadline(1) + LEARN_TITLE + `<div class="now-box" style="text-align:center"><p style="font-size:22px;margin:0 0 6px"><strong>✅ הצטרפתם למשחק בהצלחה!</strong></p><p style="font-size:19px;margin:0 0 6px">אתם <strong>קבוצה מספר ${esc(c.group.index || '')} — ”${esc(c.group.name)}”</strong> 👋</p><p>בשלב הראשון כל אחד מהקבוצה מצטלם בטלפון הזה — שם מלא וצילום פנים מקרוב. צפו קודם בהסבר הקצר.</p><button class="game-btn" type="button" onclick="openStage(1,true)">▶ צפייה בהסבר</button></div>` + `<div id="introGate"${shown ? '' : ' hidden'}>${gotItHtml(c, 's1')}</div>` + (shown ? '' : '<p id="introWait" class="smallnote" style="text-align:center">⏳ צופים בסרטון של אלקנה — הכפתור ”הבנתי” יופיע בסופו.</p>');
+      startHostVideo(c);
       add.hidden = true; return;
     }
     if (c.group.ready) {
