@@ -1845,7 +1845,9 @@ window.aiTestAsk = async function () {
       /* Voice samples - the same line in several voices, so Ayelet can choose the clearest one */
       if (Array.isArray(d.samples) && d.samples.length > 1) {
         out.insertAdjacentHTML('beforeend', '<h3 style="margin:14px 0 4px">🎧 איזה קול הכי ברור?</h3><p class="smallnote">אותו משפט בקולות שונים — הקשיבו לכולם ותגידו לי איזו אות הכי מובנת.</p>'
-          + d.samples.map(s => `<p style="margin:8px 0 2px"><strong>קול ${esc(s.label)}</strong> <span class="smallnote">(${s.nikud ? 'עם ניקוד' : 'בלי ניקוד'})</span></p><audio controls preload="none" src="${esc(s.audio)}" style="width:100%"></audio>`).join(''));
+          + d.samples.map(s => s.audio
+            ? `<p style="margin:8px 0 2px"><strong>קול ${esc(s.label)}</strong></p><audio controls preload="none" src="${esc(s.audio)}" style="width:100%"></audio>`
+            : `<p class="smallnote" style="margin:8px 0 2px">קול ${esc(s.label)} — לא נוצר <span dir="ltr">(${esc(s.voice || '')}: ${esc(s.error || '')})</span></p>`).join(''));
       }
     }, e => { clearTimeout(timer); console.warn('aiTest', e); out.innerHTML = '<p class="warn">❌ אי־אפשר לקרוא את התשובה (כנראה כללי האבטחה עוד לא פורסמו).</p>'; btn.disabled = false; });
   } catch (e) {
