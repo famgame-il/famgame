@@ -1925,7 +1925,7 @@ function startGroup(gameId) {
   whoStopAll();
   groupCtx = { gameId, uid, state: null, group: null, players: [], assignment: null, started, submitted: false, results: null, eyesBuilt: false,
     who: { pick: {}, rec: null, pend: null, saving: false, msg: '' }, whoAssign: null, whoUrl: {}, whoLoads: {} };
-  showPlay('<div class="play-wrap"><div class="order-head"><h2 id="grpTitle">הקבוצה שלנו</h2><button class="game-btn" type="button" onclick="window.exitGroupGame(false)">← יציאה לאתר</button></div><div id="hostBox" aria-live="polite"></div><div id="grpMain"><p>טוענים…</p></div><div id="grpAdd"></div><div id="cropBox"></div><div id="grpStatus"></div></div>');
+  showPlay('<div class="play-wrap"><div class="order-head"><h2 id="grpTitle">הקבוצה שלנו</h2><button class="game-btn" type="button" onclick="window.exitGroupGame(false)">← יציאה לאתר</button></div><div id="hostBox" aria-live="polite"></div><div id="hostAgainBox"></div><div id="grpMain"><p>טוענים…</p></div><div id="grpAdd"></div><div id="cropBox"></div><div id="grpStatus"></div></div>');
   const c = groupCtx, r = () => renderGroup();
   playUnsubs.push(onSnapshot(liveDoc(gameId, 'state'), s => {
     // המשחק נמחק (יום אחרי המשחק) — מודיעים במקום להיתקע
@@ -2033,7 +2033,7 @@ function startHostVideo(c) {
   v.addEventListener('ended', open);
   v.addEventListener('error', () => { v.parentNode.hidden = true; open(); });
   /* never stuck: filtered internet that holds the video, or a very slow phone */
-  setTimeout(() => { if (v.readyState < 2) { v.parentNode.hidden = true; open(); } }, 8000);
+  setTimeout(() => { if (v.readyState < 1 && v.networkState !== 2) { v.parentNode.hidden = true; open(); } }, 8000);
   setTimeout(open, 60000);
   /* with sound if the phone allows it (the join tap usually does); otherwise silent + a big "sound" button */
   v.play().catch(() => {
@@ -2101,8 +2101,19 @@ function hostRender(c) {
   if (!m) { box.innerHTML = ''; return; }
   const pose = HOST_POSES.includes(m.pose) ? m.pose : 'welcome';
   const who = m.moment === 'finalGroup' && m.gid ? ((c.allGroups || []).find(g => g.id === m.gid) || {}).name : '';
-  box.innerHTML = `<div class="host-card${c.hostPlaying ? ' talking' : ''}"><img src="e-${pose}.jpg" alt="אלקנה החשמונאי" onerror="this.onerror=null;this.src='elkana.jpg'"><div class="host-bubble">${who ? `<strong>קבוצת ${esc(who)}:</strong> ` : ''}${esc(m.text || '')}</div></div>`;
+  box.innerHTML = `<div class="host-card${c.hostPlaying ? ' talking' : ''}"><img src="e-${pose}.jpg" alt="אלקנה החשמונאי" onerror="this.onerror=null;this.src='elkana.jpg'"><div class="host-bubble">${who ? `<strong>קבוצת ${esc(who)}:</strong> ` : ''}${esc(m.text || '')}</div></div>`
+    /* missed it? hear Elkana again / watch the opening video again (11.11.26, Ayelet) */
+    + `<div class="order-actions" style="justify-content:center;margin:-4px 0 8px"><button class="game-btn" type="button" style="font-size:14px" onclick="window.hostReplay()" ${c.hostPlaying ? 'disabled' : ''}>🔁 לשמוע שוב את אלקנה</button>${c.state && (c.state.photosOpen || c.state.stage !== 'photos') ? '<button class="game-btn" type="button" style="font-size:14px" onclick="window.hostIntroAgain()">🎬 סרטון הפתיחה</button>' : ''}</div>`;
 }
+window.hostReplay = function () {
+  const c = groupCtx; if (!c || !c.hostNow || c.hostPlaying) return;
+  c.hostQueue.unshift(c.hostNow); hostPlayNext(c);
+};
+window.hostIntroAgain = function () {
+  const box = document.getElementById('hostAgainBox'); if (!box) return;
+  if (box.innerHTML) { box.innerHTML = ''; return; }
+  box.innerHTML = `<div style="text-align:center;margin:0 0 10px"><video src="elkana-intro.mp4" poster="e-welcome.jpg" controls autoplay playsinline style="width:100%;max-width:420px;border-radius:14px;background:#000" onended="this.parentNode.parentNode.innerHTML=''" onerror="this.parentNode.innerHTML='<p class=smallnote>הסרטון לא נטען במכשיר הזה.</p>'"></video></div>`;
+};
 function renderGroup() {
   const c = groupCtx; if (!c || !c.state || !c.group) return;
   groupTick(c);
