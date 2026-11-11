@@ -161,7 +161,8 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
 .slot-count{position:absolute;top:8px;right:8px;background:#fff0c7;color:#14345d;border-radius:20px;padding:2px 10px;font-weight:900;font-size:14px}
 .now-box{background:#fff8e1;border:2px solid #ffc34b;border-radius:16px;padding:14px 16px;line-height:1.7}
 /* Ayelet 11.11.26 - Elkana on the group's phone: his pose + speech bubble; he "moves" while he talks */
-.host-card{display:flex;gap:10px;align-items:center;background:#eef3ff;border:2px solid #9db4ff;border-radius:18px;padding:8px 10px;margin:8px 0 12px}.host-card img{width:96px;height:96px;object-fit:cover;object-position:50% 20%;border-radius:14px;flex:none;transform-origin:50% 90%}.host-bubble{background:#fff;border-radius:14px;padding:8px 12px;font-size:17px;line-height:1.5;box-shadow:0 1px 4px #0002}
+/* (Ayelet: "only his head, and the words as a speech bubble") - a round head + a bubble with a tail, stuck to the top while scrolling */
+#hostBox{position:sticky;top:0;z-index:20;padding-top:4px}.host-card{display:flex;gap:8px;align-items:flex-start;margin:4px 0 10px}.host-card img{width:66px;height:66px;object-fit:cover;object-position:50% 40%;border-radius:50%;border:3px solid #ffc34b;background:#fff;flex:none;transform-origin:50% 90%;box-shadow:0 2px 6px #0003}.host-bubble{position:relative;flex:1;background:#fff;border:2px solid #ffc34b;border-radius:16px;padding:7px 12px 7px 64px;font-size:16px;line-height:1.5;box-shadow:0 2px 6px #0002}.host-bubble::before{content:'';position:absolute;top:20px;right:-11px;border-style:solid;border-width:8px 0 8px 11px;border-color:transparent transparent transparent #ffc34b}.host-typing{color:#6b7a8c;font-style:italic}.host-typing i{font-style:normal;animation:hostDot 1.2s infinite}.host-typing i:nth-child(2){animation-delay:.2s}.host-typing i:nth-child(3){animation-delay:.4s}@keyframes hostDot{0%,60%,100%{opacity:.2}30%{opacity:1}}.host-tools{position:absolute;left:6px;top:50%;transform:translateY(-50%);display:flex;gap:4px}.host-tools button{width:28px;height:28px;border-radius:50%;border:1px solid #e5d3a0;background:#fff8e1;font-size:14px;cursor:pointer;padding:0}.host-tools button:disabled{opacity:.5}.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (prefers-reduced-motion:no-preference){.host-card.talking img{animation:hostTalk .55s ease-in-out infinite alternate}@keyframes hostTalk{0%{transform:translateY(0) rotate(-2deg) scale(1)}100%{transform:translateY(-4px) rotate(2deg) scale(1.05)}}}.err-row{background:#fff;border-radius:10px;padding:8px 10px;margin:6px 0;font-size:14px;line-height:1.5;box-shadow:0 1px 4px #0001;word-break:break-word}.now-compact{padding:10px 14px}.now-cur{margin:4px 0 0;font-size:18px;font-weight:700;background:#ffeeb0;border-radius:10px;padding:6px 10px}.now-more{margin-top:6px;font-size:14px}.now-more summary{cursor:pointer;color:#5b6b80}.now-more ol{margin:6px 0 0}.now-box ol{margin:6px 0 0;padding-inline-start:24px}.now-box li{margin:4px 0}.now-box li.done{color:#6b7a8c}.now-box li.cur{font-weight:900;background:#ffeeb5;border-radius:8px;padding:2px 6px}.start-big{font-size:26px!important;padding:20px!important;width:100%;margin-top:10px}
 .join-code{font-size:34px;letter-spacing:6px;direction:ltr;display:inline-block}
 .member{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid #e8dfd2;border-radius:14px;padding:10px;flex-wrap:wrap}.member img{width:180px;max-width:100%;aspect-ratio:480/190;object-fit:cover;border-radius:10px;background:#000}
@@ -1024,6 +1025,7 @@ async function showAdminPanel(user) {
   adminBox().innerHTML = `<div class="order-head" style="margin-bottom:12px"><span>מחוברת כ־<span dir="ltr">${esc(user.email || '')}</span></span><span>${logout} <a class="game-btn" href="#" style="text-decoration:none">← לאתר</a></span></div>
     <div class="info"><h3>🧪 משחק בדיקה (חינם)</h3><p class="smallnote">משחק אמיתי להיום, בלי רכישה ובלי תשלום — כדי לבדוק את שלבים 1, 2, 3 בעצמך. אפשר לשחק עם 2 קבוצות בלבד (2 טלפונים), ומנהל המשחק במחשב או בטלפון שלישי.</p>
       <button class="game-btn" type="button" onclick="window.adminTestGame(this)">🧪 יצירת משחק בדיקה להיום</button></div>
+    <div class="info" id="aiUsageBox"><h3>🤖 הקרדיט של אלקנה (Anthropic)</h3><p class="smallnote">טוענים…</p></div>
     <div class="info"><h3>💳 תשלום בביט</h3><p class="smallnote">מה שתשמרי כאן מוצג ללקוחות אחרי שליחת הזמנה.</p>
       <label><strong>מספר הביט</strong><div class="order-actions"><input id="bitPhoneInput" type="tel" inputmode="tel" placeholder="050-1234567"></div></label>
       <label><strong>קישור לתשלום (רשות) — למשל קישור לקבוצה בפייבוקס</strong><div class="order-actions"><input id="bitLinkInput" type="url" dir="ltr" placeholder="https://..." style="flex:1;min-width:220px"></div></label>
@@ -1038,6 +1040,7 @@ async function showAdminPanel(user) {
       <div class="fields"><label>האימייל שהלקוחות רואים (מופיע באתר, הלקוחות עונים אליו, והזמנות חדשות נשלחות אליו) — לא אימייל אישי<input id="emAdminEmail" type="email" dir="ltr"></label><label>Service ID<input id="emServiceId" dir="ltr" placeholder="service_xxxxxxx"></label><label>Template ID<input id="emTemplateId" dir="ltr" placeholder="template_xxxxxxx"></label><label>Public Key<input id="emPublicKey" dir="ltr"></label></div>
       <div class="order-actions" style="margin-top:10px"><button class="game-btn" type="button" onclick="window.saveEmailCfg()">שמירה</button><button class="game-btn" type="button" onclick="window.testEmail()">שליחת מייל בדיקה אליי</button></div><p id="emMsg" class="smallnote" role="status"></p></div>
     <div id="credBox"></div><div class="admin-filter" id="adminFilter"></div><div id="ordersList"><p class="smallnote">טוענים הזמנות…</p></div>`;
+  window.loadAiUsage();
   try { const s = await getDoc(doc(db, 'settings', 'payment')); if (s.exists()) { document.getElementById('bitPhoneInput').value = formatPhone(s.data().bitPhone || ''); document.getElementById('bitLinkInput').value = s.data().bitLink || ''; } } catch (e) { console.warn(e); }
   await loadPricing();
   [['pcBase', 'basePrice'], ['pcUpTo', 'baseUpTo'], ['pcExtra', 'perExtra'], ['pcCap', 'cap']].forEach(([id, k]) => document.getElementById(id).value = PRICING[k]);
@@ -1199,6 +1202,27 @@ window.adminApprove = async function (id) {
   await showCred(o, password, `✅ התשלום אושר ונוצרה סיסמה עבור ${esc(o.buyerName)}`, 'התשלום התקבל — תודה! המשחק שלכם הוקם ✅', joinCode);
 };
 /* Ayelet 11.11.26 */
+/* Elkana's AI money: the server adds the cost of every AI call to settings/aiUsage. Here: how much of the credit was used,
+   a red warning from 80% (or if the credit ran out), and "I topped up" to start counting again */
+window.loadAiUsage = async function () {
+  const box = document.getElementById('aiUsageBox'); if (!box) return;
+  let u = {};
+  try { const s = await getDoc(doc(db, 'settings', 'aiUsage')); u = s.exists() ? s.data() : {}; } catch (e) { console.warn(e); box.innerHTML = '<h3>🤖 הקרדיט של אלקנה</h3><p class="smallnote">לא נטען — ודאי שכללי האבטחה פורסמו.</p>'; return; }
+  const budget = Number(u.budgetUsd) || 5, spent = Number(u.spentUsd) || 0, pct = Math.min(100, Math.round(spent / budget * 100)), left = Math.max(0, budget - spent);
+  const warn = u.creditProblem ? '<p class="warn" style="font-size:17px"><strong>🔴 הקרדיט ב־Anthropic נגמר (או שהמפתח לא עובד)!</strong> המשחק ממשיך, אבל אלקנה אומר רק משפטים מוכנים מראש. טעני קרדיט ב־console.anthropic.com ← Billing, ואז לחצי למטה ”טענתי קרדיט”.</p>'
+    : pct >= 80 ? `<p class="warn" style="font-size:17px"><strong>🟠 נוצלו ${pct}% מהקרדיט — כדאי לטעון עכשיו</strong> (console.anthropic.com ← Billing), לפני המשחק הבא.</p>` : '';
+  box.innerHTML = `<h3>🤖 הקרדיט של אלקנה (Anthropic)</h3>${warn}
+    <p>נוצלו בערך <strong>$${spent.toFixed(2)}</strong> מתוך <strong>$${budget}</strong> שטענת — נשארו בערך <strong>$${left.toFixed(2)}</strong> (${u.calls || 0} משפטים).</p>
+    <div style="background:#eee;border-radius:8px;height:14px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${pct >= 80 || u.creditProblem ? '#c0392b' : '#2e9d5b'}"></div></div>
+    <p class="smallnote">המספר הוא הערכה של השרת לפי כל משפט של אלקנה (Claude Sonnet). משחק אחד עולה בערך כמה סנטים. המספר המדויק — ב־console.anthropic.com.</p>
+    <div class="order-actions"><label>כמה טענתי ($)<input id="aiBudget" type="number" min="1" step="1" value="${budget}" style="width:80px"></label><button class="game-btn" type="button" onclick="window.aiTopUp()">💳 טענתי קרדיט — מתחילים לספור מחדש</button></div><p id="aiUsageMsg" class="smallnote" role="status"></p>`;
+};
+window.aiTopUp = async function () {
+  const b = Number(document.getElementById('aiBudget').value) || 5;
+  if (!confirm(`לרשום שטענת $${b}, ולהתחיל לספור מאפס?`)) return;
+  try { await setDoc(doc(db, 'settings', 'aiUsage'), { budgetUsd: b, spentUsd: 0, calls: 0, creditProblem: false, resetAt: serverTimestamp() }, { merge: true }); window.loadAiUsage(); }
+  catch (e) { console.warn(e); document.getElementById('aiUsageMsg').textContent = 'השמירה נכשלה. ודאי שכללי האבטחה פורסמו.'; }
+};
 /* The game opens by itself (no manager): the live documents are created when the payment is approved / a test game is made.
    auto: true = the server (Cloud Functions engine) runs the game and Elkana hosts it. */
 function autoLiveDocs(batch, gameId, joinCode, purchased) {
@@ -2018,23 +2042,38 @@ window.groupStuck = function (btn) {
 function hostVideoHtml(src, poster, label) {
   return `<div class="host-video" style="text-align:center;margin:10px 0;position:relative"><video id="hostVid" src="${src}" poster="${poster}" controls playsinline preload="auto" style="width:100%;max-width:420px;border-radius:14px;background:#000"></video><button id="hostUnmute" class="buy" type="button" hidden style="position:absolute;left:50%;top:40%;transform:translate(-50%,-50%)">🔊 לחצו לשמוע את אלקנה</button><p class="smallnote" style="margin:4px 0 0">${label}</p></div>`;
 }
-/* the opening video plays by itself; when it ends (or cannot play) the next button opens. Seen once per game on this phone */
-function hostVideoSeen(c) { try { return localStorage.getItem('familyGame.introSeen.' + c.gameId) === '1'; } catch (e) { return false; } }
-function startHostVideo(c) {
+/* Elkana's fixed videos (opening + before each stage + the winners): they play by themselves, one after the other;
+   the next button (#introGate) opens only when they end, or if they cannot play. Seen once per game on this phone */
+function hostVideoSeen(c, key) { try { return localStorage.getItem('familyGame.vid.' + c.gameId + '.' + key) === '1'; } catch (e) { return false; } }
+function videoGate(main, c, key, srcs, poster, label, inner, gateHtml, done) {
+  c.vidDone = c.vidDone || {};
+  const shown = !!(done || c.vidDone[key] || hostVideoSeen(c, key));
+  if (main.dataset.vgate === key && main.querySelector('#hostVid, #introGate')) {
+    /* same screen: only update the part after the video (and only if it changed - so animations do not restart) */
+    const gt = document.getElementById('introGate'); if (gt) { if (gt.dataset.h !== gateHtml) { gt.innerHTML = gateHtml; gt.dataset.h = gateHtml; } gt.hidden = !shown; }
+    return;
+  }
+  main.dataset.vgate = key;
+  main.innerHTML = (shown ? '' : hostVideoHtml(srcs[0], poster, label)) + inner + `<div id="introGate"${shown ? '' : ' hidden'}>${gateHtml}</div>`
+    + (shown ? '' : '<p id="introWait" class="smallnote" style="text-align:center">⏳ צופים בסרטון של אלקנה — ההמשך יופיע בסופו.</p>');
+  if (!shown) startHostVideo(c, key, srcs);
+}
+function startHostVideo(c, key, srcs) {
   const v = document.getElementById('hostVid'); if (!v || v.dataset.started) return;
   v.dataset.started = '1';
-  let opened = false;
+  let opened = false, i = 0;
   const open = () => {
-    if (opened) return; opened = true; c.introVideoDone = true;
-    try { localStorage.setItem('familyGame.introSeen.' + c.gameId, '1'); } catch (e) { }
+    if (opened) return; opened = true; c.vidDone = c.vidDone || {}; c.vidDone[key] = true;
+    try { localStorage.setItem('familyGame.vid.' + c.gameId + '.' + key, '1'); } catch (e) { }
     const gt = document.getElementById('introGate'); if (gt) gt.hidden = false;
     const w = document.getElementById('introWait'); if (w) w.remove();
   };
-  v.addEventListener('ended', open);
+  /* the next video in the list (e.g. opening -> stage 1), then the button */
+  v.addEventListener('ended', () => { i++; if (srcs && i < srcs.length) { v.src = srcs[i]; v.play().catch(() => open()); } else open(); });
   v.addEventListener('error', () => { v.parentNode.hidden = true; open(); });
   /* never stuck: filtered internet that holds the video, or a very slow phone */
   setTimeout(() => { if (v.readyState < 1 && v.networkState !== 2) { v.parentNode.hidden = true; open(); } }, 8000);
-  setTimeout(open, 60000);
+  setTimeout(open, 100000);
   /* with sound if the phone allows it (the join tap usually does); otherwise silent + a big "sound" button */
   v.play().catch(() => {
     v.muted = true;
@@ -2070,13 +2109,16 @@ function groupTick(c) {
 const HOST_POSES = ['welcome', 'instructions', 'listen', 'start', 'attention', 'hourglass', 'bravo', 'magnifier', 'trophy', 'thumbs', 'thanks'];
 function hostAudio() { return window.__hostAudio || (window.__hostAudio = new Audio()); }
 /* phones play sound only after a tap: the first tap in the game "unlocks" Elkana's voice */
+/* (any first tap on the site - also the "הצטרפות" button itself - so Elkana talks by himself from the first moment) */
 document.addEventListener('click', function unlockHost() {
-  if (!groupCtx || window.__hostUnlocked) return;
+  if (window.__hostUnlocked) return;
   window.__hostUnlocked = true;
   try { const a = hostAudio(); a.src = silentWav(); a.play().catch(() => { window.__hostUnlocked = false; }); } catch (e) { }
 }, true);
 function hostListen(c) {
   c.hostQueue = []; c.hostSeen = null;
+  /* "אלקנה מקליד…" - the server marks when the AI starts writing a line (like WhatsApp) */
+  playUnsubs.push(onSnapshot(liveDoc(c.gameId, 'hostTyping'), s => { c.hostTypingAt = s.exists() ? tsMs(s.data().at) : 0; hostRender(c); }, () => { }));
   playUnsubs.push(onSnapshot(query(collection(db, 'familyGames', c.gameId, 'host'), orderBy('seq', 'desc'), limit(12)), s => {
     const msgs = s.docs.map(d => d.data()).sort((a, b) => a.seq - b.seq);
     if (c.hostSeen === null) {
@@ -2090,20 +2132,41 @@ function hostListen(c) {
 }
 function hostPlayNext(c) {
   if (c.hostPlaying || !c.hostQueue.length) return;
-  const m = c.hostQueue.shift(); c.hostNow = m; c.hostPlaying = true; hostRender(c);
+  /* never talk over one of Elkana's videos - wait until it ends */
+  const vid = document.getElementById('hostVid');
+  if (vid && !vid.paused && !vid.ended && vid.closest('.host-video') && !vid.closest('.host-video').hidden) { clearTimeout(c.hostWait); c.hostWait = setTimeout(() => hostPlayNext(c), 1000); return; }
+  const m = c.hostQueue.shift(); c.hostNow = m; c.hostPlaying = true;
+  /* the words are "typed" into the bubble, letter by letter, while he talks */
+  clearInterval(c.hostTypeTimer); c.hostTyped = 0; hostRender(c);
+  const full = String(m.text || '');
+  c.hostTypeTimer = setInterval(() => {
+    c.hostTyped = Math.min(full.length, c.hostTyped + 2);
+    const el = document.querySelector('#hostBox .host-text'); if (el) el.textContent = full.slice(0, c.hostTyped);
+    if (c.hostTyped >= full.length) clearInterval(c.hostTypeTimer);
+  }, 45);
   const done = () => { c.hostPlaying = false; hostRender(c); setTimeout(() => hostPlayNext(c), 600); };
   if (!m.audio) { setTimeout(done, Math.min(9000, 2500 + String(m.text || '').length * 60)); return; }
   const a = hostAudio(); a.onended = done; a.onerror = done; a.src = m.audio;
-  a.play().catch(() => setTimeout(done, Math.min(9000, 2500 + String(m.text || '').length * 60)));
+  /* the phone did not allow sound yet (no tap since the page opened) - show the line, and "🔁" plays it */
+  a.play().then(() => { c.hostMuted = false; }).catch(() => { c.hostMuted = true; hostRender(c); setTimeout(done, Math.min(9000, 2500 + String(m.text || '').length * 60)); });
 }
 function hostRender(c) {
-  const box = document.getElementById('hostBox'), m = c && c.hostNow; if (!box) return;
+  const box = document.getElementById('hostBox'); if (!box || !c) return;
+  /* before the first line: only "אלקנה מקליד…" if he is already writing */
+  const m = c.hostNow || (c.hostTypingAt && Date.now() - c.hostTypingAt < 45000 ? { text: '', pose: 'welcome' } : null);
   if (!m) { box.innerHTML = ''; return; }
   const pose = HOST_POSES.includes(m.pose) ? m.pose : 'welcome';
   const who = m.moment === 'finalGroup' && m.gid ? ((c.allGroups || []).find(g => g.id === m.gid) || {}).name : '';
-  box.innerHTML = `<div class="host-card${c.hostPlaying ? ' talking' : ''}"><img src="e-${pose}.jpg" alt="אלקנה החשמונאי" onerror="this.onerror=null;this.src='elkana.jpg'"><div class="host-bubble">${who ? `<strong>קבוצת ${esc(who)}:</strong> ` : ''}${esc(m.text || '')}</div></div>`
-    /* missed it? hear Elkana again / watch the opening video again (11.11.26, Ayelet) */
-    + `<div class="order-actions" style="justify-content:center;margin:-4px 0 8px"><button class="game-btn" type="button" style="font-size:14px" onclick="window.hostReplay()" ${c.hostPlaying ? 'disabled' : ''}>🔁 לשמוע שוב את אלקנה</button>${c.state && (c.state.photosOpen || c.state.stage !== 'photos') ? '<button class="game-btn" type="button" style="font-size:14px" onclick="window.hostIntroAgain()">🎬 סרטון הפתיחה</button>' : ''}</div>`;
+  /* only his head + the words in a speech bubble; small round buttons: hear again / the opening video again (11.11.26, Ayelet) */
+  const tools = `<span class="host-tools"><button type="button" onclick="window.hostReplay()" title="לשמוע שוב" ${c.hostPlaying ? 'disabled' : ''}>🔁<span class="vh">לשמוע שוב את אלקנה</span></button>${c.state && (c.state.photosOpen || c.state.stage !== 'photos') ? '<button type="button" onclick="window.hostIntroAgain()" title="סרטון הפתיחה">🎬<span class="vh">סרטון הפתיחה</span></button>' : ''}</span>`;
+  /* h-<pose>.jpg = only his head (square crops of the 16 poses, 11.11.26 - Ayelet: "only the head") */
+  /* while the server is writing the next line (and nothing is playing) - "אלקנה מקליד…" with moving dots */
+  const typing = !c.hostPlaying && !c.hostQueue.length && c.hostTypingAt && Date.now() - c.hostTypingAt < 45000;
+  const shownText = c.hostPlaying && c.hostTyped != null ? String(m.text || '').slice(0, c.hostTyped) : String(m.text || '');
+  const body = typing ? '<span class="host-typing">אלקנה מקליד<i>.</i><i>.</i><i>.</i></span>'
+    : `${who ? `<strong>קבוצת ${esc(who)}:</strong> ` : ''}<span class="host-text">${esc(shownText)}</span>`;
+  box.innerHTML = `<div class="host-card${c.hostPlaying ? ' talking' : ''}"><img src="h-${typing ? 'thinking' : pose}.jpg" alt="אלקנה החשמונאי" onerror="this.onerror=null;this.src='e-${pose}.jpg'"><div class="host-bubble">${body}${tools}</div></div>`
+    + (c.hostMuted ? '<p class="smallnote" style="text-align:center;margin:-6px 0 6px;background:#fff8e1;border-radius:10px;padding:4px">🔇 לחצו 🔁 כדי לשמוע את אלקנה — ומעכשיו הוא ידבר לבד.</p>' : '');
 }
 window.hostReplay = function () {
   const c = groupCtx; if (!c || !c.hostNow || c.hostPlaying) return;
@@ -2128,10 +2191,8 @@ function renderGroup() {
     if (!c.state.photosOpen && !c.group.ready && !c.players.length) {
       // מסך פתיחה: הוראות + הסבר, ”הבנו”, ומחכים שמנהל המשחק יפתח את הצילום לכולם
       /* 11.11.26 (Ayelet): the opening video of Elkana plays by itself; "הבנתי" appears only when the video ends (or if it cannot load - never stuck) */
-      const shown = !!(c.introVideoDone || hostVideoSeen(c) || (c.group.gotIt && c.group.gotIt.s1));
-      if (main.querySelector('#hostVid')) { const gt = document.getElementById('introGate'); if (gt) { gt.innerHTML = gotItHtml(c, 's1'); gt.hidden = !shown; } add.hidden = true; return; }
-      main.innerHTML = hostVideoHtml('elkana-intro.mp4', 'e-welcome.jpg', 'אלקנה מברך אתכם 🔊') + stageHeadline(1) + LEARN_TITLE + `<div class="now-box" style="text-align:center"><p style="font-size:22px;margin:0 0 6px"><strong>✅ הצטרפתם למשחק בהצלחה!</strong></p><p style="font-size:19px;margin:0 0 6px">אתם <strong>קבוצה מספר ${esc(c.group.index || '')} — ”${esc(c.group.name)}”</strong> 👋</p><p>בשלב הראשון כל אחד מהקבוצה מצטלם בטלפון הזה — שם מלא וצילום פנים מקרוב. צפו קודם בהסבר הקצר.</p><button class="game-btn" type="button" onclick="openStage(1,true)">▶ צפייה בהסבר</button></div>` + `<div id="introGate"${shown ? '' : ' hidden'}>${gotItHtml(c, 's1')}</div>` + (shown ? '' : '<p id="introWait" class="smallnote" style="text-align:center">⏳ צופים בסרטון של אלקנה — הכפתור ”הבנתי” יופיע בסופו.</p>');
-      startHostVideo(c);
+      /* the opening video + the stage-1 video play by themselves; "הבנתי" appears only when they end (never stuck) */
+      videoGate(main, c, 's1', ['elkana-intro.mp4', 'elkana-stage1.mp4'], 'e-welcome.jpg', 'אלקנה מברך אתכם 🔊', stageHeadline(1) + LEARN_TITLE + `<div class="now-box" style="text-align:center"><p style="font-size:22px;margin:0 0 6px"><strong>✅ הצטרפתם למשחק בהצלחה!</strong></p><p style="font-size:19px;margin:0 0 6px">אתם <strong>קבוצה מספר ${esc(c.group.index || '')} — ”${esc(c.group.name)}”</strong> 👋</p><p>בשלב הראשון כל אחד מהקבוצה מצטלם בטלפון הזה — שם מלא וצילום פנים מקרוב. צפו קודם בהסבר הקצר.</p><button class="game-btn" type="button" onclick="openStage(1,true)">▶ צפייה בהסבר</button></div>`, gotItHtml(c, 's1'), !!(c.group.gotIt && c.group.gotIt.s1));
       add.hidden = true; return;
     }
     if (c.group.ready) {
@@ -2170,9 +2231,10 @@ function renderGroup() {
   } else if (c.state.stage === 'final') {
     add.hidden = true; add.innerHTML = ''; crop.innerHTML = '';
     whoStopAll(); c.whoBuilt = null;
-    if (!main.querySelector('.finale')) main.innerHTML = finaleHtml(c.results, c.uid)
+    /* first Elkana's winners video (by itself), then the festive announcement and the table */
+    videoGate(main, c, 'final', ['elkana-winners.mp4'], 'e-trophy.jpg', '🏆 ההכרזה הגדולה!', '', finaleHtml(c.results, c.uid)
       + '<div class="order-actions" style="justify-content:center;margin-top:14px"><button class="buy" type="button" onclick="window.exitGroupGame(false)">🏠 סיום — חזרה לאתר</button><button class="game-btn" type="button" onclick="window.exitGroupGame(true)">👥 הצטרפות למשחק אחר (קוד חדש)</button></div>'
-      + '<p class="smallnote" style="text-align:center">אחרי היציאה, הטלפון הזה כבר לא יחזור לבד למשחק הזה.</p>';
+      + '<p class="smallnote" style="text-align:center">אחרי היציאה, הטלפון הזה כבר לא יחזור לבד למשחק הזה.</p>');
   }
 }
 // ---------- שלב 1: ”מכונת מזל” של עיניים — רצות מהר, עוצרות על זוג, כותבים של מי, ושוב ----------
@@ -2573,8 +2635,8 @@ function renderGroupAssoc(main) {
   if (st.stage === 'assocIntro') {
     c.assocBuilt = null;
     const secs = st.assocSecsPlan || ASSOC_SECS;
-    main.innerHTML = stageHeadline(2) + LEARN_TITLE + nowBox('שלב 2 — מה זה מזכיר לכם? 💭', ['תמונה רצה מהר מהר — ועוצרת. כל הקבוצות רואות את אותה תמונה.', `⏱️ יש לכם עד ${secsText(secs)} לכל תמונה (השעון רץ למעלה במסך): כותבים בתיבה שמתחת לתמונה כמה שיותר דברים שהיא מזכירה לכם על המשפחה או על החג — כל רעיון בנפרד, ולוחצים ”הוספה”.`, 'תשובה תקינה = קשר אמיתי למשפחה או לחג (למשל לזר פרחים: ”סבא קונה לסבתא כל שישי פרחים לשבת”). ”פרחים יפים” לא נחשב!', 'ככה 10 תמונות. בסוף בודקים יחד את הקבוצה עם הכי הרבה תשובות — עד מקום ראשון, שני ושלישי.'], 0)
-      + '<button class="game-btn" type="button" onclick="openStage(2,true)">▶ צפייה בהסבר</button>' + gotItHtml(c, 's2');
+    videoGate(main, c, 's2', ['elkana-stage2.mp4'], 'e-instructions.jpg', 'אלקנה מסביר את שלב 2 🔊', stageHeadline(2) + LEARN_TITLE + nowBox('שלב 2 — מה זה מזכיר לכם? 💭', ['תמונה רצה מהר מהר — ועוצרת. כל הקבוצות רואות את אותה תמונה.', `⏱️ יש לכם עד ${secsText(secs)} לכל תמונה (השעון רץ למעלה במסך): כותבים בתיבה שמתחת לתמונה כמה שיותר דברים שהיא מזכירה לכם על המשפחה או על החג — כל רעיון בנפרד, ולוחצים ”הוספה”.`, 'תשובה תקינה = קשר אמיתי למשפחה או לחג (למשל לזר פרחים: ”סבא קונה לסבתא כל שישי פרחים לשבת”). ”פרחים יפים” לא נחשב!', 'ככה 10 תמונות. בסוף בודקים יחד את הקבוצה עם הכי הרבה תשובות — עד מקום ראשון, שני ושלישי.'], 0)
+      + '<button class="game-btn" type="button" onclick="openStage(2,true)">▶ צפייה בהסבר</button>', gotItHtml(c, 's2'), !!(c.group.gotIt && c.group.gotIt.s2));
     return;
   }
   if (st.stage === 'assocCheck') {
@@ -2871,11 +2933,10 @@ function renderGroupWho(main) {
   if (st.stage !== 'whoRecord') { const w = c.who; if (w.rec) whoStopAll(); w.pend = null; }
   if (st.stage === 'whoIntro') {
     c.whoBuilt = null;
-    if (main.querySelector('#whoIntro')) { const b = document.getElementById('gotItBox'); if (b) b.innerHTML = gotItHtml(c, 's3'); return; }
     const recMin = st.whoRecMinPlan || WHO_REC_MINUTES;
-    main.innerHTML = `<div id="whoIntro">${stageHeadline(3)}${LEARN_TITLE}${nowBox('שלב 3 — מי אמר את זה?! 🎙️', [`יש ${WHO_SAID_QUESTIONS.length} שאלות מצחיקות. על כל שאלה עונה משתתף אחד מהקבוצה — כל פעם מישהו אחר. מקליטים בטלפון של הקבוצה, עד 20 שניות לכל תשובה, כמו הודעה קולית. לכל ההקלטות יחד יש ${recMin} דקות.`, 'אחר כך האתר משנה את הקולות 😄 וכל קבוצה שומעת הקלטות של הקבוצות האחרות — שאלה אחרי שאלה, עם שעון.', 'מי לדעתכם אמר כל תשובה? מקלידים את תחילת השם ובוחרים מהרשימה (אפשר לבחור רק שם מהרשימה). כל זיהוי נכון = נקודה!'], 0, 'לפני שלוחצים ”הבנתי”: לוחצים ”🎙️ בדיקת מיקרופון” ומאשרים גישה.')}
+    videoGate(main, c, 's3', ['elkana-stage3.mp4'], 'e-instructions.jpg', 'אלקנה מסביר את שלב 3 🔊', `<div id="whoIntro">${stageHeadline(3)}${LEARN_TITLE}${nowBox('שלב 3 — מי אמר את זה?! 🎙️', [`יש ${WHO_SAID_QUESTIONS.length} שאלות מצחיקות. על כל שאלה עונה משתתף אחד מהקבוצה — כל פעם מישהו אחר. מקליטים בטלפון של הקבוצה, עד 20 שניות לכל תשובה, כמו הודעה קולית. לכל ההקלטות יחד יש ${recMin} דקות.`, 'אחר כך האתר משנה את הקולות 😄 וכל קבוצה שומעת הקלטות של הקבוצות האחרות — שאלה אחרי שאלה, עם שעון.', 'מי לדעתכם אמר כל תשובה? מקלידים את תחילת השם ובוחרים מהרשימה (אפשר לבחור רק שם מהרשימה). כל זיהוי נכון = נקודה!'], 0, 'לפני שלוחצים ”הבנתי”: לוחצים ”🎙️ בדיקת מיקרופון” ומאשרים גישה.')}
       <button class="buy" type="button" onclick="window.whoMicTest(this)">🎙️ בדיקת מיקרופון</button><p class="smallnote" id="whoMicMsg"></p>
-      <button class="game-btn" type="button" onclick="openStage(3,true)">▶ צפייה בהסבר</button><div id="gotItBox">${gotItHtml(c, 's3')}</div></div>`;
+      <button class="game-btn" type="button" onclick="openStage(3,true)">▶ צפייה בהסבר</button></div>`, gotItHtml(c, 's3'), !!(c.group.gotIt && c.group.gotIt.s3));
     return;
   }
   if (st.stage === 'whoRecord') {
