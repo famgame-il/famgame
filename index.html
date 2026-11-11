@@ -159,7 +159,10 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
 .slot.char-slot img.char-bg{filter:none}.slot.char-slot .slot-count{top:44px}
 .eyes-card .char-card{max-width:300px}.eyes-card .char-name{font-size:19px}.eyes-card .char-pic img{max-width:none;aspect-ratio:auto}
 .slot-count{position:absolute;top:8px;right:8px;background:#fff0c7;color:#14345d;border-radius:20px;padding:2px 10px;font-weight:900;font-size:14px}
-.now-box{background:#fff8e1;border:2px solid #ffc34b;border-radius:16px;padding:14px 16px;line-height:1.7}.err-row{background:#fff;border-radius:10px;padding:8px 10px;margin:6px 0;font-size:14px;line-height:1.5;box-shadow:0 1px 4px #0001;word-break:break-word}.now-compact{padding:10px 14px}.now-cur{margin:4px 0 0;font-size:18px;font-weight:700;background:#ffeeb0;border-radius:10px;padding:6px 10px}.now-more{margin-top:6px;font-size:14px}.now-more summary{cursor:pointer;color:#5b6b80}.now-more ol{margin:6px 0 0}.now-box ol{margin:6px 0 0;padding-inline-start:24px}.now-box li{margin:4px 0}.now-box li.done{color:#6b7a8c}.now-box li.cur{font-weight:900;background:#ffeeb5;border-radius:8px;padding:2px 6px}.start-big{font-size:26px!important;padding:20px!important;width:100%;margin-top:10px}
+.now-box{background:#fff8e1;border:2px solid #ffc34b;border-radius:16px;padding:14px 16px;line-height:1.7}
+/* Ayelet 11.11.26 - Elkana on the group's phone: his pose + speech bubble; he "moves" while he talks */
+.host-card{display:flex;gap:10px;align-items:center;background:#eef3ff;border:2px solid #9db4ff;border-radius:18px;padding:8px 10px;margin:8px 0 12px}.host-card img{width:96px;height:96px;object-fit:cover;object-position:50% 20%;border-radius:14px;flex:none;transform-origin:50% 90%}.host-bubble{background:#fff;border-radius:14px;padding:8px 12px;font-size:17px;line-height:1.5;box-shadow:0 1px 4px #0002}
+@media (prefers-reduced-motion:no-preference){.host-card.talking img{animation:hostTalk .55s ease-in-out infinite alternate}@keyframes hostTalk{0%{transform:translateY(0) rotate(-2deg) scale(1)}100%{transform:translateY(-4px) rotate(2deg) scale(1.05)}}}.err-row{background:#fff;border-radius:10px;padding:8px 10px;margin:6px 0;font-size:14px;line-height:1.5;box-shadow:0 1px 4px #0001;word-break:break-word}.now-compact{padding:10px 14px}.now-cur{margin:4px 0 0;font-size:18px;font-weight:700;background:#ffeeb0;border-radius:10px;padding:6px 10px}.now-more{margin-top:6px;font-size:14px}.now-more summary{cursor:pointer;color:#5b6b80}.now-more ol{margin:6px 0 0}.now-box ol{margin:6px 0 0;padding-inline-start:24px}.now-box li{margin:4px 0}.now-box li.done{color:#6b7a8c}.now-box li.cur{font-weight:900;background:#ffeeb5;border-radius:8px;padding:2px 6px}.start-big{font-size:26px!important;padding:20px!important;width:100%;margin-top:10px}
 .join-code{font-size:34px;letter-spacing:6px;direction:ltr;display:inline-block}
 .member{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid #e8dfd2;border-radius:14px;padding:10px;flex-wrap:wrap}.member img{width:180px;max-width:100%;aspect-ratio:480/190;object-fit:cover;border-radius:10px;background:#000}
 .eyes-card{flex-direction:column;align-items:stretch;text-align:center}.eyes-card img{width:100%}.eyes-preview{width:100%;max-width:480px;border-radius:12px;display:block;margin:8px auto}
@@ -180,7 +183,7 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
       <button class="start-option primary" type="button" onclick="startPlaying()">
         <span class="start-icon" aria-hidden="true">▶️</span>
         <strong>אני רוצה לשחק</strong>
-        <small>מנהל המשחק (אימייל וסיסמה) או קבוצה (קוד הצטרפות)</small>
+        <small>כל קבוצה מצטרפת עם קוד ההצטרפות</small>
       </button>
     </div>
     <div class="start-purchase"><button class="buy" type="button" onclick="enterSiteAndPurchase()">🛒 לרכישת המשחק ↓</button></div>
@@ -202,8 +205,8 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
 <section class="section" id="before"><div class="head"><h2>מה צריך כדי לשחק?</h2></div><div class="before-grid">
 <article class="info"><strong>👥 קבוצות של עד 5</strong>מתחלקים במקום לקבוצות של עד 5 משתתפים — לפחות 3 קבוצות. אפשר גם פחות מ־5 בקבוצה.</article>
 <article class="info"><strong>📱 טלפון אחד לכל קבוצה</strong>כל הקבוצה משחקת מטלפון אחד: מצלמים, כותבים ומקליטים בו — רק כשהמשחק מבקש. אפשר גם מחשב עם מצלמה ומיקרופון, אבל טלפון נוח יותר ומומלץ.</article>
-<article class="info"><strong>🎬 מנהל המשחק + טלפון נפרד</strong>מי שרכש, או מישהו אחר שבחרתם. הוא מתחיל את המשחק ומעביר בין השלבים, מטלפון משלו — לא אחד מהטלפונים של הקבוצות.</article>
-<article class="info"><strong>🔢 קוד הצטרפות</strong>מנהל המשחק מקבל במייל קוד בן 6 ספרות. כל הקבוצות מקלידות את אותו קוד — והן במשחק.</article>
+<article class="info"><strong>🤖 אלקנה החשמונאי מנחה</strong>אין מנהל משחק ואין טלפון נוסף — כולם משחקים! אלקנה, המנחה המצחיק שלנו, מסביר כל שלב, מעביר הלאה לבד ומכריז על המנצחים.</article>
+<article class="info"><strong>🔢 קוד הצטרפות</strong>מי שרכש מקבל במייל קישור עם קוד בן 6 ספרות ושולח אותו לכל הקבוצות. כל הקבוצות נכנסות עם אותו קוד — והן במשחק.</article>
 <article class="info"><strong>🔀 כל אחד בטלפון שלו — ומשחקים עם כולם</strong>האתר מערבב בין כל הקבוצות: בשלב 1 ובשלב 3 כל קבוצה מקבלת את התמונות וההקלטות של הקבוצות האחרות — אף פעם לא של עצמה.</article>
 </div>
 <div class="notneed"><h3>ומה לא צריך? 🙌</h3><div class="nn-cube" aria-hidden="true"><div class="nn-box" id="nnBox"><div class="nn-face nn-front">❌ הכנה מראש</div><div class="nn-face nn-bottom"></div></div></div>
@@ -232,35 +235,33 @@ document.addEventListener('DOMContentLoaded', () => {
 </script></section>
 <section class="section" id="how"><div class="head"><h2>איך זה עובד?</h2></div><div class="steps-flow">
 <div class="step-circle s1"><span class="sn">1</span><span class="si">🛒</span><h3>רוכשים</h3><p>בוחרים מספר משתתפים ותאריך, ומשלמים בביט.</p></div>
-<div class="step-circle s2"><span class="sn">2</span><span class="si">📧</span><h3>מקבלים מייל</h3><p>סיסמה למנהל המשחק וקוד הצטרפות לקבוצות.</p></div>
+<div class="step-circle s2"><span class="sn">2</span><span class="si">📧</span><h3>מקבלים מייל</h3><p>קישור עם קוד הצטרפות — שולחים אותו לכל הקבוצות.</p></div>
 <div class="step-circle s3"><span class="sn">3</span><span class="si">👥</span><h3>ביום המשחק</h3><p>מתחלקים לקבוצות, וכל קבוצה מצטרפת עם הקוד.</p></div>
-<div class="step-circle s4"><span class="sn">4</span><span class="si">🎉</span><h3>משחקים!</h3><p>מנהל המשחק מעביר בין השלבים, והאתר מסביר הכול.</p></div>
+<div class="step-circle s4"><span class="sn">4</span><span class="si">🎉</span><h3>משחקים!</h3><p>אלקנה החשמונאי מסביר, מצחיק ומעביר בין השלבים — לבד.</p></div>
 </div><p class="smallnote" style="text-align:center;margin-top:14px">המשחק פתוח רק בתאריך שבחרתם, מ־6:00 בבוקר עד 1:00 בלילה.</p></section>
 <section class="section" id="who"><div class="head"><h2>למי זה מתאים?</h2><p>לכל מי שרוצה להתגבש 😉</p></div><div class="who-chips"><span>🏡 משפחות</span><span>🧑‍🤝‍🧑 חברים</span><span>💼 צוותי עבודה</span><span>🏫 כיתות ומחזורים</span><span>🎉 וכל קבוצה</span></div><p style="text-align:center;margin:12px 0 0">🕍 מותאם לציבור הדתי</p></section>
 <section class="section" id="faq"><div class="head"><h2>שאלות נפוצות</h2></div>
 <details><summary>האם צריך להכין משהו מראש?</summary><p><strong>לא.</strong> המשחק מוכן מראש. לא מכינים תמונות, שאלות או חומרי משחק — האתר מנחה אתכם במהלך המשחק.</p></details>
 <details><summary>כמה אנשים בכל קבוצה?</summary><p>עד 5 משתתפים בקבוצה (אפשר גם פחות), ולפחות 3 קבוצות. האתר לא מאפשר לרשום יותר מ־5 בקבוצה — אם אתם יותר, מתחלקים לשתי קבוצות.</p></details>
-<details><summary>כמה טלפונים צריך?</summary><p>טלפון אחד לכל קבוצה, ועוד טלפון נפרד למנהל המשחק. (אפשר גם מחשב עם מצלמה ומיקרופון — אבל טלפון נוח יותר ומומלץ.)</p></details>
-<details><summary>מי הוא מנהל המשחק?</summary><p>מי שרכש את המשחק, או מישהו אחר שבחרתם לנהל אותו. הוא מפעיל את האירוע: פותח את המשחק, רואה אילו קבוצות הצטרפו, מתחיל כל שלב ומעביר לשלב הבא.</p></details>
-<details><summary>מה ההבדל בין מנהל המשחק לקבוצה?</summary><p>מנהל המשחק מפעיל את האירוע ממסך הניהול, עם אימייל וסיסמה. כל קבוצה משחקת בטלפון שלה, עם קוד ההצטרפות. הקוד רק מצרף קבוצות — הוא לא נותן הרשאות ניהול. מנהל המשחק לא חייב להיות חלק מקבוצה.</p></details>
-<details><summary>איך מנהל המשחק נכנס?</summary><p>עם האימייל והסיסמה שקיבל במייל אחרי התשלום: באתר לוחצים ”אני רוצה לשחק” ← ”אני מנהל המשחק”.</p></details>
-<details><summary>איך הקבוצות מצטרפות?</summary><p>כל קבוצה פותחת את האתר בטלפון שלה ← ”אני רוצה לשחק” ← ”אנחנו קבוצה”, ומקלידה את קוד ההצטרפות בן 6 הספרות שקיבלה ממנהל המשחק (או לוחצת על הקישור שהוא שלח).</p></details>
-<details><summary>מי מתחיל את המשחק ומי מעביר לשלב הבא?</summary><p>רק מנהל המשחק. הקבוצות מבצעות את המשימות בטלפונים שלהן, ומחכות שמנהל המשחק יעביר הלאה. קבוצה לא יכולה להתחיל שלב בעצמה.</p></details>
-<details><summary>הצטרפנו — אבל המשחק עוד לא התחיל?</summary><p>מיד אחרי ההצטרפות מתכוננים לשלב הראשון (כל משתתף מצטלם). את השעון מפעיל מנהל המשחק, כשכל הקבוצות מוכנות. במסך של כל קבוצה כתוב תמיד מה עושים עכשיו ולמה מחכים.</p></details>
+<details><summary>כמה טלפונים צריך?</summary><p>טלפון אחד לכל קבוצה — וזהו. אין מנהל משחק ואין טלפון נוסף. (אפשר גם מחשב עם מצלמה ומיקרופון — אבל טלפון נוח יותר ומומלץ.)</p></details>
+<details><summary>מי מנחה את המשחק?</summary><p>אלקנה החשמונאי — מנחה מצחיק שמופיע בכל הטלפונים ומדבר בקול: מקבל כל קבוצה, מסביר כל שלב בקצרה, מעביר הלאה לבד, מכריז על המנצחים ואומר מה הוא חושב על כל קבוצה. כולם משחקים — אף אחד לא צריך ”לנהל”.</p></details>
+<details><summary>איך הקבוצות מצטרפות?</summary><p>מי שרכש מקבל במייל קישור עם קוד הצטרפות בן 6 ספרות ושולח אותו לכל הקבוצות. כל קבוצה פותחת את הקישור בטלפון שלה (או נכנסת לאתר ← ”אני רוצה לשחק” ומקלידה את הקוד), כותבת שם לקבוצה — והיא במשחק.</p></details>
+<details><summary>מתי המשחק מתחיל ומי מעביר לשלב הבא?</summary><p>המשחק מתחיל כשכל הקבוצות מוכנות: אם הגיעו כל המשתתפים שהוזמנו — מיד. אם הגיעו פחות — כל הקבוצות לוחצות ”כולנו כאן — מתחילים” (אחרי כמה דקות אלקנה מתחיל בעצמו, ומי שצריך עוד רגע לוחץ ”רגע, עוד לא!”). בין השלבים אלקנה מעביר הלאה לבד — כשכל הקבוצות סיימו או כשהזמן נגמר.</p></details>
+<details><summary>ומה אם משהו נתקע?</summary><p>לא נתקע 🙂 לכל שלב יש שעון, והשרת מעביר הלאה גם אם קבוצה לא סיימה. ויש בכל טלפון כפתור ”המשחק תקוע?” — אם רוב הקבוצות לוחצות, ממשיכים.</p></details>
 <details><summary>כל קבוצה משחקת לבד בטלפון שלה?</summary><p>כל קבוצה משחקת מהטלפון שלה — אבל כולם משחקים יחד. האתר מערבב בין כל הקבוצות: בשלב 1 כל קבוצה מזהה תמונות של בני משפחה מהקבוצות האחרות, ובשלב 3 שומעת הקלטות של הקבוצות האחרות. קבוצה אף פעם לא מקבלת את התמונות או ההקלטות של עצמה. בשלב 2 כל הקבוצות רואות את אותה תמונה באותו רגע, ובסוף משווים בין כולן.</p></details>
-<details><summary>האם חייבים מקרן?</summary><p>לא. אפשר להקרין את המסך של מנהל המשחק כדי שכולם יראו, אבל אפשר לשחק גם בלי.</p></details>
+<details><summary>האם חייבים מקרן?</summary><p>לא. כל קבוצה רואה ושומעת את אלקנה בטלפון שלה.</p></details>
 <details><summary>אילו תמונות צריך לצלם?</summary><p>רק בשלב 1: כל משתתף מצטלם בטלפון של הקבוצה — פנים מקרוב — כשהמשחק מבקש. מישהו מהקבוצה מצלם אותו (או סלפי). בשלב 2 התמונות מגיעות מהאתר — לא מצלמים כלום. בשלב 3 לא מצלמים, רק מקליטים.</p></details>
 <details><summary>למה מופיעים בשלב 2 מספרים, אותיות ותמונות?</summary><p>זה רמז: כותבים כמה שיותר דברים שהתמונה מזכירה לכם על המשפחה. למשל לתמונה של זר פרחים: ”סבא קונה לסבתא כל שישי פרחים לשבת”. בסרטון ההסבר של שלב 2 יש דוגמה.</p></details>
 <details><summary>כמה משתתפים אפשר?</summary><p>בין 10 ל־100 משתתפים לאירוע, לפי המספר שרכשתם. כשהמכסה מתמלאת, אי־אפשר להוסיף עוד משתתפים או קבוצות.</p></details>
-<details><summary>מה עושים אם קוד ההצטרפות לא עובד?</summary><p>בודקים שהקלדתם את 6 הספרות נכון, ומבקשים ממנהל המשחק את הקוד שוב. האתר כותב בדיוק מה הבעיה: קוד שגוי, המשחק עוד לא נפתח היום (נפתח רק ביום המשחק מ־6:00), או שהמשחק מלא.</p></details><details><summary>איך משלמים ומקבלים גישה?</summary><p>אחרי שליחת ההזמנה מופיעות הוראות לתשלום בביט. אחרי שהתשלום מתקבל, נשלחים אליכם אימייל וסיסמה לכניסת מנהל המשחק.</p><p><span class="contact-line" data-contact></span></p></details><details><summary>מתי אפשר לשחק?</summary><p>המשחק פתוח רק בתאריך שבחרתם ברכישה — מ־6:00 בבוקר עד 1:00 בלילה. לפני התאריך ואחריו אי־אפשר להיכנס למשחק.</p></details></section>
+<details><summary>מה עושים אם קוד ההצטרפות לא עובד?</summary><p>בודקים שהקלדתם את 6 הספרות נכון, ומבקשים את הקישור שוב ממי שרכש. האתר כותב בדיוק מה הבעיה: קוד שגוי, המשחק עוד לא נפתח היום (נפתח רק ביום המשחק מ־6:00), או שהמשחק מלא.</p></details><details><summary>איך משלמים ומקבלים גישה?</summary><p>אחרי שליחת ההזמנה מופיעות הוראות לתשלום בביט. אחרי שהתשלום מתקבל, נשלח אליכם במייל קישור הצטרפות עם קוד — שולחים אותו לכל הקבוצות.</p><p><span class="contact-line" data-contact></span></p></details><details><summary>מתי אפשר לשחק?</summary><p>המשחק פתוח רק בתאריך שבחרתם ברכישה — מ־6:00 בבוקר עד 1:00 בלילה. לפני התאריך ואחריו אי־אפשר להיכנס למשחק.</p></details></section>
 <section class="section" id="purchase"><div class="head"><h2>רכישת המשחק</h2><p>בחרו את מספר המשתתפים ואת תאריך המשחק. ביום המשחק מתחלקים במקום לקבוצות של עד 5.</p></div><p class="smallnote" id="priceNote">מחיר נגיש, עם תקרה של 320 ₪ למשחק.</p>
 <div class="price-grid" id="priceGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px;margin:18px 0"></div><div class="trust-box">🤝 <strong>קנייה בטוחה:</strong> פרטי הכניסה נשלחים אליכם במייל עד 24 שעות מהתשלום (בדרך כלל הרבה יותר מהר). לא קיבלתם? החזר כספי מלא.<span class="contact-line" data-contact></span></div><div class="info"><form class="fields" id="orderForm" onsubmit="event.preventDefault();submitOrder()">
 <label for="people"><strong>מספר המשתתפים</strong></label><input id="people" type="number" min="10" max="100" step="1" value="30" required oninput="updateGroups()">
 <div class="purchase-summary" id="groupSummary">30 משתתפים</div>
-<div class="purchase-summary" id="phoneSummary" style="background:#dceefa">📱 חובה טלפון אחד לכל קבוצה + מכשיר נוסף למנהל המשחק</div>
+<div class="purchase-summary" id="phoneSummary" style="background:#dceefa">📱 טלפון אחד לכל קבוצה — וזהו</div>
 <div class="purchase-summary" id="totalSummary">עלות כוללת: 320 ₪</div>
 <p class="smallnote">חשוב לדעת: בין 10 ל־100 משתתפים. מתחלקים במקום לקבוצות של עד 5 (לפחות 3 קבוצות), ו<strong>לכל קבוצה טלפון אחד</strong>.</p>
-<p class="smallnote"><strong>🎬 ועוד טלפון נפרד למנהל המשחק</strong> — מי שמתחיל את המשחק ומעביר בין השלבים. כדאי לבחור מישהו שמבין בטלפון, שיהיה עם המכשיר לאורך כל המשחק.</p>
+<p class="smallnote"><strong>🤖 בלי מנהל משחק:</strong> אלקנה החשמונאי מנחה את כל המשחק בכל הטלפונים — כולם משחקים.</p>
 <label for="gameDate"><strong>תאריך המשחק</strong></label><input id="gameDate" type="date" required oninput="this.setCustomValidity('')">
 <p class="smallnote">המשחק יהיה פתוח רק בתאריך הזה — מ־6:00 בבוקר עד 1:00 בלילה.</p>
 <label for="buyer"><strong>שם הרוכש/ת</strong></label><input id="buyer" placeholder="שם מלא" required maxlength="60" autocomplete="name">
@@ -285,14 +286,14 @@ document.addEventListener('DOMContentLoaded', () => {
 <section class="section" id="adminScreen" hidden><div class="head"><h2>ניהול הזמנות</h2><p>אזור למנהלת האתר בלבד</p></div><div id="adminContent"></div></section>
 <!-- המשחק עצמו: מסך מנהל המשחק ומסך הטלפון של כל קבוצה -->
 <section id="playScreen" hidden></section>
-<div class="modal" id="gameAccessModal" role="dialog" aria-modal="true" aria-labelledby="gameAccessTitle"><div class="dialog"><button class="close" onclick="closeGameAccess()" aria-label="סגירה">×</button><span class="pill">כניסה למשחק</span><h2 id="gameAccessTitle">התחלת משחק</h2><p id="gameAccessIntro">מנהל המשחק נכנס עם פרטי הגישה שקיבל לאחר הרכישה.</p><div id="gameAccessContent"></div></div></div>
+<div class="modal" id="gameAccessModal" role="dialog" aria-modal="true" aria-labelledby="gameAccessTitle"><div class="dialog"><button class="close" onclick="closeGameAccess()" aria-label="סגירה">×</button><span class="pill">כניסה למשחק</span><h2 id="gameAccessTitle">התחלת משחק</h2><p id="gameAccessIntro">כל קבוצה נכנסת עם קוד ההצטרפות.</p><div id="gameAccessContent"></div></div></div>
 <!-- Ayelet 08.11.26 - privacy policy (Amendment 13) -->
 <div class="modal" id="privacyModal" role="dialog" aria-modal="true" aria-labelledby="privacyTitle"><div class="dialog"><button class="close" onclick="famCloseDoc()" aria-label="סגירה">×</button><span class="pill">פרטיות</span><h2 id="privacyTitle">מדיניות פרטיות</h2>
 <p>אנחנו שומרים רק את מה שצריך כדי שהמשחק יעבוד, ומוחקים את תוכן המשחק מהר ככל האפשר.</p>
 <h3>מה נאסף ולמה</h3><ul><li><strong>בהזמנה:</strong> שם, טלפון, אימייל, מספר משתתפים, תאריך המשחק וקוד קופון. כדי לטפל בהזמנה ובתשלום, לשלוח את פרטי הכניסה ולחזור אליכם אם יש שאלה.</li><li><strong>במשחק:</strong> שמות הקבוצות והמשתתפים, תמונות, תשובות כתובות והקלטות קול. רק כדי לשחק, והן מוצגות רק למשתתפי אותו משחק.</li><li><strong>יומן תקלות:</strong> כשמשהו לא עובד נשמר תיאור טכני של התקלה (סוג המכשיר, הדפדפן ומה קרה), כדי שנוכל לתקן.</li></ul>
 <h3>כמה זמן שומרים</h3><ul><li>כל תוכן המשחק (תמונות, הקלטות, שמות ותשובות) נמחק אוטומטית יום אחרי המשחק.</li><li>ההזמנות נשמרות לרישום התשלומים.</li><li>יומן התקלות נמחק אחרי 30 יום.</li></ul>
 <h3>מי עוד מקבל מידע</h3><ul><li><strong>Google Firebase</strong>: שם נשמרים הנתונים ופרטי הכניסה.</li><li><strong>EmailJS</strong>: דרכו נשלחים המיילים על ההזמנה ופרטי הכניסה.</li><li><strong>ביט</strong>: התשלום נעשה באפליקציה של ביט, ואנחנו לא רואים ולא שומרים פרטי אשראי.</li></ul><p>אנחנו לא מוכרים ולא מעבירים מידע לאף אחד אחר.</p>
-<h3>ילדים</h3><p>במשחק משתתפים לפעמים ילדים. מנהל המשחק אחראי לקבל את הסכמת ההורים לפני שמצלמים או מקליטים ילד.</p>
+<h3>ילדים</h3><p>במשחק משתתפים לפעמים ילדים. מי שרכש את המשחק אחראי לקבל את הסכמת ההורים לפני שמצלמים או מקליטים ילד.</p>
 <h3>עוגיות</h3><p>אין באתר עוגיות מעקב או פרסום. הדפדפן שומר רק הגדרות שנדרשות להפעלת המשחק (למשל לאיזו קבוצה הצטרפתם, ואת הגדרות הנגישות).</p>
 <h3>הזכויות שלכם</h3><p>אפשר לבקש לראות את המידע שנשמר עליכם, לתקן אותו או למחוק אותו. פנו אלינו ונטפל בהקדם.</p><p data-contact></p>
 <p class="smallnote">המדיניות עודכנה ב-8.11.2026.</p></div></div>
@@ -303,20 +304,20 @@ document.addEventListener('DOMContentLoaded', () => {
 <h3>פרטי הכניסה</h3><p>שם המשתמש והסיסמה נשלחים במייל עד 24 שעות אחרי שהתשלום מתקבל. לא קיבלתם? מחזירים את כל הכסף.</p>
 <h3>ביטול</h3><ul><li>אפשר לבטל תוך 14 יום מההזמנה, כל עוד המשחק עוד לא נפתח. דמי הביטול: 5% מהמחיר או 100 ₪, הנמוך מביניהם.</li><li>אנשים עם מוגבלות, אזרחים ותיקים ועולים חדשים יכולים לבטל עד 4 חודשים מההזמנה, כשהחוק חל עליהם, כל עוד המשחק עוד לא נפתח.</li><li>הכסף מוחזר תוך 14 יום מהבקשה לביטול.</li></ul>
 <h3>שינוי תאריך</h3><p>רוצים להעביר את המשחק ליום אחר? פנו אלינו לפני היום שנבחר, ונתאם יחד תאריך חדש.</p>
-<h3>תמונות והקלטות</h3><p>מי שמשתתף במשחק מסכים שיצלמו אותו ויקליטו אותו במסגרת המשחק. התוכן מוצג רק למשתתפי אותו משחק, ונמחק יום אחרי המשחק. מנהל המשחק אחראי לקבל את הסכמת ההורים לילדים.</p>
+<h3>תמונות והקלטות</h3><p>מי שמשתתף במשחק מסכים שיצלמו אותו ויקליטו אותו במסגרת המשחק. התוכן מוצג רק למשתתפי אותו משחק, ונמחק יום אחרי המשחק. מי שרכש את המשחק אחראי לקבל את הסכמת ההורים לילדים.</p>
 <h3>פרטי העסק ויצירת קשר</h3><p>המשחק נמכר על ידי <strong>הכל בקליק</strong>, עוסק זעיר מס' 207680679.<br>טלפון: <a href="tel:0548920993" dir="ltr">054-8920993</a> · אימייל: <a href="mailto:allclick2027@gmail.com" dir="ltr">allclick2027@gmail.com</a></p>
 <p class="smallnote">התקנון עודכן ב-8.11.2026.</p></div></div>
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="title"><div class="dialog"><button class="close" onclick="closeModal()" aria-label="סגירה">×</button><span class="pill" id="pill"></span><h2 id="title"></h2><div class="video" id="video"><strong id="videoTitle">הסבר קצר</strong><div class="clip" id="clip" aria-live="polite"></div><div class="clip-bar" id="clipBar" aria-hidden="true"></div><div class="clip-controls"><button type="button" class="game-btn" id="clipToggle" onclick="toggleClip()">⏸ השהיה</button><button type="button" class="game-btn" onclick="playClip(0)">↻ מההתחלה</button></div></div><p id="desc"></p><ol id="steps"></ol></div></div>
 <script>
 // ההסבר הציבורי של שלב 1 שומר על הסוד (בלי ”עיניים”). את ההסבר המלא רואים רק השחקנים, בתוך המשחק (stagesGame / clipsGame)
 const stages={
-1:{title:'מי זה במשפחה? 🕵️',desc:'כל משתתף מצטלם בטלפון של הקבוצה — ואז, באופן מסתורי, התמונות מקבלות תפנית... 🌀 צריך לזהות מי זה, נגד השעון! כל זיהוי נכון = נקודה.',steps:['מתי: מיד אחרי שהקבוצה מצטרפת למשחק. מי: כל משתתף בקבוצה, אחד אחרי השני.','איך: כותבים את השם המלא שלו, ומישהו מהקבוצה מצלם אותו מקרוב (או סלפי) בטלפון של הקבוצה — רק את הפנים. התמונה עולה לאתר לבד.','כולם הצטלמו? לוחצים ”העלינו ואנחנו מוכנים” ומחכים למנהל המשחק.','מנהל המשחק מפעיל את השעון — והתמונות מקבלות תפנית מסתורית 🌀','🔀 האתר מערבב את התמונות של כל הקבוצות: כל קבוצה מקבלת רק תמונות של בני משפחה מהקבוצות האחרות — אף פעם לא של עצמה. כל קבוצה בטלפון שלה, אבל משחקים עם כולם!','התמונות רצות על המסך ועוצרות — כותבים מי זה.','כל זיהוי נכון = נקודה. התמונות נמחקות מהאתר יום אחרי המשחק. מה בדיוק קורה? תגלו כשתשחקו 😉']},
+1:{title:'מי זה במשפחה? 🕵️',desc:'כל משתתף מצטלם בטלפון של הקבוצה — ואז, באופן מסתורי, התמונות מקבלות תפנית... 🌀 צריך לזהות מי זה, נגד השעון! כל זיהוי נכון = נקודה.',steps:['מתי: מיד אחרי שהקבוצה מצטרפת למשחק. מי: כל משתתף בקבוצה, אחד אחרי השני.','איך: כותבים את השם המלא שלו, ומישהו מהקבוצה מצלם אותו מקרוב (או סלפי) בטלפון של הקבוצה — רק את הפנים. התמונה עולה לאתר לבד.','כולם הצטלמו? לוחצים ”העלינו ואנחנו מוכנים” ומחכים לשאר הקבוצות.','כשכולם מוכנים, אלקנה מפעיל את השעון — והתמונות מקבלות תפנית מסתורית 🌀','🔀 האתר מערבב את התמונות של כל הקבוצות: כל קבוצה מקבלת רק תמונות של בני משפחה מהקבוצות האחרות — אף פעם לא של עצמה. כל קבוצה בטלפון שלה, אבל משחקים עם כולם!','התמונות רצות על המסך ועוצרות — כותבים מי זה.','כל זיהוי נכון = נקודה. התמונות נמחקות מהאתר יום אחרי המשחק. מה בדיוק קורה? תגלו כשתשחקו 😉']},
 2:{title:'מה זה מזכיר לכם? 💭',desc:'10 סבבים: תמונות רצות מהר מהר על המסך ועוצרות על אחת — כל הקבוצות רואות את אותה תמונה. שעון של כדקה מתחיל, וכותבים בטלפון כמה שיותר דברים שהתמונה מזכירה לכם על המשפחה או על החג. בסוף בודקים יחד — והקבוצה עם הכי הרבה תשובות תקינות מנצחת!',steps:['התמונות מגיעות מהאתר (פרחים, מספר, אות, מטוס…) — לא מצלמים כלום בשלב הזה. הן רצות מהר מהר ועוצרות על אחת, וכל הקבוצות רואות את אותה תמונה.','שעון של כדקה: כותבים בטלפון כמה שיותר דברים שהתמונה מזכירה לכם על המשפחה או על החג — כל רעיון בנפרד.','תשובה תקינה = קשר אמיתי למשפחה או לחג (למשל לזר פרחים: ”סבא קונה לסבתא כל שישי פרחים לשבת”). ”פרחים יפים” לא נחשב! כפילויות לא נספרות.','אחרי 10 תמונות: הקבוצה עם הכי הרבה תשובות — בודקים יחד בקול שהכול תקין. תשובה לא תקינה נפסלת, ואם הקבוצה ירדה — בודקים את הבאה בתור.','ככה עד שיש מקום ראשון, שני ושלישי 🥇🥈🥉']},
 3:{title:'מי אמר את זה?! 🎙️',desc:'10 שאלות מצחיקות — למשל ”אם היית יכול לנסוע בזמן, לאן היית נוסע?”. בכל קבוצה, על כל שאלה עונה בקול משתתף אחר (עד 20 שניות). האתר משנה את הקולות ומערבב אותם, וכל קבוצה צריכה לנחש מי אמר מה!',steps:['על כל שאלה עונה משתתף אחד מהקבוצה — כל פעם מישהו אחר. הוא מקליט תשובה של עד 20 שניות, כמו הודעה קולית. השם נשמר בסוד.','מעודדים להיות מקוריים, מצחיקים ומפתיעים — אבל אף אחד לא חייב לספר משהו אישי.','אחרי שכולם ענו, האתר משנה את הקולות ומערבב את ההקלטות של כל הקבוצות 🔀 — כל קבוצה בטלפון שלה, אבל משחקים עם כולם!','לכל שאלה כל קבוצה שומעת הקלטות של הקבוצות האחרות (אף פעם לא של עצמה) וכותבת מי לדעתה אמר כל אחת. כשיש הרבה משתתפים — שומעים מבחר אקראי, כדי שיישאר כיף וקצר.','בסוף — מיד התוצאות: מי אמר מה, כל זיהוי נכון = נקודה, וטבלת הניקוד של כל המשחק עם הקבוצה המנצחת! 🏆']}
 };
 // ההסבר המלא של שלב 1 — רק לשחקנים, בתוך המשחק
 const stagesGame={
-1:{title:'מכירים בעיניים 👀',desc:'כל משתתף מצטלם מקרוב וכותב את השם המלא שלו, והמערכת חותכת לבד את העיניים. אחרי ”המשך” עיניים של בני משפחה מקבוצות אחרות רצות מהר על המסך ועוצרות על זוג אחד — בוחרים מהרשימה של מי, ושוב רץ. כל תשובה נכונה = נקודה!',steps:['כל משתתף מצטלם מקרוב במכשיר של הקבוצה — רק הפנים, לא כל הגוף — וכותב שם מלא: שם פרטי ושם משפחה.','כשכל הקבוצה הצטלמה, לוחצים ”העלינו ואנחנו מוכנים”.','מנהל המשחק לוחץ ”המשך” — והשעון מתחיל.','עיניים רצות מהר מהר ועוצרות על זוג אחד: מקלידים את תחילת השם, בוחרים מהרשימה של מי, ולוחצים ”הבא”. עד 15 זוגות, אף פעם לא מהקבוצה שלכם.','בסוף לוחצים ”אישור”. כשהקבוצה האחרונה מאשרת — או כשהזמן נגמר — מגלים לכולם מה נכון. כל תשובה נכונה = נקודה.']}
+1:{title:'מכירים בעיניים 👀',desc:'כל משתתף מצטלם מקרוב וכותב את השם המלא שלו, והמערכת חותכת לבד את העיניים. אחרי ”המשך” עיניים של בני משפחה מקבוצות אחרות רצות מהר על המסך ועוצרות על זוג אחד — בוחרים מהרשימה של מי, ושוב רץ. כל תשובה נכונה = נקודה!',steps:['כל משתתף מצטלם מקרוב במכשיר של הקבוצה — רק הפנים, לא כל הגוף — וכותב שם מלא: שם פרטי ושם משפחה.','כשכל הקבוצה הצטלמה, לוחצים ”העלינו ואנחנו מוכנים”.','כשכל הקבוצות מוכנות — אלקנה מתחיל והשעון רץ.','עיניים רצות מהר מהר ועוצרות על זוג אחד: מקלידים את תחילת השם, בוחרים מהרשימה של מי, ולוחצים ”הבא”. עד 15 זוגות, אף פעם לא מהקבוצה שלכם.','בסוף לוחצים ”אישור”. כשהקבוצה האחרונה מאשרת — או כשהזמן נגמר — מגלים לכולם מה נכון. כל תשובה נכונה = נקודה.']}
 };
 // עשר השאלות של ”מי אמר את זה?!” (לשלב 3)
 const WHO_SAID_QUESTIONS=[
@@ -372,7 +373,7 @@ const clipsGame={
  {art:'✍️',text:'כותבים שם מלא — שם פרטי ושם משפחה',ms:3000},
  {art:'✂️ 👀',text:'הסוד נחשף: המערכת חותכת רק את העיניים!',ms:3400},
  {art:'✅',text:'כל הקבוצה הצטלמה? לוחצים ”העלינו ואנחנו מוכנים”',ms:3300},
- {art:'▶️ ⏱️',text:'מנהל המשחק לוחץ ”המשך” — והשעון מתחיל!',ms:3200},
+ {art:'▶️ ⏱️',text:'כולם מוכנים — אלקנה מתחיל והשעון רץ!',ms:3200},
  {art:'🔀 📱📱📱',text:'האתר מערבב את העיניים של כל הקבוצות — כל קבוצה מקבלת רק עיניים של הקבוצות האחרות, אף פעם לא של עצמה',ms:4400},
  {art:'🎰 👀',text:'העיניים רצות מהר מהר — ועוצרות על זוג אחד',ms:3600},
  {art:'✍️ ▶',text:'מקלידים תחילת שם, בוחרים מהרשימה של מי העיניים ולוחצים ”הבא” — ושוב רץ. עד 15 זוגות',ms:4000},
@@ -465,17 +466,18 @@ function describeGroupSizes(sizes){
 function updateGroups(){
  const people=document.getElementById('people');
  const typed=parseInt(people.value)||0;
- if(typed<10){document.getElementById('groupSummary').textContent='מינימום 10 משתתפים';document.getElementById('phoneSummary').textContent='📱 חובה טלפון אחד לכל קבוצה + מכשיר נוסף למנהל המשחק';document.getElementById('totalSummary').textContent=`עלות כוללת: ${PRICING.basePrice} ₪ (מחיר מינימום)`;return;}
- if(typed>MAX_PARTICIPANTS){document.getElementById('groupSummary').textContent='אפשר להזמין עד 100 משתתפים לאירוע';document.getElementById('phoneSummary').textContent='📱 חובה טלפון אחד לכל קבוצה + מכשיר נוסף למנהל המשחק';document.getElementById('totalSummary').textContent='';return;}
+ if(typed<10){document.getElementById('groupSummary').textContent='מינימום 10 משתתפים';document.getElementById('phoneSummary').textContent='📱 טלפון אחד לכל קבוצה — וזהו';document.getElementById('totalSummary').textContent=`עלות כוללת: ${PRICING.basePrice} ₪ (מחיר מינימום)`;return;}
+ if(typed>MAX_PARTICIPANTS){document.getElementById('groupSummary').textContent='אפשר להזמין עד 100 משתתפים לאירוע';document.getElementById('phoneSummary').textContent='📱 טלפון אחד לכל קבוצה — וזהו';document.getElementById('totalSummary').textContent='';return;}
  const n=typed;
  document.getElementById('groupSummary').textContent=n+` משתתפים · מתחלקים במקום לקבוצות של עד 5 — למשל ${describeGroupSizes(getGroupSizes(n,5))}`;
- document.getElementById('phoneSummary').textContent='📱 חובה טלפון אחד לכל קבוצה + מכשיר נוסף למנהל המשחק';
+ document.getElementById('phoneSummary').textContent='📱 טלפון אחד לכל קבוצה — וזהו';
  const total=getTotalPrice(n),final=finalPrice(n,couponPercent);
  document.getElementById('totalSummary').textContent=couponPercent?`עלות כוללת: ${final.toLocaleString('he-IL')} ₪ (במקום ${total.toLocaleString('he-IL')} ₪ — ${couponPercent}% הנחה)`:'עלות כוללת: '+total.toLocaleString('he-IL')+' ₪';
 }
 // ”אני רוצה לשחק”: קודם בוחרים מי אתם — מנהל המשחק (אימייל וסיסמה) או קבוצה (קוד הצטרפות). שני מסלולים נפרדים
 function openGameAccess(mode){
- if(mode==='join'){if(window.openJoin)window.openJoin('');return;}
+ /* 11.11.26 no game manager: "אני רוצה לשחק" goes straight to joining as a group */
+ if(mode==='join'||mode==='choose'){if(window.openJoin)window.openJoin('');return;}
  document.getElementById('gameAccessModal').classList.add('open');
  if(mode==='choose')renderPlayChooser();else renderManagerLogin();
 }
@@ -910,7 +912,7 @@ async function createOrderLogin(email) {
 // ---------- ניקוי אוטומטי: יום אחרי המשחק נמחק כל תוכן המשחק (תמונות, שמות, קבוצות, תשובות) ----------
 // ההזמנות עצמן נשארות (רישום תשלומים). הניקוי רץ לבד, ברקע, בכל פעם שהאתר נפתח במכשיר שמחובר כמנהלת — ועוד פעם בשעה כל עוד הוא פתוח.
 // (עד הניקוי התוכן ממילא נעול: אחרי יום המשחק כללי האבטחה לא מאפשרים לאף אחד חוץ מהמנהלת לקרוא אותו)
-const GAME_SUBCOLLECTIONS = ['players', 'groups', 'assignments', 'answers', 'assoc', 'recordings', 'whoAssign', 'whoAnswers', 'live'];
+const GAME_SUBCOLLECTIONS = ['players', 'groups', 'assignments', 'answers', 'assoc', 'recordings', 'whoAssign', 'whoAnswers', 'live', 'host'];
 async function autoCleanupIfAdmin() {
   const u = auth.currentUser; if (!u || u.isAnonymous) return;
   try { if ((await getDoc(doc(db, 'admins', u.uid))).exists()) await cleanupOldGames(); } catch (e) { console.warn(e); }
@@ -1187,6 +1189,7 @@ window.adminApprove = async function (id) {
       orderId: id, orderCode: o.code, pricePaid: total, createdAt: serverTimestamp(), ...(joinCode ? { joinCode } : {})
     });
     batch.update(doc(db, 'gameOrders', id), { status: 'paid', approvedAt: serverTimestamp(), amountPaid: total, gameId: id });
+    autoLiveDocs(batch, id, joinCode, o.participants);
     await batch.commit();
   } catch (e) {
     console.warn(e);
@@ -1196,6 +1199,13 @@ window.adminApprove = async function (id) {
   await showCred(o, password, `✅ התשלום אושר ונוצרה סיסמה עבור ${esc(o.buyerName)}`, 'התשלום התקבל — תודה! המשחק שלכם הוקם ✅', joinCode);
 };
 /* Ayelet 11.11.26 */
+/* The game opens by itself (no manager): the live documents are created when the payment is approved / a test game is made.
+   auto: true = the server (Cloud Functions engine) runs the game and Elkana hosts it. */
+function autoLiveDocs(batch, gameId, joinCode, purchased) {
+  batch.set(liveDoc(gameId, 'state'), { stage: 'photos', auto: true, v: 0, joinCode: joinCode || '', purchased: Number(purchased), overrides: {}, lobby: {}, enteredAt: serverTimestamp(), updatedAt: serverTimestamp() });
+  batch.set(liveDoc(gameId, 'groupCount'), { count: 0 });
+  batch.set(liveDoc(gameId, 'playerCount'), { count: 0 });
+}
 /* Free test game for the admin: a pending order is created and approved at once (total 0, test: true), for today.
    A test game may be played with 2 groups (minGroups). Same rules and screens as a real game. */
 window.adminTestGame = async function (btn) {
@@ -1220,10 +1230,11 @@ window.adminTestGame = async function (btn) {
       orderId: id, orderCode: o.code, pricePaid: 0, createdAt: serverTimestamp(), ...(joinCode ? { joinCode } : {})
     });
     batch.update(doc(db, 'gameOrders', id), { status: 'paid', test: true, approvedAt: serverTimestamp(), amountPaid: 0, gameId: id });
+    autoLiveDocs(batch, id, joinCode, o.participants);
     await batch.commit();
     await showCred(o, password, '🧪 משחק הבדיקה מוכן', 'משחק הבדיקה הוקם ✅', joinCode);
     credBox.insertAdjacentHTML('afterbegin', `<div class="info"><h3>🧪 איך בודקים</h3><ol>
-      <li><strong>מנהל המשחק:</strong> בחלון גלישה בסתר (Ctrl+Shift+N) או בטלפון שלישי ← ”אני רוצה לשחק” ← ”אני מנהל המשחק” ← האימייל שלך + הסיסמה שלמטה ← ”פתיחת המשחק”. (בחלון הזה את נשארת מחוברת לניהול.)</li>
+      <li><strong>אין מנהל משחק</strong> — המשחק כבר פתוח, ואלקנה מנחה אותו לבד.</li>
       <li><strong>2 טלפונים = 2 קבוצות:</strong> בכל טלפון פותחים את הקישור ${joinCode ? `<span dir="ltr">${esc(SITE_URL)}#join=${joinCode}</span>` : '(הקוד יופיע אצל מנהל המשחק)'} ← שם קבוצה ← כמה משתתפים (מומלץ 2 בכל קבוצה, כדי ששלב 3 יוכל להחליף משתתף בכל שאלה).</li>
       <li>משחקים את שלבים 1, 2, 3 עד הסוף. המשחק נסגר לבד ב־1:00 בלילה ונמחק אחרי יום, כמו משחק רגיל.</li></ol></div>`);
   } catch (e) {
@@ -1243,10 +1254,11 @@ async function createJoinCode(gameId, gameDate) {
 // מסך ”שולחים ללקוח את הפרטים” — אחרי אישור תשלום או אחרי סיסמה חדשה. מסודר לפי: מנהל המשחק · קוד לקבוצות · איך מפעילים
 async function showCred(o, password, title, opening, joinCode) {
   const credBox = document.getElementById('credBox');
+  /* 11.11.26 - no game manager: the email has only the join link + how to play (no password) */
   const codePart = joinCode
-    ? `👥 קוד הצטרפות לקבוצות: ${joinCode}\nכל קבוצה פותחת את האתר בטלפון שלה ← ”אני רוצה לשחק” ← ”אנחנו קבוצה” ← מקלידה את הקוד.\n(הקבוצות יכולות להצטרף רק אחרי שמנהל המשחק לחץ ”פתיחת המשחק”.)\nאו קישור ישיר שאפשר לשלוח לקבוצות: ${SITE_URL}#join=${joinCode}\nהקוד רק מצרף קבוצות למשחק — הוא לא נותן גישה לניהול. את הסיסמה לא מעבירים לקבוצות.`
-    : '👥 קוד הצטרפות לקבוצות: יופיע למנהל המשחק במסך, כשהוא לוחץ ”פתיחת המשחק” ביום המשחק.';
-  const text = `שלום ${o.buyerName}, ${opening}\n\n📅 יום המשחק: ${formatDateHe(o.gameDate)} — פתוח מ־6:00 בבוקר עד 1:00 בלילה.\n\n🎬 כניסה למנהל המשחק (מסך הניהול):\nאתר: ${SITE_URL}\nאימייל: ${o.email}\nסיסמה: ${password}\nבאתר: ”אני רוצה לשחק” ← ”אני מנהל המשחק”. (לכל הזמנה יש סיסמה משלה — שמרו את המייל הזה.)\n\n${codePart}\n\n⚠️ חשוב — הסדר ביום המשחק: קודם מנהל המשחק נכנס ולוחץ ”פתיחת המשחק”, ורק אחרי זה הקבוצות מצטרפות עם הקוד. קבוצה שתנסה להצטרף לפני כן תקבל הודעה ש”מנהל המשחק עוד לא פתח את המשחק” — פשוט מחכים שהוא יפתח ומנסים שוב.\n\nמי זה מנהל המשחק? מי שמפעיל את האירוע — מי שרכש או מישהו אחר שבחרתם. יש לו טלפון נפרד, לא אחד מהטלפונים של הקבוצות. רק הוא מתחיל את המשחק ומעביר בין השלבים. אפשר להקרין את המסך שלו על מקרן — לא חובה.\n\nאיך מפעילים ביום המשחק:\n1. מתחלקים לקבוצות של עד 5 משתתפים (לפחות 3 קבוצות). לכל קבוצה טלפון אחד.\n2. מנהל המשחק נכנס עם האימייל והסיסמה ← ”פתיחת המשחק” (חובה לפני שהקבוצות מצטרפות!).\n3. רק אחרי זה — כל קבוצה מצטרפת עם הקוד.\n4. האתר מסביר בכל שלב מה עושים, ומנהל המשחק מעביר הלאה.\nלא צריך להכין שום דבר מראש.\n\nשיהיה בהצלחה ושיהיה כיף!`;
+    ? `👥 הקישור למשחק — שלחו אותו לכל הקבוצות (למשל בוואטסאפ של המשפחה):\n${SITE_URL}#join=${joinCode}\nקוד ההצטרפות: ${joinCode} (אפשר גם להיכנס לאתר ← ”אני רוצה לשחק” ← להקליד את הקוד).`
+    : `👥 קוד ההצטרפות יישלח אליכם בנפרד. לשאלות: ${SITE_URL}`;
+  const text = `שלום ${o.buyerName}, ${opening}\n\n📅 יום המשחק: ${formatDateHe(o.gameDate)} — פתוח מ־6:00 בבוקר עד 1:00 בלילה.\n\n${codePart}\n\n🤖 אין מנהל משחק — כולם משחקים! אלקנה החשמונאי, המנחה שלנו, מופיע בכל הטלפונים: מסביר כל שלב, מעביר הלאה לבד ומכריז על המנצחים.\n\nאיך משחקים ביום המשחק:\n1. מתחלקים לקבוצות של עד 5 משתתפים (לפחות 3 קבוצות). לכל קבוצה טלפון אחד.\n2. כל קבוצה פותחת את הקישור, כותבת שם לקבוצה וכמה משתתפים יש בה.\n3. מצטלמים, לוחצים ”מוכנים” — ואלקנה מתחיל כשכולם מוכנים.\n4. מגבירים את הקול בטלפון כדי לשמוע את אלקנה. 🔊\nלא צריך להכין שום דבר מראש.\n\nשיהיה בהצלחה ושיהיה כיף!`;
   window.lastCredText = text;
   const subject = 'פרטי הכניסה למשחק המשפחה';
   window.lastCred = { to: o.email, subject, text };
@@ -1510,6 +1522,7 @@ function startTicker() {
   clearInterval(ticker);
   ticker = setInterval(() => {
     const st = (managerCtx || groupCtx || {}).state; if (!st) return;
+    if (groupCtx) groupTick(groupCtx);
     if (st.stage === 'assoc') return assocTick(st);
     if (st.stage === 'whoRecord' || st.stage === 'whoGuess') return whoTick(st);
     if (st.stage !== 'eyes') return;
@@ -1569,7 +1582,7 @@ window.setEyesPerPair = function (v) { if (managerCtx) { managerCtx.eyesPerPair 
 // (משחקים ישנים: לפי plannedSizes)
 const MAX_GROUP_SIZE = 5; // עד 5 משתתפים בקבוצה (נאכף גם בכללי האבטחה)
 function requiredFor(state, group, count) {
-  if (state.overrides && state.overrides[group.id || group.uid]) return Math.max(1, count);
+  if (group.shortOk || (state.overrides && state.overrides[group.id || group.uid])) return Math.max(1, count);
   if (Number.isInteger(group.size) && group.size > 0) return group.size;
   const plan = state.plannedSizes;
   if (Array.isArray(plan) && plan.length) return plan[Math.min(group.index, plan.length) - 1] || plan[plan.length - 1];
@@ -1872,7 +1885,7 @@ window.joinGame = async function () {
     if (!auth.currentUser) await signInAnonymously(auth);
     const uid = auth.currentUser.uid;
     const codeDoc = await getDoc(doc(db, 'gameCodes', code));
-    if (!codeDoc.exists()) { msg.textContent = 'לא נמצא משחק עם הקוד הזה. בדקו שהקלדתם 6 ספרות נכון, או בקשו ממנהל המשחק את הקוד שוב.'; btn.disabled = false; return; }
+    if (!codeDoc.exists()) { msg.textContent = 'לא נמצא משחק עם הקוד הזה. בדקו שהקלדתם 6 ספרות נכון, או בקשו את הקישור שוב ממי שרכש את המשחק.'; btn.disabled = false; return; }
     const gameId = codeDoc.data().gameId, gameDate = codeDoc.data().gameDate;
     // הקוד נכון, אבל המשחק פתוח רק ביום המשחק
     if (gameDate && gameDate !== israelGameDay()) {
@@ -1886,7 +1899,7 @@ window.joinGame = async function () {
       const all = await getDocs(collection(db, 'familyGames', gameId, 'groups'));
       if (all.docs.some(d => String(d.data().name).trim().toLowerCase() === name.toLowerCase())) { msg.textContent = 'כבר יש קבוצה בשם הזה. בחרו שם אחר.'; btn.disabled = false; return; }
       // הקוד נכון, אבל מנהל המשחק עוד לא לחץ ”פתיחת המשחק” (המונה נוצר רק אז)
-      if (!(await getDoc(liveDoc(gameId, 'groupCount'))).exists()) { msg.textContent = 'הקוד נכון ✓ — אבל מנהל המשחק עוד לא פתח את המשחק. בקשו ממנו ללחוץ ”פתיחת המשחק”, ואז נסו שוב.'; btn.disabled = false; return; }
+      if (!(await getDoc(liveDoc(gameId, 'groupCount'))).exists()) { msg.textContent = 'הקוד נכון ✓ — אבל המשחק עוד לא מוכן. נסו שוב בעוד דקה, ואם זה ממשיך — פנו למי שרכש את המשחק.'; btn.disabled = false; return; }
       // המונה מבטיח שאי־אפשר לפתוח יותר קבוצות ממה שנרכש — גם אם כמה קבוצות מצטרפות באותו רגע
       await retryBusy(() => runTransaction(db, async tx => {
         const counter = await tx.get(liveDoc(gameId, 'groupCount'));
@@ -1899,7 +1912,7 @@ window.joinGame = async function () {
     startGroup(gameId);
   } catch (e) {
     console.warn(e);
-    msg.textContent = e.code === 'permission-denied' ? 'אי־אפשר להצטרף: המשחק מלא (הצטרפו כבר כל הקבוצות האפשריות), או שעוד לא 6:00 בבוקר. פנו למנהל המשחק.'
+    msg.textContent = e.code === 'permission-denied' ? 'אי־אפשר להצטרף: המשחק מלא (הצטרפו כבר כל הקבוצות האפשריות), או שעוד לא 6:00 בבוקר.'
       : e.code === 'auth/operation-not-allowed' ? 'ההצטרפות לקבוצות עוד לא הופעלה במערכת. פנו לבעלת האתר.'
       : 'ההצטרפות נכשלה. בדקו את החיבור לאינטרנט ונסו שוב.';
     btn.disabled = false;
@@ -1912,7 +1925,7 @@ function startGroup(gameId) {
   whoStopAll();
   groupCtx = { gameId, uid, state: null, group: null, players: [], assignment: null, started, submitted: false, results: null, eyesBuilt: false,
     who: { pick: {}, rec: null, pend: null, saving: false, msg: '' }, whoAssign: null, whoUrl: {}, whoLoads: {} };
-  showPlay('<div class="play-wrap"><div class="order-head"><h2 id="grpTitle">הקבוצה שלנו</h2><button class="game-btn" type="button" onclick="window.exitGroupGame(false)">← יציאה לאתר</button></div><div id="grpMain"><p>טוענים…</p></div><div id="grpAdd"></div><div id="cropBox"></div><div id="grpStatus"></div></div>');
+  showPlay('<div class="play-wrap"><div class="order-head"><h2 id="grpTitle">הקבוצה שלנו</h2><button class="game-btn" type="button" onclick="window.exitGroupGame(false)">← יציאה לאתר</button></div><div id="hostBox" aria-live="polite"></div><div id="grpMain"><p>טוענים…</p></div><div id="grpAdd"></div><div id="cropBox"></div><div id="grpStatus"></div></div>');
   const c = groupCtx, r = () => renderGroup();
   playUnsubs.push(onSnapshot(liveDoc(gameId, 'state'), s => {
     // המשחק נמחק (יום אחרי המשחק) — מודיעים במקום להיתקע
@@ -1935,6 +1948,7 @@ function startGroup(gameId) {
   }, playError));
   playUnsubs.push(onSnapshot(doc(db, 'familyGames', gameId, 'assignments', uid), s => { c.assignment = s.exists() ? s.data() : null; r(); }, playError));
   playUnsubs.push(onSnapshot(doc(db, 'familyGames', gameId, 'whoAssign', uid), s => { c.whoAssign = s.exists() ? s.data() : null; r(); }, () => { }));
+  hostListen(c);
 }
 // מצב כל הקבוצות — כמו שמנהל המשחק רואה: בצילום (מי מוכנה), בניחוש העיניים (מי אישרה), בהקלטות (כמה הוקלטו ומי סיימה)
 // עדכון המסמך של הקבוצה. שדות ”מתי סיימה” (…At) הם רק ללוח ההתקדמות: אם השרת עוד עם כללי אבטחה ישנים ודוחה אותם — שולחים בלעדיהם, והמשחק ממשיך
@@ -1967,11 +1981,107 @@ function groupsStatusHtml(c) {
     + all.map(g => { const ok = cfg.done(g); return `<div class="group-item${g.id === c.uid ? ' mine' : ''}"><span>${esc(g.name)}${g.id === c.uid ? ' <strong class="me-tag">(אתם)</strong>' : ''}${cfg.extra(g)}${g.id === firstId ? ' · 🥇 סיימה ראשונה' : ''}</span><span class="badge ${ok ? 'paid' : 'pending'}">${ok ? cfg.label[0] : cfg.label[1]}</span></div>`; }).join('')
     + '</div></div>';
 }
+/* Ayelet 11.11.26 */
+/* ---------- The game without a manager: Elkana + the group's buttons (plan: קוד-מקור\auto-game-plan.txt) ----------
+   The server moves the game on by itself. A phone only votes, asks for "a moment more", or says "the game is stuck". */
+const tsMs = t => (t && t.toMillis ? t.toMillis() : typeof t === 'number' ? t : 0);
+/* "everyone is here?" - shown to every group once all the groups that joined are ready */
+function lobbyHtml(c) {
+  const lobby = (c.state && c.state.lobby) || {}, since = tsMs(lobby.allReadyAt);
+  if (!since) return '';
+  const all = c.allGroups || [], voted = all.filter(g => tsMs(g.startVoteAt) >= since).length, mine = tsMs(c.group.startVoteAt) >= since;
+  const autoAt = tsMs(lobby.autoStartAt);
+  return `<div class="now-box lobby-box" style="text-align:center"><p style="font-size:20px;margin:0 0 6px"><strong>🙋 כל הקבוצות מוכנות! כולם כאן?</strong></p>`
+    + (mine ? `<p>✅ לחצתם. מחכים לעוד ${all.length - voted === 1 ? 'קבוצה אחת' : (all.length - voted) + ' קבוצות'}.</p>`
+      : `<p>אם כל המשפחה כבר כאן — לוחצים. מתחילים כשכל הקבוצות לוחצות.</p><button class="buy" type="button" onclick="window.groupStartVote()">כולנו כאן — מתחילים ✓</button>`)
+    + (autoAt ? `<p style="margin-top:10px"><strong>⏱️ אלקנה מתחיל בעוד <span data-autostart>${fmtClock(autoAt - Date.now())}</span></strong></p><button class="game-btn" type="button" onclick="window.groupHold()">✋ רגע, עוד לא! (עוד 3 דקות)</button>` : '')
+    + '</div>';
+}
+/* after a results screen: when the next stage opens, by itself */
+function nextStepHtml(c) {
+  const at = tsMs(c.state && c.state.nextAt);
+  return at ? `<div class="now-box" style="text-align:center"><p style="margin:0">⏭️ אלקנה עובר לשלב הבא בעוד <strong data-next>${fmtClock(at - Date.now())}</strong></p></div>` : '';
+}
+window.groupStartVote = function () { const c = groupCtx; if (c) updateGroupDoc(c, { startVoteAt: serverTimestamp() }).catch(e => console.warn(e)); };
+window.groupHold = function () { const c = groupCtx; if (c) updateGroupDoc(c, { holdAt: serverTimestamp() }).catch(e => console.warn(e)); };
+window.groupShort = function (n) {
+  const c = groupCtx; if (!c || !confirm(`להמשיך עם ${n === 1 ? 'משתתף אחד' : n + ' משתתפים'} בלבד? (מי שלא הגיע לא ישתתף)`)) return;
+  updateGroupDoc(c, { shortOk: true }).catch(e => { console.warn(e); alert('לא הצלחנו לעדכן. נסו שוב.'); });
+};
+window.groupStuck = function (btn) {
+  const c = groupCtx; if (!c) return;
+  updateGroupDoc(c, { stuckAt: serverTimestamp() }).catch(e => console.warn(e));
+  if (btn) { btn.disabled = true; btn.textContent = '✓ נרשם — אם רוב הקבוצות לוחצות, ממשיכים'; }
+};
+/* a fixed video of Elkana talking (opening; later also before each stage). If filtered internet holds the video,
+   it is simply hidden - Elkana's pose + voice still work, the game never waits for a video */
+function hostVideoHtml(src, poster, label) {
+  return `<div class="host-video" style="text-align:center;margin:10px 0"><video src="${src}" poster="${poster}" controls playsinline preload="none" style="width:100%;max-width:420px;border-radius:14px;background:#000" onerror="this.parentNode.hidden=true"></video><p class="smallnote" style="margin:4px 0 0">${label}</p></div>`;
+}
+function stuckHtml() { return '<p style="text-align:center;margin:14px 0 0"><button class="game-btn" type="button" style="font-size:14px" onclick="window.groupStuck(this)">😕 המשחק תקוע?</button></p>'; }
+/* when a clock on this phone ends, it "wakes" the server (the server checks the time by its own clock) */
+let lastTick = 0;
+function dueAt(st) {
+  if (!st) return 0;
+  if (st.stage === 'eyes') return eyesEndMs(st) + 6500;
+  if (st.stage === 'assoc') return assocEndMs(st) + 3000;
+  if (st.stage === 'whoRecord') return whoRecEndMs(st) + 2500;
+  if (st.stage === 'whoGuess') return whoEndMs(st) + 6500;
+  if (st.stage === 'photos' && st.lobby && st.lobby.autoStartAt) return tsMs(st.lobby.autoStartAt) + 500;
+  return tsMs(st.nextAt) + 500;
+}
+function groupTick(c) {
+  const due = dueAt(c.state), now = Date.now();
+  document.querySelectorAll('[data-next]').forEach(el => { el.textContent = fmtClock(tsMs(c.state.nextAt) - now); });
+  document.querySelectorAll('[data-autostart]').forEach(el => { el.textContent = fmtClock(tsMs((c.state.lobby || {}).autoStartAt) - now); });
+  if (due && now > due && now - lastTick > 8000) {
+    lastTick = now;
+    setDoc(liveDoc(c.gameId, 'tick'), { at: serverTimestamp() }).catch(() => { });
+  }
+}
+/* ---------- Elkana on the phone: his pose, a speech bubble and his voice. Plays each new line once, in order ---------- */
+const HOST_POSES = ['welcome', 'instructions', 'listen', 'start', 'attention', 'hourglass', 'bravo', 'magnifier', 'trophy', 'thumbs', 'thanks'];
+function hostAudio() { return window.__hostAudio || (window.__hostAudio = new Audio()); }
+/* phones play sound only after a tap: the first tap in the game "unlocks" Elkana's voice */
+document.addEventListener('click', function unlockHost() {
+  if (!groupCtx || window.__hostUnlocked) return;
+  window.__hostUnlocked = true;
+  try { const a = hostAudio(); a.src = silentWav(); a.play().catch(() => { window.__hostUnlocked = false; }); } catch (e) { }
+}, true);
+function hostListen(c) {
+  c.hostQueue = []; c.hostSeen = null;
+  playUnsubs.push(onSnapshot(query(collection(db, 'familyGames', c.gameId, 'host'), orderBy('seq', 'desc'), limit(12)), s => {
+    const msgs = s.docs.map(d => d.data()).sort((a, b) => a.seq - b.seq);
+    if (c.hostSeen === null) {
+      /* opening the game (or after a refresh): show the last line; play it only if it is fresh */
+      const last = msgs[msgs.length - 1];
+      c.hostSeen = last ? last.seq : 0;
+      if (last) { c.hostNow = last; if (Date.now() - tsMs(last.at) < 20000) c.hostQueue.push(last); }
+    } else msgs.filter(m => m.seq > c.hostSeen).forEach(m => { c.hostSeen = Math.max(c.hostSeen, m.seq); c.hostQueue.push(m); });
+    hostPlayNext(c); hostRender(c);
+  }, () => { }));
+}
+function hostPlayNext(c) {
+  if (c.hostPlaying || !c.hostQueue.length) return;
+  const m = c.hostQueue.shift(); c.hostNow = m; c.hostPlaying = true; hostRender(c);
+  const done = () => { c.hostPlaying = false; hostRender(c); setTimeout(() => hostPlayNext(c), 600); };
+  if (!m.audio) { setTimeout(done, Math.min(9000, 2500 + String(m.text || '').length * 60)); return; }
+  const a = hostAudio(); a.onended = done; a.onerror = done; a.src = m.audio;
+  a.play().catch(() => setTimeout(done, Math.min(9000, 2500 + String(m.text || '').length * 60)));
+}
+function hostRender(c) {
+  const box = document.getElementById('hostBox'), m = c && c.hostNow; if (!box) return;
+  if (!m) { box.innerHTML = ''; return; }
+  const pose = HOST_POSES.includes(m.pose) ? m.pose : 'welcome';
+  const who = m.moment === 'finalGroup' && m.gid ? ((c.allGroups || []).find(g => g.id === m.gid) || {}).name : '';
+  box.innerHTML = `<div class="host-card${c.hostPlaying ? ' talking' : ''}"><img src="e-${pose}.jpg" alt="אלקנה החשמונאי" onerror="this.onerror=null;this.src='elkana.jpg'"><div class="host-bubble">${who ? `<strong>קבוצת ${esc(who)}:</strong> ` : ''}${esc(m.text || '')}</div></div>`;
+}
 function renderGroup() {
   const c = groupCtx; if (!c || !c.state || !c.group) return;
+  groupTick(c);
   // ציורי הדמויות הם קבצים נפרדים (כדי שהאתר ייפתח מהר) — טוענים אותם מראש ברגע שהקבוצה במשחק
   if (!window.charsPreloaded) { window.charsPreloaded = true; EYE_CHARS.forEach(ch => { new Image().src = ch.src; }); }
-  const statusBox = document.getElementById('grpStatus'); if (statusBox) statusBox.innerHTML = groupsStatusHtml(c);
+  const statusBox = document.getElementById('grpStatus'); if (statusBox) statusBox.innerHTML = groupsStatusHtml(c) + (c.state.stage !== 'final' ? stuckHtml() : '');
   document.getElementById('grpTitle').textContent = 'קבוצת ' + c.group.name;
   const main = document.getElementById('grpMain'), add = document.getElementById('grpAdd'), crop = document.getElementById('cropBox');
   if (c.state.stage === 'photos') {
@@ -1979,17 +2089,19 @@ function renderGroup() {
     const members = c.players.map(p => `<div class="member"><img src="${esc(p.eyes)}" alt="העיניים של ${esc(p.name)}"><div><strong>${esc(p.name)}</strong>${editable ? ` <button class="game-btn" type="button" onclick="window.renameMember('${esc(p.id)}')">✏️ שינוי שם</button> <button class="game-btn" type="button" onclick="window.removeMember('${esc(p.id)}')">מחיקה</button>` : ''}</div></div>`).join('');
     if (!c.state.photosOpen && !c.group.ready && !c.players.length) {
       // מסך פתיחה: הוראות + הסבר, ”הבנו”, ומחכים שמנהל המשחק יפתח את הצילום לכולם
-      main.innerHTML = stageHeadline(1) + LEARN_TITLE + `<div class="now-box" style="text-align:center"><p style="font-size:22px;margin:0 0 6px"><strong>✅ הצטרפתם למשחק בהצלחה!</strong></p><p style="font-size:19px;margin:0 0 6px">אתם <strong>קבוצה מספר ${esc(c.group.index || '')} — ”${esc(c.group.name)}”</strong> 👋</p><p>בשלב הראשון כל אחד מהקבוצה מצטלם בטלפון הזה — שם מלא וצילום פנים מקרוב. צפו קודם בהסבר הקצר.</p><button class="game-btn" type="button" onclick="openStage(1,true)">▶ צפייה בהסבר</button></div>` + gotItHtml(c, 's1');
+      main.innerHTML = stageHeadline(1) + LEARN_TITLE + `<div class="now-box" style="text-align:center"><p style="font-size:22px;margin:0 0 6px"><strong>✅ הצטרפתם למשחק בהצלחה!</strong></p><p style="font-size:19px;margin:0 0 6px">אתם <strong>קבוצה מספר ${esc(c.group.index || '')} — ”${esc(c.group.name)}”</strong> 👋</p><p>בשלב הראשון כל אחד מהקבוצה מצטלם בטלפון הזה — שם מלא וצילום פנים מקרוב. צפו קודם בהסבר הקצר.</p><button class="game-btn" type="button" onclick="openStage(1,true)">▶ צפייה בהסבר</button></div>` + hostVideoHtml('elkana-intro.mp4', 'e-welcome.jpg', '▶ לוחצים — ואלקנה מברך אתכם 🔊') + gotItHtml(c, 's1');
       add.hidden = true; return;
     }
     if (c.group.ready) {
-      main.innerHTML = nowBox('מה עושים עכשיו?', ['כל המשתתפים הצטלמו.', 'לחצתם ”העלינו ואנחנו מוכנים”.', 'מחכים: כשכל הקבוצות יהיו מוכנות, מנהל המשחק ילחץ ”המשך”. אז יתחיל כאן לבד המשחק, עם שעון עצר.'], 2, `⏱️ כשיתחיל: יהיו לכם כ־${secsText(c.state.eyesPerPair || 15)} לכל זוג עיניים, והשעון רץ למעלה במסך. לא צריך לרענן ולא לסגור את המסך.`) + `<p><strong>✅ העליתם ${c.players.length === 1 ? 'משתתף אחד' : c.players.length + ' משתתפים'}:</strong></p>${members}<button class="game-btn" type="button" onclick="window.setGroupReady(false)">רגע, עוד לא — חזרה לצילום (או לתיקון שם)</button>`;
+      main.innerHTML = lobbyHtml(c) + nowBox('מה עושים עכשיו?', ['כל המשתתפים הצטלמו.', 'לחצתם ”העלינו ואנחנו מוכנים”.', 'מחכים לשאר הקבוצות. כשכולן מוכנות — אלקנה מתחיל את המשחק לבד, עם שעון עצר.'], 2, `⏱️ כשיתחיל: יהיו לכם כ־${secsText(c.state.eyesPerPair || 15)} לכל זוג עיניים, והשעון רץ למעלה במסך. לא צריך לרענן ולא לסגור את המסך.`) + `<p><strong>✅ העליתם ${c.players.length === 1 ? 'משתתף אחד' : c.players.length + ' משתתפים'}:</strong></p>${members}<button class="game-btn" type="button" onclick="window.setGroupReady(false)">רגע, עוד לא — חזרה לצילום (או לתיקון שם)</button>`;
       add.hidden = true; crop.innerHTML = ''; pendingFace = null;
     } else {
       // ”העלינו ואנחנו מוכנים” נפתח רק כשהקבוצה העלתה בדיוק את מספר המשתתפים שלה
       const readyBtn = missing <= 0
         ? '<button class="buy" type="button" onclick="window.setGroupReady(true)">העלינו ואנחנו מוכנים ✓</button>'
-        : `<button class="buy" type="button" disabled>העלינו ואנחנו מוכנים ✓</button><p class="warn" style="margin:4px 0">צריך עוד ${missing === 1 ? 'משתתף אחד' : missing + ' משתתפים'} כדי להמשיך — הקבוצה שלכם צריכה ${need}.</p>`;
+        : `<button class="buy" type="button" disabled>העלינו ואנחנו מוכנים ✓</button><p class="warn" style="margin:4px 0">צריך עוד ${missing === 1 ? 'משתתף אחד' : missing + ' משתתפים'} כדי להמשיך — הקבוצה שלכם צריכה ${need}.</p>`
+          /* without a manager: a group whose member did not come may continue with fewer */
+          + (c.players.length ? `<button class="game-btn" type="button" onclick="window.groupShort(${c.players.length})">מישהו לא הגיע? אנחנו רק ${c.players.length} — ממשיכים</button>` : '');
       main.innerHTML = nowBox('מה עושים?', ['כל אחד בתורו כותב שם מלא', 'מצטלם מקרוב ולוחץ ”שמירה”', `כשכל ה־${need} הצטלמו — ”העלינו ואנחנו מוכנים”`], missing <= 0 ? 2 : 0)
         + `<button class="game-btn" type="button" onclick="openStage(1,true)">▶ צפייה חוזרת בהסבר</button><p><strong>משתתפים בקבוצה: ${c.players.length} מתוך ${need}</strong></p>${members || '<p class="smallnote">עדיין לא הצטלם אף אחד.</p>'}${readyBtn}`;
       add.hidden = false;
@@ -2006,7 +2118,7 @@ function renderGroup() {
     const eyesOf = Object.fromEntries(((c.assignment && c.assignment.items) || []).map((it, i) => [it.pid, charCard(eyeCharFor(c.uid, i), it.eyes)]));
     main.innerHTML = `<div class="now-box" style="text-align:center"><p style="font-size:24px;margin:0"><strong>🎉 קיבלתם ${mine.score} ${mine.score === 1 ? 'נקודה' : 'נקודות'} מתוך ${mine.total}!</strong></p></div>`
       + mine.details.map((d, i) => `<div class="member eyes-card"><strong>${d.ok ? '✅ נכון!' : '❌ לא נכון'} — תמונה ${i + 1}</strong>${eyesOf[d.pid] || ''}<p style="margin:4px 0">כתבתם: ”${esc(d.guess || '—')}”<br>אלה העיניים של: <strong>${esc(d.real)}</strong></p></div>`).join('')
-      + scoreboard(c.results.stage1, '🏆 טבלת הניקוד — שלב 1') + '<p class="smallnote">מחכים למנהל המשחק לשלב הבא.</p>';
+      + scoreboard(c.results.stage1, '🏆 טבלת הניקוד — שלב 1') + nextStepHtml(c);
   } else if (['assocIntro', 'assoc', 'assocCheck', 'assocDone'].includes(c.state.stage)) {
     add.hidden = true; add.innerHTML = ''; crop.innerHTML = '';
     renderGroupAssoc(main);
@@ -2123,7 +2235,7 @@ const LEARN_TITLE = '<h3 class="learn-title">📖 בואו נבין מה צרי�
 function quickTip(t) { return `<div class="quick-tip">👉 ${t}</div>`; }
 function gotItHtml(c, k) {
   return c.group.gotIt && c.group.gotIt[k]
-    ? '<div class="gotit done">✅ מעולה! מחכים שכולם יבינו — כשמנהל המשחק ילחץ ”כולם הבינו”, המשחק ייפתח.</div>'
+    ? '<div class="gotit done">✅ מעולה! ברגע שכל הקבוצות לוחצות ”הבנתי” — אלקנה פותח את השלב (לכל היותר 3 דקות).</div>'
     : `<div class="gotit"><p>קראתם את ההוראות? לוחצים:</p><button class="gotit-btn" type="button" onclick="window.groupGotIt('${k}')">✓ הבנתי</button></div>`;
 }
 window.groupGotIt = function (k) {
@@ -2425,13 +2537,13 @@ function renderGroupAssoc(main) {
   }
   if (st.stage === 'assocCheck') {
     c.assocBuilt = null;
-    main.innerHTML = a.checking ? assocCheckTitle(a) + `<div class="info">${assocCheckList(a, false)}</div>` : '<div class="now-box"><p><strong>⏰ הזמן נגמר! סופרים את התשובות…</strong></p></div>';
+    main.innerHTML = a.checking ? assocCheckTitle(a) + `<div class="info">${assocCheckList(a, false)}</div>` : '<div class="now-box"><p><strong>⏰ הזמן נגמר! 🔍 אלקנה בודק עכשיו את כל התשובות של כל הקבוצות…</strong></p><p class="smallnote">תשובה בלי קשר אמיתי למשפחה או לחג — נפסלת. כפולות נספרות פעם אחת.</p></div>';
     return;
   }
   if (st.stage === 'assocDone') {
     c.assocBuilt = null;
     const mine = (a.podium || []).find(p => p.id === c.uid), pts = mine ? assocPlacePoints(a.podium, mine) : 0;
-    main.innerHTML = `<div class="now-box" style="text-align:center"><p style="font-size:22px;margin:0"><strong>🏆 התוצאות של שלב 2!</strong></p>${pts ? `<p style="margin:6px 0 0">כל הכבוד — אתם בין 3 המקומות הראשונים, וקיבלתם ${pts === 1 ? 'נקודה אחת' : pts + ' נקודות'}! 🎉</p>` : ''}</div>${assocPodiumHtml(a.podium || [])}${c.results && c.results.stage2 ? totalsTable(c.results, c.uid, '📊 הניקוד הכולל עד עכשיו') : ''}<p class="smallnote">מחכים למנהל המשחק לשלב הבא.</p>`;
+    main.innerHTML = `<div class="now-box" style="text-align:center"><p style="font-size:22px;margin:0"><strong>🏆 התוצאות של שלב 2!</strong></p>${pts ? `<p style="margin:6px 0 0">כל הכבוד — אתם בין 3 המקומות הראשונים, וקיבלתם ${pts === 1 ? 'נקודה אחת' : pts + ' נקודות'}! 🎉</p>` : ''}</div>${assocPodiumHtml(a.podium || [])}${c.results && c.results.stage2 ? totalsTable(c.results, c.uid, '📊 הניקוד הכולל עד עכשיו') : ''}${nextStepHtml(c)}`;
     return;
   }
   // סבב פעיל: בונים את המסך פעם אחת לכל תמונה — כדי לא למחוק את מה שמקלידים
@@ -2742,7 +2854,7 @@ function renderGroupWho(main) {
     const byQ = {}; (mine.details || []).forEach(d => (byQ[d.q] = byQ[d.q] || []).push(d));
     main.innerHTML = `<div id="whoDone"><div class="now-box" style="text-align:center"><p style="font-size:24px;margin:0"><strong>🎉 קיבלתם ${mine.score} ${mine.score === 1 ? 'נקודה' : 'נקודות'} מתוך ${mine.total} בשלב 3!</strong></p></div>`
       + Object.keys(byQ).map(q => `<div class="info"><h3>🎙️ ${esc(WHO_SAID_QUESTIONS[q].title)}</h3>${byQ[q].map((d, i) => `<div class="who-item"><div><strong>${d.ok ? '✅ נכון!' : '❌ לא נכון'} — הקלטה ${i + 1}</strong><br>כתבתם: ”${esc(d.guess || '—')}”<br>אמר/ה: <strong>${esc(d.real)}</strong></div><button class="game-btn" type="button" data-label="▶ בקול האמיתי" onclick="window.whoPlay('${esc(d.rid)}', 1, this)">▶ בקול האמיתי</button></div>`).join('')}</div>`).join('')
-      + scoreboard(c.results.stage3, '🏆 טבלת הניקוד — שלב 3') + totalsTable(c.results, c.uid, '📊 הניקוד הכולל') + '<p class="smallnote">מחכים למנהל המשחק — עוד רגע ההכרזה על המנצחים! 🥁</p></div>';
+      + scoreboard(c.results.stage3, '🏆 טבלת הניקוד — שלב 3') + totalsTable(c.results, c.uid, '📊 הניקוד הכולל') + '<p class="smallnote">עוד רגע ההכרזה על המנצחים! 🥁</p>' + nextStepHtml(c) + '</div>';
   }
 }
 window.whoMicTest = async function (btn) {
