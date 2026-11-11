@@ -140,7 +140,7 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
 .trust-box{background:#eaf7ec;border:2px solid #b7e0c0;border-radius:16px;padding:14px 16px;margin:0 0 16px;line-height:1.7}.contact-line{display:block}[data-contact] a{color:inherit;font-weight:800}footer [data-contact]{opacity:.9}.pay-opt{background:#fff;border:1px solid #cfe8d4;border-radius:12px;padding:10px 14px;margin:8px 0}.pay-opt p{margin:6px 0}.bit-box{background:#eaf7ec;border-radius:16px;padding:18px;line-height:1.8}.bit-box h3{margin:0 0 8px}.bit-box ol{margin:8px 0;padding-inline-start:22px}.bit-box[hidden],#adminScreen[hidden],#orderForm[hidden]{display:none!important}
 .order{border:2px solid #e8dfd2;border-radius:14px;padding:14px;margin:10px 0;background:#fff}.order.pending{border-color:#ffc34b;background:#fffaf0}.order.cancelled{opacity:.7}
 .order-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-weight:900}.badge{border-radius:20px;padding:3px 10px;font-size:13px;font-weight:800}.badge.pending{background:#fff0c7}.badge.paid{background:#d9f0dd}.badge.cancelled{background:#f3e3e3}
-.order-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:4px 14px;margin:8px 0;font-size:15px;word-break:break-word}.order-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}.order-actions input{font:inherit;padding:9px;border:1px solid #ddd2c0;border-radius:10px}
+.order-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:4px 14px;margin:8px 0;font-size:15px;word-break:break-word}.order-codes{background:#fff8e1;border:1px solid #f3c64b;border-radius:12px;padding:8px 12px;margin:6px 0;font-size:15px;word-break:break-word}.order-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}.order-actions input{font:inherit;padding:9px;border:1px solid #ddd2c0;border-radius:10px}
 .cred{background:#eaf7ec;border-radius:14px;padding:14px;margin:10px 0;white-space:pre-line;line-height:1.7}.admin-filter{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.admin-filter .on{background:#fff0c7;border-color:#ffc34b}.warn{color:#b3261e;font-weight:800}
 /* המשחק: מסכי מנהל וקבוצה */
 #playScreen[hidden]{display:none!important}.play-wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px;display:grid;gap:12px;font-size:17px}.play-wrap h2{margin:0}.play-wrap .buy{font-size:18px;padding:15px 24px}
@@ -956,7 +956,8 @@ function logError(err, where) {
   } catch (e) { rawWarn(e); }
 }
 // כל מקום בקוד שתופס שגיאה כותב console.warn(e) — משם היא נכנסת ליומן
-console.warn = (...a) => { rawWarn(...a); const e = a.find(x => x instanceof Error || (x && typeof x === 'object' && x.code)); if (e) logError(e, 'warn'); };
+/* (11.11.26) the label written next to the error (console.warn('aiUsage', e)) goes into the log, so we know WHAT failed */
+console.warn = (...a) => { rawWarn(...a); const e = a.find(x => x instanceof Error || (x && typeof x === 'object' && x.code)); const label = a.find(x => typeof x === 'string'); if (e) logError(e, label ? 'warn: ' + label : 'warn: ' + String((new Error().stack || '').split('\n')[2] || '').trim().slice(0, 50)); };
 window.addEventListener('error', e => logError(e.error || e.message, 'error'));
 window.addEventListener('unhandledrejection', e => logError(e.reason, 'promise'));
 function deviceName(ua) { return /iPhone|iPad/.test(ua) ? '📱 אייפון' : /Android/.test(ua) ? '📱 אנדרואיד' : /Windows/.test(ua) ? '💻 Windows' : /Mac/.test(ua) ? '💻 מק' : '❓'; }
@@ -967,7 +968,7 @@ window.loadErrorLog = async function () {
     const s = await getDocs(query(collection(db, 'errorLog'), orderBy('at', 'desc'), limit(30)));
     if (s.empty) { box.innerHTML = '<p>✅ אין תקלות. הכול עובד.</p>'; return; }
     const fmt = t => t ? new Intl.DateTimeFormat('he-IL', { timeZone: 'Asia/Jerusalem', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(t.toDate()) : '';
-    box.innerHTML = `<p class="smallnote">${s.size} התקלות האחרונות (החדשה למעלה):</p>` + s.docs.map(d => { const e = d.data(); return `<div class="err-row"><strong>${esc(fmt(e.at))}</strong> · ${esc(e.role || '')}${e.stage ? ' · שלב: ' + esc(e.stage) : ''} · ${deviceName(e.device || '')}<br><span dir="ltr">${esc(e.code ? e.code + ' — ' : '')}${esc(e.msg || '')}</span></div>`; }).join('');
+    box.innerHTML = `<p class="smallnote">${s.size} התקלות האחרונות (החדשה למעלה):</p>` + s.docs.map(d => { const e = d.data(); return `<div class="err-row"><strong>${esc(fmt(e.at))}</strong> · ${esc(e.role || '')}${e.stage ? ' · שלב: ' + esc(e.stage) : ''} · ${deviceName(e.device || '')}${e.where ? ` · <span dir="ltr" class="smallnote">${esc(e.where)}</span>` : ''}<br><span dir="ltr">${esc(e.code ? e.code + ' — ' : '')}${esc(e.msg || '')}</span></div>`; }).join('');
   } catch (e) { rawWarn(e); box.innerHTML = '<p class="warn">לא הצלחנו לטעון את היומן. ודאי שכללי האבטחה פורסמו.</p>'; }
 };
 window.clearErrorLog = async function () {
@@ -1086,6 +1087,7 @@ function renderOrders() {
   document.getElementById('adminFilter').innerHTML = tabs.map(([k, label]) => `<button type="button" class="game-btn ${adminFilter === k ? 'on' : ''}" onclick="window.setAdminFilter('${k}')">${label}</button>`).join('');
   const list = adminOrders.filter(o => adminFilter === 'all' || o.status === adminFilter);
   document.getElementById('ordersList').innerHTML = list.map(orderCard).join('') || '<p class="smallnote">אין הזמנות ברשימה הזו.</p>';
+  fillOrderCodes();
 }
 // המחיר הנכון להזמנה — כולל הנחת קופון רק אם הקוד שהלקוח כתב הוא אחד מהקודים שהגדרת
 function orderPrice(o) {
@@ -1107,7 +1109,21 @@ function orderCard(o) {
   if (o.status !== 'paid') actions += `<button class="game-btn danger" type="button" onclick="window.adminDeleteOrder('${o.id}')">🗑️ מחיקת ההזמנה לגמרי</button>`;
   return `<div class="order ${esc(o.status)}"><div class="order-head"><span>הזמנה ${esc(o.code)} · ${esc(o.buyerName)}</span><span class="badge ${esc(o.status)}">${STATUS_LABEL[o.status] || esc(o.status)}</span></div>
     <div class="order-grid"><span>📅 תאריך המשחק: <b>${formatDateHe(o.gameDate)}</b></span><span>👥 ${esc(o.participants)} משתתפים</span><span>💰 לתשלום: <b>${total.toLocaleString('he-IL')} ₪</b> ${mismatch}</span><span>📞 <a href="tel:${esc(o.phone)}" dir="ltr">${esc(formatPhone(o.phone))}</a></span><span>✉️ <span dir="ltr">${esc(o.email)}</span></span><span>🕒 הוזמן: ${created}</span>${couponInfo}${wiped}</div>
+    ${o.status === 'paid' ? `<div class="order-codes" id="jc-${esc(o.id)}" data-game="${esc(o.gameId || o.id)}">👥 קוד ההצטרפות למשתתפים: <span class="smallnote">טוענים…</span></div>` : ''}
     <div class="order-actions">${actions}</div></div>`;
+}
+/* Ayelet 11.11.26: in the admin list, every paid order shows the participants' join code + link (from familyGames/{id}.joinCode).
+   The customer's password is never stored (only Firebase Auth has it) - so it is not shown; "🔑 סיסמה חדשה ללקוח" makes a new one. */
+async function fillOrderCodes() {
+  for (const el of document.querySelectorAll('.order-codes[data-game]')) {
+    let jc = '';
+    try { const g = await getDoc(doc(db, 'familyGames', el.dataset.game)); jc = (g.exists() && g.data().joinCode) || ''; } catch (e) { console.warn('orderCodes', e); }
+    const link = SITE_URL + '#join=' + jc;
+    el.innerHTML = jc
+      ? `👥 קוד ההצטרפות למשתתפים: <b dir="ltr" style="font-size:20px;letter-spacing:2px">${esc(jc)}</b> · <span dir="ltr" class="smallnote">${esc(link)}</span> <button class="game-btn" type="button" onclick="navigator.clipboard.writeText('${esc(link)}').then(()=>{this.textContent='✅ הועתק'})">📋 העתקת הקישור</button>
+         <br><span class="smallnote">🔑 אין מנהל משחק. סיסמת הכניסה של הלקוח לא נשמרת באתר (לאבטחה) — אם צריך, ”🔑 סיסמה חדשה ללקוח”.</span>`
+      : '👥 קוד ההצטרפות למשתתפים: <span class="smallnote">אין קוד (המשחק נמחק או עוד לא הוקם)</span>';
+  }
 }
 // ---------- מחירון: נקבע בניהול, וכל האתר (טבלה, טופס, אישור תשלום) מחשב לפיו ----------
 async function loadPricing() { try { const s = await getDoc(doc(db, 'settings', 'pricing')); if (s.exists()) setPricing(s.data()); } catch (e) { console.warn(e); } }
@@ -3199,7 +3215,7 @@ authReady.then(async user => {
     const st = await getDoc(liveDoc(gameId, 'state'));
     if (st.exists() && st.data().stage === 'final') { forgetGroupGame(); return; }
     startGroup(gameId);
-  } catch (e) { console.warn(e); }
+  } catch (e) { if (e && e.code === 'permission-denied') forgetGroupGame(); else console.warn('autoResume', e); }
 });
 function forgetGroupGame() { try { localStorage.removeItem(GROUP_KEY); } catch (e) { } window.resumeGameId = null; const b = document.getElementById('resumeBox'); if (b) b.hidden = true; }
 /* Ayelet 11.11.26 - "I want to leave, and if I stopped in the middle - continue from where the game stopped":
@@ -3219,7 +3235,11 @@ window.showResume = async function () {
     window.resumeGameId = gameId;
     box.innerHTML = `<button class="buy" type="button" style="width:100%;font-size:20px;margin:0 0 14px" onclick="window.resumeGame()">🎮 חזרה למשחק — קבוצת ${esc(g.data().name || '')}</button><p class="smallnote" style="margin:-8px 0 12px">המשחק ממשיך בדיוק מאיפה שהוא עכשיו.</p>`;
     box.hidden = false;
-  } catch (e) { console.warn(e); box.hidden = true; }
+  } catch (e) {
+    /* a game that is already closed (after its day) cannot be read any more - just forget it, it is not a fault */
+    if (e && e.code === 'permission-denied') forgetGroupGame(); else console.warn('showResume', e);
+    box.hidden = true;
+  }
 };
 window.startGroup = id => startGroup(id);
 window.resumeGame = function () { const id = window.resumeGameId; if (!id) return; document.getElementById('resumeBox').hidden = true; startGroup(id); };

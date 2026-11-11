@@ -13,6 +13,14 @@
 html{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{margin:0;background:var(--cream);color:var(--navy);font-family:Arial,sans-serif;font-size:18px;line-height:1.75}
+/* Ayelet 11.11.26: the same colorful background as the site; the text stays on white panels for contrast */
+body{background:linear-gradient(-45deg,#ffc2d9,#ffe08a,#bfe3ff,#c7f0bd,#e2d1ff,#ffc2d9);background-size:400% 400%;background-attachment:fixed;animation:bgShift 24s ease-in-out infinite}
+@keyframes bgShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@media (prefers-reduced-motion:reduce){body{animation:none}}
+.top{background:rgba(255,255,255,.92)!important}
+.hero{background:transparent!important}.hero-in{background:rgba(255,255,255,.9);border-radius:22px;padding:22px 24px;box-shadow:0 6px 20px rgba(20,52,93,.08)}
+main{background:rgba(255,255,255,.93);border-radius:22px;padding:20px 26px 26px;box-shadow:0 6px 20px rgba(20,52,93,.08)}
+@media (max-width:860px){main{padding:16px 16px 22px}.hero-in{padding:18px 16px}}
 a{color:var(--link)}
 a:focus-visible,button:focus-visible{outline:3px solid #ff6f00;outline-offset:2px}
 .top{background:#fff;border-bottom:1px solid var(--line)}
