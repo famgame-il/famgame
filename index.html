@@ -1257,8 +1257,9 @@ window.aiTopUp = async function () {
 };
 /* The game opens by itself (no manager): the live documents are created when the payment is approved / a test game is made.
    auto: true = the server (Cloud Functions engine) runs the game and Elkana hosts it. */
-function autoLiveDocs(batch, gameId, joinCode, purchased) {
-  batch.set(liveDoc(gameId, 'state'), { stage: 'photos', auto: true, v: 0, joinCode: joinCode || '', purchased: Number(purchased), overrides: {}, lobby: {}, enteredAt: serverTimestamp(), updatedAt: serverTimestamp() });
+function autoLiveDocs(batch, gameId, joinCode, purchased, test) {
+  /* minGroups is only shown to the phones ("waiting for 1 more group") - the server decides by the game doc (test -> 2) */
+  batch.set(liveDoc(gameId, 'state'), { stage: 'photos', auto: true, v: 0, joinCode: joinCode || '', purchased: Number(purchased), minGroups: minGroups({ test: !!test }), overrides: {}, lobby: {}, enteredAt: serverTimestamp(), updatedAt: serverTimestamp() });
   batch.set(liveDoc(gameId, 'groupCount'), { count: 0 });
   batch.set(liveDoc(gameId, 'playerCount'), { count: 0 });
 }
@@ -1286,7 +1287,7 @@ window.adminTestGame = async function (btn) {
       orderId: id, orderCode: o.code, pricePaid: 0, createdAt: serverTimestamp(), ...(joinCode ? { joinCode } : {})
     });
     batch.update(doc(db, 'gameOrders', id), { status: 'paid', test: true, approvedAt: serverTimestamp(), amountPaid: 0, gameId: id });
-    autoLiveDocs(batch, id, joinCode, o.participants);
+    autoLiveDocs(batch, id, joinCode, o.participants, true);
     await batch.commit();
     await showCred(o, password, '🧪 משחק הבדיקה מוכן', 'משחק הבדיקה הוקם ✅', joinCode);
     credBox.insertAdjacentHTML('afterbegin', `<div class="info"><h3>🧪 איך בודקים</h3><ol>
@@ -2400,6 +2401,15 @@ const LEARN_TITLE = '<h3 class="learn-title">📖 בואו נבין מה צרי�
 // תזכורת קצרה למעלה ברגע שהשלב נפתח
 function quickTip(t) { return `<div class="quick-tip">👉 ${t}</div>`; }
 function gotItHtml(c, k) {
+  /* 11.11.26 (Ayelet waited alone and the text promised "at most 3 minutes"): stage 1 opens only when enough groups joined -
+     say how many joined and how many are still missing; the 3-minute limit is only for stages 2 and 3 */
+  if (c.group.gotIt && c.group.gotIt[k] && k === 's1') {
+    const n = (c.allGroups || []).length, need = Number(c.state && c.state.minGroups) || 0;
+    const waiting = need ? n < need : n < 2;
+    return waiting
+      ? `<div class="gotit done">✅ מעולה! <strong>מחכים שיצטרפו עוד קבוצות</strong> — הצטרפו ${n}${need ? `, צריך לפחות ${need}` : ''}. אי־אפשר לשחק עם קבוצה אחת: שלחו לשאר הקבוצות את הקישור למשחק. כשמספיק קבוצות הצטרפו וכולן לחצו ”הבנתי” — אלקנה (דמות ה־AI) פותח את השלב.</div>`
+      : '<div class="gotit done">✅ מעולה! ברגע שכל הקבוצות לוחצות ”הבנתי” — אלקנה (דמות ה־AI) פותח את השלב.</div>';
+  }
   return c.group.gotIt && c.group.gotIt[k]
     ? '<div class="gotit done">✅ מעולה! ברגע שכל הקבוצות לוחצות ”הבנתי” — אלקנה (דמות ה־AI) פותח את השלב (לכל היותר 3 דקות).</div>'
     : `<div class="gotit"><p>קראתם את ההוראות? לוחצים:</p><button class="gotit-btn" type="button" onclick="window.groupGotIt('${k}')">✓ הבנתי</button></div>`;
