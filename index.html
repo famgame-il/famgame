@@ -169,6 +169,7 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
 .eyes-card{flex-direction:column;align-items:stretch;text-align:center}.eyes-card img{width:100%}.eyes-preview{width:100%;max-width:480px;border-radius:12px;display:block;margin:8px auto}
 .crop-stage{position:relative;touch-action:none;user-select:none;overflow:hidden;margin:10px 0;border-radius:12px}.crop-stage img{display:block;width:100%;height:auto;pointer-events:none}.crop-rect{position:absolute;border:3px solid #ffc34b;border-radius:8px;box-shadow:0 0 0 9999px #0009;cursor:move;touch-action:none}
 .gender-pick{display:flex;gap:10px}.gender-pick label{flex:1;display:flex;gap:8px;align-items:center;justify-content:center;border:2px solid #e8dfd2;border-radius:12px;padding:12px;font-weight:800;cursor:pointer}.gender-pick input{width:auto}
+.host-name{display:block;font-size:12px;color:#8a6d00;font-weight:700;margin-bottom:2px;letter-spacing:.2px}
 </style></head><body>
 <section class="start-screen" id="startScreen">
   <div class="start-card">
@@ -206,7 +207,7 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
 <section class="section" id="before"><div class="head"><h2>מה צריך כדי לשחק?</h2></div><div class="before-grid">
 <article class="info"><strong>👥 קבוצות של עד 5</strong>מתחלקים במקום לקבוצות של עד 5 משתתפים — לפחות 3 קבוצות. אפשר גם פחות מ־5 בקבוצה.</article>
 <article class="info"><strong>📱 טלפון אחד לכל קבוצה</strong>כל הקבוצה משחקת מטלפון אחד: מצלמים, כותבים ומקליטים בו — רק כשהמשחק מבקש. אפשר גם מחשב עם מצלמה ומיקרופון, אבל טלפון נוח יותר ומומלץ.</article>
-<article class="info"><strong>🤖 אלקנה החשמונאי מנחה</strong>אין מנהל משחק ואין טלפון נוסף — כולם משחקים! אלקנה, המנחה המצחיק שלנו, מסביר כל שלב, מעביר הלאה לבד ומכריז על המנצחים.</article>
+<article class="info"><strong>🤖 אלקנה החשמונאי — דמות AI — מנחה</strong>אין מנהל משחק ואין טלפון נוסף — כולם משחקים! אלקנה, דמות ה־AI המצחיקה שמנחה את המשחק, מסביר כל שלב, מעביר הלאה לבד ומכריז על המנצחים.</article>
 <article class="info"><strong>🔢 קוד הצטרפות</strong>מי שרכש מקבל במייל קישור עם קוד בן 6 ספרות ושולח אותו לכל הקבוצות. כל הקבוצות נכנסות עם אותו קוד — והן במשחק.</article>
 <article class="info"><strong>🔀 כל אחד בטלפון שלו — ומשחקים עם כולם</strong>האתר מערבב בין כל הקבוצות: בשלב 1 ובשלב 3 כל קבוצה מקבלת את התמונות וההקלטות של הקבוצות האחרות — אף פעם לא של עצמה.</article>
 </div>
@@ -238,19 +239,19 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="step-circle s1"><span class="sn">1</span><span class="si">🛒</span><h3>רוכשים</h3><p>בוחרים מספר משתתפים ותאריך, ומשלמים בביט.</p></div>
 <div class="step-circle s2"><span class="sn">2</span><span class="si">📧</span><h3>מקבלים מייל</h3><p>קישור עם קוד הצטרפות — שולחים אותו לכל הקבוצות.</p></div>
 <div class="step-circle s3"><span class="sn">3</span><span class="si">👥</span><h3>ביום המשחק</h3><p>מתחלקים לקבוצות, וכל קבוצה מצטרפת עם הקוד.</p></div>
-<div class="step-circle s4"><span class="sn">4</span><span class="si">🎉</span><h3>משחקים!</h3><p>אלקנה החשמונאי מסביר, מצחיק ומעביר בין השלבים — לבד.</p></div>
+<div class="step-circle s4"><span class="sn">4</span><span class="si">🎉</span><h3>משחקים!</h3><p>אלקנה החשמונאי (דמות AI) מסביר, מצחיק ומעביר בין השלבים — לבד.</p></div>
 </div><p class="smallnote" style="text-align:center;margin-top:14px">המשחק פתוח רק בתאריך שבחרתם, מ־6:00 בבוקר עד 1:00 בלילה.</p></section>
 <section class="section" id="who"><div class="head"><h2>למי זה מתאים?</h2><p>לכל מי שרוצה להתגבש 😉</p></div><div class="who-chips"><span>🏡 משפחות</span><span>🧑‍🤝‍🧑 חברים</span><span>💼 צוותי עבודה</span><span>🏫 כיתות ומחזורים</span><span>🎉 וכל קבוצה</span></div><p style="text-align:center;margin:12px 0 0">🕍 מותאם לציבור הדתי</p></section>
 <section class="section" id="faq"><div class="head"><h2>שאלות נפוצות</h2></div>
 <details><summary>האם צריך להכין משהו מראש?</summary><p><strong>לא.</strong> המשחק מוכן מראש. לא מכינים תמונות, שאלות או חומרי משחק — האתר מנחה אתכם במהלך המשחק.</p></details>
 <details><summary>כמה אנשים בכל קבוצה?</summary><p>עד 5 משתתפים בקבוצה (אפשר גם פחות), ולפחות 3 קבוצות. האתר לא מאפשר לרשום יותר מ־5 בקבוצה — אם אתם יותר, מתחלקים לשתי קבוצות.</p></details>
 <details><summary>כמה טלפונים צריך?</summary><p>טלפון אחד לכל קבוצה — וזהו. אין מנהל משחק ואין טלפון נוסף. (אפשר גם מחשב עם מצלמה ומיקרופון — אבל טלפון נוח יותר ומומלץ.)</p></details>
-<details><summary>מי מנחה את המשחק?</summary><p>אלקנה החשמונאי — מנחה מצחיק שמופיע בכל הטלפונים ומדבר בקול: מקבל כל קבוצה, מסביר כל שלב בקצרה, מעביר הלאה לבד, מכריז על המנצחים ואומר מה הוא חושב על כל קבוצה. כולם משחקים — אף אחד לא צריך ”לנהל”.</p></details>
+<details><summary>מי מנחה את המשחק?</summary><p>אלקנה החשמונאי — דמות AI: מנחה מצחיק שמופיע בכל הטלפונים ומדבר בקול: מקבל כל קבוצה, מסביר כל שלב בקצרה, מעביר הלאה לבד, מכריז על המנצחים ואומר מה הוא חושב על כל קבוצה. כולם משחקים — אף אחד לא צריך ”לנהל”.</p></details>
 <details><summary>איך הקבוצות מצטרפות?</summary><p>מי שרכש מקבל במייל קישור עם קוד הצטרפות בן 6 ספרות ושולח אותו לכל הקבוצות. כל קבוצה פותחת את הקישור בטלפון שלה (או נכנסת לאתר ← ”אני רוצה לשחק” ומקלידה את הקוד), כותבת שם לקבוצה — והיא במשחק.</p></details>
-<details><summary>מתי המשחק מתחיל ומי מעביר לשלב הבא?</summary><p>המשחק מתחיל כשכל הקבוצות מוכנות: אם הגיעו כל המשתתפים שהוזמנו — מיד. אם הגיעו פחות — כל הקבוצות לוחצות ”כולנו כאן — מתחילים” (אחרי כמה דקות אלקנה מתחיל בעצמו, ומי שצריך עוד רגע לוחץ ”רגע, עוד לא!”). בין השלבים אלקנה מעביר הלאה לבד — כשכל הקבוצות סיימו או כשהזמן נגמר.</p></details>
+<details><summary>מתי המשחק מתחיל ומי מעביר לשלב הבא?</summary><p>המשחק מתחיל כשכל הקבוצות מוכנות: אם הגיעו כל המשתתפים שהוזמנו — מיד. אם הגיעו פחות — כל הקבוצות לוחצות ”כולנו כאן — מתחילים” (אחרי כמה דקות אלקנה, דמות ה־AI, מתחיל בעצמו, ומי שצריך עוד רגע לוחץ ”רגע, עוד לא!”). בין השלבים אלקנה מעביר הלאה לבד — כשכל הקבוצות סיימו או כשהזמן נגמר.</p></details>
 <details><summary>ומה אם משהו נתקע?</summary><p>לא נתקע 🙂 לכל שלב יש שעון, והשרת מעביר הלאה גם אם קבוצה לא סיימה. ויש בכל טלפון כפתור ”המשחק תקוע?” — אם רוב הקבוצות לוחצות, ממשיכים.</p></details>
 <details><summary>כל קבוצה משחקת לבד בטלפון שלה?</summary><p>כל קבוצה משחקת מהטלפון שלה — אבל כולם משחקים יחד. האתר מערבב בין כל הקבוצות: בשלב 1 כל קבוצה מזהה תמונות של בני משפחה מהקבוצות האחרות, ובשלב 3 שומעת הקלטות של הקבוצות האחרות. קבוצה אף פעם לא מקבלת את התמונות או ההקלטות של עצמה. בשלב 2 כל הקבוצות רואות את אותה תמונה באותו רגע, ובסוף משווים בין כולן.</p></details>
-<details><summary>האם חייבים מקרן?</summary><p>לא. כל קבוצה רואה ושומעת את אלקנה בטלפון שלה.</p></details>
+<details><summary>האם חייבים מקרן?</summary><p>לא. כל קבוצה רואה ושומעת את אלקנה (דמות AI) בטלפון שלה.</p></details>
 <details><summary>אילו תמונות צריך לצלם?</summary><p>רק בשלב 1: כל משתתף מצטלם בטלפון של הקבוצה — פנים מקרוב — כשהמשחק מבקש. מישהו מהקבוצה מצלם אותו (או סלפי). בשלב 2 התמונות מגיעות מהאתר — לא מצלמים כלום. בשלב 3 לא מצלמים, רק מקליטים.</p></details>
 <details><summary>למה מופיעים בשלב 2 מספרים, אותיות ותמונות?</summary><p>זה רמז: כותבים כמה שיותר דברים שהתמונה מזכירה לכם על המשפחה. למשל לתמונה של זר פרחים: ”סבא קונה לסבתא כל שישי פרחים לשבת”. בסרטון ההסבר של שלב 2 יש דוגמה.</p></details>
 <details><summary>כמה משתתפים אפשר?</summary><p>בין 10 ל־100 משתתפים לאירוע, לפי המספר שרכשתם. כשהמכסה מתמלאת, אי־אפשר להוסיף עוד משתתפים או קבוצות.</p></details>
@@ -262,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="purchase-summary" id="phoneSummary" style="background:#dceefa">📱 טלפון אחד לכל קבוצה — וזהו</div>
 <div class="purchase-summary" id="totalSummary">עלות כוללת: 320 ₪</div>
 <p class="smallnote">חשוב לדעת: בין 10 ל־100 משתתפים. מתחלקים במקום לקבוצות של עד 5 (לפחות 3 קבוצות), ו<strong>לכל קבוצה טלפון אחד</strong>.</p>
-<p class="smallnote"><strong>🤖 בלי מנהל משחק:</strong> אלקנה החשמונאי מנחה את כל המשחק בכל הטלפונים — כולם משחקים.</p>
+<p class="smallnote"><strong>🤖 בלי מנהל משחק:</strong> אלקנה החשמונאי, דמות AI, מנחה את כל המשחק בכל הטלפונים — כולם משחקים.</p>
 <label for="gameDate"><strong>תאריך המשחק</strong></label><input id="gameDate" type="date" required oninput="this.setCustomValidity('')">
 <p class="smallnote">המשחק יהיה פתוח רק בתאריך הזה — מ־6:00 בבוקר עד 1:00 בלילה.</p>
 <label for="buyer"><strong>שם הרוכש/ת</strong></label><input id="buyer" placeholder="שם מלא" required maxlength="60" autocomplete="name">
@@ -277,8 +278,8 @@ document.addEventListener('DOMContentLoaded', () => {
 </div>
 <!-- אזור ניהול הזמנות — נפתח בכתובת האתר עם #admin בסוף -->
 <!-- Ayelet 11.11.26 - AI host proof page (#ai-test): the phone talks only to Firestore, the server answers -->
-<section class="section" id="aiTestScreen" hidden><div class="head"><h2>🤖 בדיקת AI</h2><p>בודקים שהמנחה אלקנה החשמונאי עובד גם בטלפון עם סינון</p></div>
-<div class="info" style="text-align:center"><img src="elkana.jpg" alt="אלקנה החשמונאי, המנחה של המשחק" width="480" height="320" style="max-width:100%;height:auto;border-radius:16px">
+<section class="section" id="aiTestScreen" hidden><div class="head"><h2>🤖 בדיקת AI</h2><p>בודקים שהמנחה אלקנה החשמונאי (דמות AI) עובד גם בטלפון עם סינון</p></div>
+<div class="info" style="text-align:center"><img src="elkana.jpg" alt="אלקנה החשמונאי, דמות ה־AI שמנחה את המשחק" width="480" height="320" style="max-width:100%;height:auto;border-radius:16px">
 <p>לוחצים על הכפתור ← אלקנה כותב בדיחה ← ואחרי כמה שניות גם אומר אותה בקול.</p>
 <button class="game-btn" type="button" id="aiTestBtn" onclick="window.aiTestAsk()">🤖 בדיקת AI</button>
 <div id="aiTestOut" aria-live="polite" style="margin-top:12px"></div>
@@ -312,13 +313,13 @@ document.addEventListener('DOMContentLoaded', () => {
 <script>
 // ההסבר הציבורי של שלב 1 שומר על הסוד (בלי ”עיניים”). את ההסבר המלא רואים רק השחקנים, בתוך המשחק (stagesGame / clipsGame)
 const stages={
-1:{title:'מי זה במשפחה? 🕵️',desc:'כל משתתף מצטלם בטלפון של הקבוצה — ואז, באופן מסתורי, התמונות מקבלות תפנית... 🌀 צריך לזהות מי זה, נגד השעון! כל זיהוי נכון = נקודה.',steps:['מתי: מיד אחרי שהקבוצה מצטרפת למשחק. מי: כל משתתף בקבוצה, אחד אחרי השני.','איך: כותבים את השם המלא שלו, ומישהו מהקבוצה מצלם אותו מקרוב (או סלפי) בטלפון של הקבוצה — רק את הפנים. התמונה עולה לאתר לבד.','כולם הצטלמו? לוחצים ”העלינו ואנחנו מוכנים” ומחכים לשאר הקבוצות.','כשכולם מוכנים, אלקנה מפעיל את השעון — והתמונות מקבלות תפנית מסתורית 🌀','🔀 האתר מערבב את התמונות של כל הקבוצות: כל קבוצה מקבלת רק תמונות של בני משפחה מהקבוצות האחרות — אף פעם לא של עצמה. כל קבוצה בטלפון שלה, אבל משחקים עם כולם!','התמונות רצות על המסך ועוצרות — כותבים מי זה.','כל זיהוי נכון = נקודה. התמונות נמחקות מהאתר יום אחרי המשחק. מה בדיוק קורה? תגלו כשתשחקו 😉']},
+1:{title:'מי זה במשפחה? 🕵️',desc:'כל משתתף מצטלם בטלפון של הקבוצה — ואז, באופן מסתורי, התמונות מקבלות תפנית... 🌀 צריך לזהות מי זה, נגד השעון! כל זיהוי נכון = נקודה.',steps:['מתי: מיד אחרי שהקבוצה מצטרפת למשחק. מי: כל משתתף בקבוצה, אחד אחרי השני.','איך: כותבים את השם המלא שלו, ומישהו מהקבוצה מצלם אותו מקרוב (או סלפי) בטלפון של הקבוצה — רק את הפנים. התמונה עולה לאתר לבד.','כולם הצטלמו? לוחצים ”העלינו ואנחנו מוכנים” ומחכים לשאר הקבוצות.','כשכולם מוכנים, אלקנה (דמות ה־AI) מפעיל את השעון — והתמונות מקבלות תפנית מסתורית 🌀','🔀 האתר מערבב את התמונות של כל הקבוצות: כל קבוצה מקבלת רק תמונות של בני משפחה מהקבוצות האחרות — אף פעם לא של עצמה. כל קבוצה בטלפון שלה, אבל משחקים עם כולם!','התמונות רצות על המסך ועוצרות — כותבים מי זה.','כל זיהוי נכון = נקודה. התמונות נמחקות מהאתר יום אחרי המשחק. מה בדיוק קורה? תגלו כשתשחקו 😉']},
 2:{title:'מה זה מזכיר לכם? 💭',desc:'10 סבבים: תמונות רצות מהר מהר על המסך ועוצרות על אחת — כל הקבוצות רואות את אותה תמונה. שעון של כדקה מתחיל, וכותבים בטלפון כמה שיותר דברים שהתמונה מזכירה לכם על המשפחה או על החג. בסוף בודקים יחד — והקבוצה עם הכי הרבה תשובות תקינות מנצחת!',steps:['התמונות מגיעות מהאתר (פרחים, מספר, אות, מטוס…) — לא מצלמים כלום בשלב הזה. הן רצות מהר מהר ועוצרות על אחת, וכל הקבוצות רואות את אותה תמונה.','שעון של כדקה: כותבים בטלפון כמה שיותר דברים שהתמונה מזכירה לכם על המשפחה או על החג — כל רעיון בנפרד.','תשובה תקינה = קשר אמיתי למשפחה או לחג (למשל לזר פרחים: ”סבא קונה לסבתא כל שישי פרחים לשבת”). ”פרחים יפים” לא נחשב! כפילויות לא נספרות.','אחרי 10 תמונות: הקבוצה עם הכי הרבה תשובות — בודקים יחד בקול שהכול תקין. תשובה לא תקינה נפסלת, ואם הקבוצה ירדה — בודקים את הבאה בתור.','ככה עד שיש מקום ראשון, שני ושלישי 🥇🥈🥉']},
 3:{title:'מי אמר את זה?! 🎙️',desc:'10 שאלות מצחיקות — למשל ”אם היית יכול לנסוע בזמן, לאן היית נוסע?”. בכל קבוצה, על כל שאלה עונה בקול משתתף אחר (עד 20 שניות). האתר משנה את הקולות ומערבב אותם, וכל קבוצה צריכה לנחש מי אמר מה!',steps:['על כל שאלה עונה משתתף אחד מהקבוצה — כל פעם מישהו אחר. הוא מקליט תשובה של עד 20 שניות, כמו הודעה קולית. השם נשמר בסוד.','מעודדים להיות מקוריים, מצחיקים ומפתיעים — אבל אף אחד לא חייב לספר משהו אישי.','אחרי שכולם ענו, האתר משנה את הקולות ומערבב את ההקלטות של כל הקבוצות 🔀 — כל קבוצה בטלפון שלה, אבל משחקים עם כולם!','לכל שאלה כל קבוצה שומעת הקלטות של הקבוצות האחרות (אף פעם לא של עצמה) וכותבת מי לדעתה אמר כל אחת. כשיש הרבה משתתפים — שומעים מבחר אקראי, כדי שיישאר כיף וקצר.','בסוף — מיד התוצאות: מי אמר מה, כל זיהוי נכון = נקודה, וטבלת הניקוד של כל המשחק עם הקבוצה המנצחת! 🏆']}
 };
 // ההסבר המלא של שלב 1 — רק לשחקנים, בתוך המשחק
 const stagesGame={
-1:{title:'מכירים בעיניים 👀',desc:'כל משתתף מצטלם מקרוב וכותב את השם המלא שלו, והמערכת חותכת לבד את העיניים. אחרי ”המשך” עיניים של בני משפחה מקבוצות אחרות רצות מהר על המסך ועוצרות על זוג אחד — בוחרים מהרשימה של מי, ושוב רץ. כל תשובה נכונה = נקודה!',steps:['כל משתתף מצטלם מקרוב במכשיר של הקבוצה — רק הפנים, לא כל הגוף — וכותב שם מלא: שם פרטי ושם משפחה.','כשכל הקבוצה הצטלמה, לוחצים ”העלינו ואנחנו מוכנים”.','כשכל הקבוצות מוכנות — אלקנה מתחיל והשעון רץ.','עיניים רצות מהר מהר ועוצרות על זוג אחד: מקלידים את תחילת השם, בוחרים מהרשימה של מי, ולוחצים ”הבא”. עד 15 זוגות, אף פעם לא מהקבוצה שלכם.','בסוף לוחצים ”אישור”. כשהקבוצה האחרונה מאשרת — או כשהזמן נגמר — מגלים לכולם מה נכון. כל תשובה נכונה = נקודה.']}
+1:{title:'מכירים בעיניים 👀',desc:'כל משתתף מצטלם מקרוב וכותב את השם המלא שלו, והמערכת חותכת לבד את העיניים. אחרי ”המשך” עיניים של בני משפחה מקבוצות אחרות רצות מהר על המסך ועוצרות על זוג אחד — בוחרים מהרשימה של מי, ושוב רץ. כל תשובה נכונה = נקודה!',steps:['כל משתתף מצטלם מקרוב במכשיר של הקבוצה — רק הפנים, לא כל הגוף — וכותב שם מלא: שם פרטי ושם משפחה.','כשכל הקבוצה הצטלמה, לוחצים ”העלינו ואנחנו מוכנים”.','כשכל הקבוצות מוכנות — אלקנה (דמות ה־AI) מתחיל והשעון רץ.','עיניים רצות מהר מהר ועוצרות על זוג אחד: מקלידים את תחילת השם, בוחרים מהרשימה של מי, ולוחצים ”הבא”. עד 15 זוגות, אף פעם לא מהקבוצה שלכם.','בסוף לוחצים ”אישור”. כשהקבוצה האחרונה מאשרת — או כשהזמן נגמר — מגלים לכולם מה נכון. כל תשובה נכונה = נקודה.']}
 };
 // עשר השאלות של ”מי אמר את זה?!” (לשלב 3)
 const WHO_SAID_QUESTIONS=[
@@ -374,7 +375,7 @@ const clipsGame={
  {art:'✍️',text:'כותבים שם מלא — שם פרטי ושם משפחה',ms:3000},
  {art:'✂️ 👀',text:'הסוד נחשף: המערכת חותכת רק את העיניים!',ms:3400},
  {art:'✅',text:'כל הקבוצה הצטלמה? לוחצים ”העלינו ואנחנו מוכנים”',ms:3300},
- {art:'▶️ ⏱️',text:'כולם מוכנים — אלקנה מתחיל והשעון רץ!',ms:3200},
+ {art:'▶️ ⏱️',text:'כולם מוכנים — אלקנה (דמות AI) מתחיל והשעון רץ!',ms:3200},
  {art:'🔀 📱📱📱',text:'האתר מערבב את העיניים של כל הקבוצות — כל קבוצה מקבלת רק עיניים של הקבוצות האחרות, אף פעם לא של עצמה',ms:4400},
  {art:'🎰 👀',text:'העיניים רצות מהר מהר — ועוצרות על זוג אחד',ms:3600},
  {art:'✍️ ▶',text:'מקלידים תחילת שם, בוחרים מהרשימה של מי העיניים ולוחצים ”הבא” — ושוב רץ. עד 15 זוגות',ms:4000},
@@ -1258,7 +1259,7 @@ window.adminTestGame = async function (btn) {
     await batch.commit();
     await showCred(o, password, '🧪 משחק הבדיקה מוכן', 'משחק הבדיקה הוקם ✅', joinCode);
     credBox.insertAdjacentHTML('afterbegin', `<div class="info"><h3>🧪 איך בודקים</h3><ol>
-      <li><strong>אין מנהל משחק</strong> — המשחק כבר פתוח, ואלקנה מנחה אותו לבד.</li>
+      <li><strong>אין מנהל משחק</strong> — המשחק כבר פתוח, ואלקנה, דמות ה־AI, מנחה אותו לבד.</li>
       <li><strong>2 טלפונים = 2 קבוצות:</strong> בכל טלפון פותחים את הקישור ${joinCode ? `<span dir="ltr">${esc(SITE_URL)}#join=${joinCode}</span>` : '(הקוד יופיע אצל מנהל המשחק)'} ← שם קבוצה ← כמה משתתפים (מומלץ 2 בכל קבוצה, כדי ששלב 3 יוכל להחליף משתתף בכל שאלה).</li>
       <li>משחקים את שלבים 1, 2, 3 עד הסוף. המשחק נסגר לבד ב־1:00 בלילה ונמחק אחרי יום, כמו משחק רגיל.</li></ol></div>`);
   } catch (e) {
@@ -1282,7 +1283,7 @@ async function showCred(o, password, title, opening, joinCode) {
   const codePart = joinCode
     ? `👥 הקישור למשחק — שלחו אותו לכל הקבוצות (למשל בוואטסאפ של המשפחה):\n${SITE_URL}#join=${joinCode}\nקוד ההצטרפות: ${joinCode} (אפשר גם להיכנס לאתר ← ”אני רוצה לשחק” ← להקליד את הקוד).`
     : `👥 קוד ההצטרפות יישלח אליכם בנפרד. לשאלות: ${SITE_URL}`;
-  const text = `שלום ${o.buyerName}, ${opening}\n\n📅 יום המשחק: ${formatDateHe(o.gameDate)} — פתוח מ־6:00 בבוקר עד 1:00 בלילה.\n\n${codePart}\n\n🤖 אין מנהל משחק — כולם משחקים! אלקנה החשמונאי, המנחה שלנו, מופיע בכל הטלפונים: מסביר כל שלב, מעביר הלאה לבד ומכריז על המנצחים.\n\nאיך משחקים ביום המשחק:\n1. מתחלקים לקבוצות של עד 5 משתתפים (לפחות 3 קבוצות). לכל קבוצה טלפון אחד.\n2. כל קבוצה פותחת את הקישור, כותבת שם לקבוצה וכמה משתתפים יש בה.\n3. מצטלמים, לוחצים ”מוכנים” — ואלקנה מתחיל כשכולם מוכנים.\n4. מגבירים את הקול בטלפון כדי לשמוע את אלקנה. 🔊\nלא צריך להכין שום דבר מראש.\n\nשיהיה בהצלחה ושיהיה כיף!`;
+  const text = `שלום ${o.buyerName}, ${opening}\n\n📅 יום המשחק: ${formatDateHe(o.gameDate)} — פתוח מ־6:00 בבוקר עד 1:00 בלילה.\n\n${codePart}\n\n🤖 אין מנהל משחק — כולם משחקים! אלקנה החשמונאי, דמות ה־AI שמנחה את המשחק, מופיע בכל הטלפונים: מסביר כל שלב, מעביר הלאה לבד ומכריז על המנצחים.\n\nאיך משחקים ביום המשחק:\n1. מתחלקים לקבוצות של עד 5 משתתפים (לפחות 3 קבוצות). לכל קבוצה טלפון אחד.\n2. כל קבוצה פותחת את הקישור, כותבת שם לקבוצה וכמה משתתפים יש בה.\n3. מצטלמים, לוחצים ”מוכנים” — ואלקנה מתחיל כשכולם מוכנים.\n4. מגבירים את הקול בטלפון כדי לשמוע את אלקנה. 🔊\nלא צריך להכין שום דבר מראש.\n\nשיהיה בהצלחה ושיהיה כיף!`;
   window.lastCredText = text;
   const subject = 'פרטי הכניסה למשחק המשפחה';
   window.lastCred = { to: o.email, subject, text };
@@ -1861,7 +1862,7 @@ window.aiTestAsk = async function () {
     const old = await withTimeout(getDoc(ref), 15000);
     if (old.exists()) await deleteDoc(ref);
     await withTimeout(setDoc(ref, { question: '', createdAt: serverTimestamp() }), 15000);
-    out.textContent = '🤔 אלקנה חושב על בדיחה…';
+    out.textContent = '🤔 אלקנה (דמות AI) חושב על בדיחה…';
     const timer = setTimeout(() => {
       if (aiTestStop) { aiTestStop(); aiTestStop = null; }
       out.innerHTML = '<p class="warn">⏳ אלקנה לא ענה תוך דקה. אם זו הפעם הראשונה — כנראה השרת עוד לא הופעל. נסו שוב.</p>';
@@ -1869,13 +1870,13 @@ window.aiTestAsk = async function () {
     }, 60000);
     aiTestStop = onSnapshot(ref, snap => {
       const d = snap.data() || {};
-      if (d.status === 'working') out.textContent = '✍️ אלקנה כותב ומקליט…';
+      if (d.status === 'working') out.textContent = '✍️ אלקנה (דמות AI) כותב ומקליט…';
       if (d.status !== 'done' && d.status !== 'error') return;
       clearTimeout(timer); if (aiTestStop) { aiTestStop(); aiTestStop = null; }
       btn.disabled = false; btn.textContent = '🤖 עוד בדיחה';
       const secs = Math.round((Date.now() - started) / 1000);
       if (d.status === 'error') { out.innerHTML = `<p class="warn">❌ ${esc(AI_TEST_ERRORS[d.error] || 'משהו השתבש בשרת.')}</p><p class="smallnote" dir="ltr">${esc(d.error || '')}</p>`; return; }
-      out.innerHTML = `<p style="font-size:20px"><strong>🗣️ אלקנה:</strong> ${esc(d.answer || '')}</p>`
+      out.innerHTML = `<p style="font-size:20px"><strong>🗣️ אלקנה (דמות AI):</strong> ${esc(d.answer || '')}</p>`
         + `<p class="smallnote">✅ הטקסט הגיע מהשרת דרך Firebase בלבד (${secs} שניות).${d.audio ? ' 🔊 גם הקול הגיע.' : ''}</p>`
         + (d.audio ? '' : `<p class="warn">🔇 הקול לא נוצר בשרת${d.audioError ? ' (' + esc(d.audioError) + ')' : ''}.</p>`);
       if (d.audio) { player.src = d.audio; player.hidden = false; player.play().catch(() => { out.insertAdjacentHTML('beforeend', '<p>👆 לחצו ▶ כדי לשמוע את אלקנה.</p>'); }); }
@@ -2021,13 +2022,13 @@ function lobbyHtml(c) {
   return `<div class="now-box lobby-box" style="text-align:center"><p style="font-size:20px;margin:0 0 6px"><strong>🙋 כל הקבוצות מוכנות! כולם כאן?</strong></p>`
     + (mine ? `<p>✅ לחצתם. מחכים לעוד ${all.length - voted === 1 ? 'קבוצה אחת' : (all.length - voted) + ' קבוצות'}.</p>`
       : `<p>אם כל המשפחה כבר כאן — לוחצים. מתחילים כשכל הקבוצות לוחצות.</p><button class="buy" type="button" onclick="window.groupStartVote()">כולנו כאן — מתחילים ✓</button>`)
-    + (autoAt ? `<p style="margin-top:10px"><strong>⏱️ אלקנה מתחיל בעוד <span data-autostart>${fmtClock(autoAt - Date.now())}</span></strong></p><button class="game-btn" type="button" onclick="window.groupHold()">✋ רגע, עוד לא! (עוד 3 דקות)</button>` : '')
+    + (autoAt ? `<p style="margin-top:10px"><strong>⏱️ אלקנה (דמות AI) מתחיל בעוד <span data-autostart>${fmtClock(autoAt - Date.now())}</span></strong></p><button class="game-btn" type="button" onclick="window.groupHold()">✋ רגע, עוד לא! (עוד 3 דקות)</button>` : '')
     + '</div>';
 }
 /* after a results screen: when the next stage opens, by itself */
 function nextStepHtml(c) {
   const at = tsMs(c.state && c.state.nextAt);
-  return at ? `<div class="now-box" style="text-align:center"><p style="margin:0">⏭️ אלקנה עובר לשלב הבא בעוד <strong data-next>${fmtClock(at - Date.now())}</strong></p></div>` : '';
+  return at ? `<div class="now-box" style="text-align:center"><p style="margin:0">⏭️ אלקנה (דמות AI) עובר לשלב הבא בעוד <strong data-next>${fmtClock(at - Date.now())}</strong></p></div>` : '';
 }
 window.groupStartVote = function () { const c = groupCtx; if (c) updateGroupDoc(c, { startVoteAt: serverTimestamp() }).catch(e => console.warn(e)); };
 window.groupHold = function () { const c = groupCtx; if (c) updateGroupDoc(c, { holdAt: serverTimestamp() }).catch(e => console.warn(e)); };
@@ -2178,10 +2179,10 @@ function hostRender(c) {
   /* while the server is writing the next line (and nothing is playing) - "אלקנה מקליד…" with moving dots */
   const typing = !c.hostPlaying && !c.hostQueue.length && c.hostTypingAt && Date.now() - c.hostTypingAt < 45000;
   const shownText = c.hostPlaying && c.hostTyped != null ? String(m.text || '').slice(0, c.hostTyped) : String(m.text || '');
-  const body = typing ? '<span class="host-typing">אלקנה מקליד<i>.</i><i>.</i><i>.</i></span>'
+  const body = typing ? '<span class="host-typing">אלקנה (דמות AI) מקליד<i>.</i><i>.</i><i>.</i></span>'
     : `${who ? `<strong>קבוצת ${esc(who)}:</strong> ` : ''}<span class="host-text">${esc(shownText)}</span>`;
   setTimeout(() => { try { document.documentElement.style.setProperty('--hostH', box.offsetHeight + 'px'); } catch (e) { } }, 0);
-  box.innerHTML = `<div class="host-card${c.hostPlaying ? ' talking' : ''}"><img src="h-${typing ? 'thinking' : pose}.jpg" alt="אלקנה החשמונאי" onerror="this.onerror=null;this.src='e-${pose}.jpg'"><div class="host-bubble">${body}${tools}</div></div>`
+  box.innerHTML = `<div class="host-card${c.hostPlaying ? ' talking' : ''}"><img src="h-${typing ? 'thinking' : pose}.jpg" alt="אלקנה החשמונאי, דמות AI" onerror="this.onerror=null;this.src='e-${pose}.jpg'"><div class="host-bubble"><b class="host-name">🤖 אלקנה · דמות AI</b>${body}${tools}</div></div>`
     + (c.hostMuted ? '<p class="smallnote" style="text-align:center;margin:-6px 0 6px;background:#fff8e1;border-radius:10px;padding:4px">🔇 לחצו 🔁 כדי לשמוע את אלקנה — ומעכשיו הוא ידבר לבד.</p>' : '');
 }
 window.hostReplay = function () {
@@ -2192,8 +2193,8 @@ window.hostIntroAgain = function () {
   const c = groupCtx; if (!c) return;
   /* the video of the current part again (on its own full screen) */
   const st = (c.state && c.state.stage) || '';
-  const v = st.startsWith('assoc') ? ['elkana-stage2.mp4', 'e-instructions.jpg', 'אלקנה מסביר את שלב 2'] : st.startsWith('who') ? ['elkana-stage3.mp4', 'e-instructions.jpg', 'אלקנה מסביר את שלב 3']
-    : st === 'final' ? ['elkana-winners.mp4', 'e-trophy.jpg', 'ההכרזה'] : ['elkana-stage1.mp4', 'e-welcome.jpg', 'אלקנה מסביר את שלב 1'];
+  const v = st.startsWith('assoc') ? ['elkana-stage2.mp4', 'e-instructions.jpg', 'אלקנה (דמות AI) מסביר את שלב 2'] : st.startsWith('who') ? ['elkana-stage3.mp4', 'e-instructions.jpg', 'אלקנה (דמות AI) מסביר את שלב 3']
+    : st === 'final' ? ['elkana-winners.mp4', 'e-trophy.jpg', 'ההכרזה'] : ['elkana-stage1.mp4', 'e-welcome.jpg', 'אלקנה (דמות AI) מסביר את שלב 1'];
   openVideoOverlay(c, 'again', [v[0]], v[1], v[2], true);
 };
 function renderGroup() {
@@ -2211,11 +2212,11 @@ function renderGroup() {
       // מסך פתיחה: הוראות + הסבר, ”הבנו”, ומחכים שמנהל המשחק יפתח את הצילום לכולם
       /* 11.11.26 (Ayelet): the opening video of Elkana plays by itself; "הבנתי" appears only when the video ends (or if it cannot load - never stuck) */
       /* the opening video + the stage-1 video play by themselves; "הבנתי" appears only when they end (never stuck) */
-      videoGate(main, c, 's1', ['elkana-intro.mp4', 'elkana-stage1.mp4'], 'e-welcome.jpg', 'אלקנה מברך אתכם 🔊', stageHeadline(1) + LEARN_TITLE + `<div class="now-box" style="text-align:center"><p style="font-size:22px;margin:0 0 6px"><strong>✅ הצטרפתם למשחק בהצלחה!</strong></p><p style="font-size:19px;margin:0 0 6px">אתם <strong>קבוצה מספר ${esc(c.group.index || '')} — ”${esc(c.group.name)}”</strong> 👋</p><p>בשלב הראשון כל אחד מהקבוצה מצטלם בטלפון הזה — שם מלא וצילום פנים מקרוב.</p></div>`, gotItHtml(c, 's1'), !!(c.group.gotIt && c.group.gotIt.s1));
+      videoGate(main, c, 's1', ['elkana-intro.mp4', 'elkana-stage1.mp4'], 'e-welcome.jpg', 'אלקנה (דמות AI) מברך אתכם 🔊', stageHeadline(1) + LEARN_TITLE + `<div class="now-box" style="text-align:center"><p style="font-size:22px;margin:0 0 6px"><strong>✅ הצטרפתם למשחק בהצלחה!</strong></p><p style="font-size:19px;margin:0 0 6px">אתם <strong>קבוצה מספר ${esc(c.group.index || '')} — ”${esc(c.group.name)}”</strong> 👋</p><p>בשלב הראשון כל אחד מהקבוצה מצטלם בטלפון הזה — שם מלא וצילום פנים מקרוב.</p></div>`, gotItHtml(c, 's1'), !!(c.group.gotIt && c.group.gotIt.s1));
       add.hidden = true; return;
     }
     if (c.group.ready) {
-      main.innerHTML = lobbyHtml(c) + nowBox('מה עושים עכשיו?', ['כל המשתתפים הצטלמו.', 'לחצתם ”העלינו ואנחנו מוכנים”.', 'מחכים לשאר הקבוצות. כשכולן מוכנות — אלקנה מתחיל את המשחק לבד, עם שעון עצר.'], 2, `⏱️ כשיתחיל: יהיו לכם כ־${secsText(c.state.eyesPerPair || 15)} לכל זוג עיניים, והשעון רץ למעלה במסך. לא צריך לרענן ולא לסגור את המסך.`) + `<p><strong>✅ העליתם ${c.players.length === 1 ? 'משתתף אחד' : c.players.length + ' משתתפים'}:</strong></p>${members}<button class="game-btn" type="button" onclick="window.setGroupReady(false)">רגע, עוד לא — חזרה לצילום (או לתיקון שם)</button>`;
+      main.innerHTML = lobbyHtml(c) + nowBox('מה עושים עכשיו?', ['כל המשתתפים הצטלמו.', 'לחצתם ”העלינו ואנחנו מוכנים”.', 'מחכים לשאר הקבוצות. כשכולן מוכנות — אלקנה (דמות ה־AI) מתחיל את המשחק לבד, עם שעון עצר.'], 2, `⏱️ כשיתחיל: יהיו לכם כ־${secsText(c.state.eyesPerPair || 15)} לכל זוג עיניים, והשעון רץ למעלה במסך. לא צריך לרענן ולא לסגור את המסך.`) + `<p><strong>✅ העליתם ${c.players.length === 1 ? 'משתתף אחד' : c.players.length + ' משתתפים'}:</strong></p>${members}<button class="game-btn" type="button" onclick="window.setGroupReady(false)">רגע, עוד לא — חזרה לצילום (או לתיקון שם)</button>`;
       add.hidden = true; crop.innerHTML = ''; pendingFace = null;
     } else {
       // ”העלינו ואנחנו מוכנים” נפתח רק כשהקבוצה העלתה בדיוק את מספר המשתתפים שלה
@@ -2358,7 +2359,7 @@ const LEARN_TITLE = '<h3 class="learn-title">📖 בואו נבין מה צרי�
 function quickTip(t) { return `<div class="quick-tip">👉 ${t}</div>`; }
 function gotItHtml(c, k) {
   return c.group.gotIt && c.group.gotIt[k]
-    ? '<div class="gotit done">✅ מעולה! ברגע שכל הקבוצות לוחצות ”הבנתי” — אלקנה פותח את השלב (לכל היותר 3 דקות).</div>'
+    ? '<div class="gotit done">✅ מעולה! ברגע שכל הקבוצות לוחצות ”הבנתי” — אלקנה (דמות ה־AI) פותח את השלב (לכל היותר 3 דקות).</div>'
     : `<div class="gotit"><p>קראתם את ההוראות? לוחצים:</p><button class="gotit-btn" type="button" onclick="window.groupGotIt('${k}')">✓ הבנתי</button></div>`;
 }
 window.groupGotIt = function (k) {
@@ -2654,13 +2655,13 @@ function renderGroupAssoc(main) {
   if (st.stage === 'assocIntro') {
     c.assocBuilt = null;
     const secs = st.assocSecsPlan || ASSOC_SECS;
-    videoGate(main, c, 's2', ['elkana-stage2.mp4'], 'e-instructions.jpg', 'אלקנה מסביר את שלב 2 🔊', stageHeadline(2) + LEARN_TITLE + nowBox('שלב 2 — מה זה מזכיר לכם? 💭', ['תמונה רצה מהר מהר — ועוצרת. כל הקבוצות רואות את אותה תמונה.', `⏱️ יש לכם עד ${secsText(secs)} לכל תמונה (השעון רץ למעלה במסך): כותבים בתיבה שמתחת לתמונה כמה שיותר דברים שהיא מזכירה לכם על המשפחה או על החג — כל רעיון בנפרד, ולוחצים ”הוספה”.`, 'תשובה תקינה = קשר אמיתי למשפחה או לחג (למשל לזר פרחים: ”סבא קונה לסבתא כל שישי פרחים לשבת”). ”פרחים יפים” לא נחשב!', 'ככה 10 תמונות. בסוף בודקים יחד את הקבוצה עם הכי הרבה תשובות — עד מקום ראשון, שני ושלישי.'], 0)
+    videoGate(main, c, 's2', ['elkana-stage2.mp4'], 'e-instructions.jpg', 'אלקנה (דמות AI) מסביר את שלב 2 🔊', stageHeadline(2) + LEARN_TITLE + nowBox('שלב 2 — מה זה מזכיר לכם? 💭', ['תמונה רצה מהר מהר — ועוצרת. כל הקבוצות רואות את אותה תמונה.', `⏱️ יש לכם עד ${secsText(secs)} לכל תמונה (השעון רץ למעלה במסך): כותבים בתיבה שמתחת לתמונה כמה שיותר דברים שהיא מזכירה לכם על המשפחה או על החג — כל רעיון בנפרד, ולוחצים ”הוספה”.`, 'תשובה תקינה = קשר אמיתי למשפחה או לחג (למשל לזר פרחים: ”סבא קונה לסבתא כל שישי פרחים לשבת”). ”פרחים יפים” לא נחשב!', 'ככה 10 תמונות. בסוף בודקים יחד את הקבוצה עם הכי הרבה תשובות — עד מקום ראשון, שני ושלישי.'], 0)
       , gotItHtml(c, 's2'), !!(c.group.gotIt && c.group.gotIt.s2));
     return;
   }
   if (st.stage === 'assocCheck') {
     c.assocBuilt = null;
-    main.innerHTML = a.checking ? assocCheckTitle(a) + `<div class="info">${assocCheckList(a, false)}</div>` : '<div class="now-box"><p><strong>⏰ הזמן נגמר! 🔍 אלקנה בודק עכשיו את כל התשובות של כל הקבוצות…</strong></p><p class="smallnote">תשובה בלי קשר אמיתי למשפחה או לחג — נפסלת. כפולות נספרות פעם אחת.</p></div>';
+    main.innerHTML = a.checking ? assocCheckTitle(a) + `<div class="info">${assocCheckList(a, false)}</div>` : '<div class="now-box"><p><strong>⏰ הזמן נגמר! 🔍 אלקנה (דמות ה־AI) בודק עכשיו את כל התשובות של כל הקבוצות…</strong></p><p class="smallnote">תשובה בלי קשר אמיתי למשפחה או לחג — נפסלת. כפולות נספרות פעם אחת.</p></div>';
     return;
   }
   if (st.stage === 'assocDone') {
@@ -2954,7 +2955,7 @@ function renderGroupWho(main) {
   if (st.stage === 'whoIntro') {
     c.whoBuilt = null;
     const recMin = st.whoRecMinPlan || WHO_REC_MINUTES;
-    videoGate(main, c, 's3', ['elkana-stage3.mp4'], 'e-instructions.jpg', 'אלקנה מסביר את שלב 3 🔊', `<div id="whoIntro">${stageHeadline(3)}${LEARN_TITLE}${nowBox('שלב 3 — מי אמר את זה?! 🎙️', [`יש ${WHO_SAID_QUESTIONS.length} שאלות מצחיקות. על כל שאלה עונה משתתף אחד מהקבוצה — כל פעם מישהו אחר. מקליטים בטלפון של הקבוצה, עד 20 שניות לכל תשובה, כמו הודעה קולית. בלי שעון — כשסיימתם לוחצים ”סיימנו”.`, 'אחר כך האתר משנה קצת את הקולות 😄 וכל קבוצה שומעת הקלטות של הקבוצות האחרות — שאלה אחרי שאלה, עם שעון.', 'מי לדעתכם אמר כל תשובה? מקלידים את תחילת השם ובוחרים מהרשימה (אפשר לבחור רק שם מהרשימה). כל זיהוי נכון = נקודה!'], 0, 'לפני שלוחצים ”הבנתי”: לוחצים ”🎙️ בדיקת מיקרופון” ומאשרים גישה.')}
+    videoGate(main, c, 's3', ['elkana-stage3.mp4'], 'e-instructions.jpg', 'אלקנה (דמות AI) מסביר את שלב 3 🔊', `<div id="whoIntro">${stageHeadline(3)}${LEARN_TITLE}${nowBox('שלב 3 — מי אמר את זה?! 🎙️', [`יש ${WHO_SAID_QUESTIONS.length} שאלות מצחיקות. על כל שאלה עונה משתתף אחד מהקבוצה — כל פעם מישהו אחר. מקליטים בטלפון של הקבוצה, עד 20 שניות לכל תשובה, כמו הודעה קולית. בלי שעון — כשסיימתם לוחצים ”סיימנו”.`, 'אחר כך האתר משנה קצת את הקולות 😄 וכל קבוצה שומעת הקלטות של הקבוצות האחרות — שאלה אחרי שאלה, עם שעון.', 'מי לדעתכם אמר כל תשובה? מקלידים את תחילת השם ובוחרים מהרשימה (אפשר לבחור רק שם מהרשימה). כל זיהוי נכון = נקודה!'], 0, 'לפני שלוחצים ”הבנתי”: לוחצים ”🎙️ בדיקת מיקרופון” ומאשרים גישה.')}
       <button class="buy" type="button" onclick="window.whoMicTest(this)">🎙️ בדיקת מיקרופון</button><p class="smallnote" id="whoMicMsg"></p>
       </div>`, gotItHtml(c, 's3'), !!(c.group.gotIt && c.group.gotIt.s3));
     return;
