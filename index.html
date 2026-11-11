@@ -447,6 +447,8 @@ document.addEventListener('DOMContentLoaded',renderPriceGrid);
 const MIN_PARTICIPANTS=10,MAX_PARTICIPANTS=100,MIN_GROUPS=3,MIN_GROUP_SIZE=1;
 const maxGroupsFor=n=>n;
 // מספר הקבוצות לפי גודל הקבוצה שנבחר (4 מומלץ, או 5) — ולפחות 3 קבוצות
+/* Ayelet 11.11.26 - a free test game (made in the admin area) may be played with only 2 groups */
+function minGroups(game){return game&&game.test?2:MIN_GROUPS}
 function groupCountFor(n,size){return Math.max(MIN_GROUPS,Math.ceil(n/(size||4)))}
 function getGroupSizes(n,size){
  if(n<1)return [];
@@ -664,7 +666,8 @@ function backToStart(){if(history.state&&history.state.screen==='site')history.b
 function routeFromHash(){
  const admin=document.getElementById('adminScreen'),aiTest=document.getElementById('aiTestScreen');
  /* AI host proof page */
- if(location.hash==='#ai-test'){closeModal();closeGameAccess();document.getElementById('startScreen').hidden=true;document.getElementById('siteContent').hidden=true;admin.hidden=true;aiTest.hidden=false;return;}
+ /* also ?ai-test (some apps and filters drop the # part of a link) */
+ if(location.hash==='#ai-test'||(!location.hash&&/[?&]ai-test\b/.test(location.search))){closeModal();closeGameAccess();document.getElementById('startScreen').hidden=true;document.getElementById('siteContent').hidden=true;admin.hidden=true;aiTest.hidden=false;return;}
  if(!aiTest.hidden){aiTest.hidden=true;document.getElementById('startScreen').hidden=false;}
  if(location.hash==='#admin'){closeModal();closeGameAccess();document.getElementById('startScreen').hidden=true;document.getElementById('siteContent').hidden=true;admin.hidden=false;if(window.renderAdmin)window.renderAdmin();}
  else if(location.hash.startsWith('#join=')){if(window.openJoin)window.openJoin(location.hash.slice(6));}
@@ -1017,6 +1020,8 @@ async function showAdminPanel(user) {
     return;
   }
   adminBox().innerHTML = `<div class="order-head" style="margin-bottom:12px"><span>מחוברת כ־<span dir="ltr">${esc(user.email || '')}</span></span><span>${logout} <a class="game-btn" href="#" style="text-decoration:none">← לאתר</a></span></div>
+    <div class="info"><h3>🧪 משחק בדיקה (חינם)</h3><p class="smallnote">משחק אמיתי להיום, בלי רכישה ובלי תשלום — כדי לבדוק את שלבים 1, 2, 3 בעצמך. אפשר לשחק עם 2 קבוצות בלבד (2 טלפונים), ומנהל המשחק במחשב או בטלפון שלישי.</p>
+      <button class="game-btn" type="button" onclick="window.adminTestGame(this)">🧪 יצירת משחק בדיקה להיום</button></div>
     <div class="info"><h3>💳 תשלום בביט</h3><p class="smallnote">מה שתשמרי כאן מוצג ללקוחות אחרי שליחת הזמנה.</p>
       <label><strong>מספר הביט</strong><div class="order-actions"><input id="bitPhoneInput" type="tel" inputmode="tel" placeholder="050-1234567"></div></label>
       <label><strong>קישור לתשלום (רשות) — למשל קישור לקבוצה בפייבוקס</strong><div class="order-actions"><input id="bitLinkInput" type="url" dir="ltr" placeholder="https://..." style="flex:1;min-width:220px"></div></label>
@@ -1189,6 +1194,43 @@ window.adminApprove = async function (id) {
     return;
   }
   await showCred(o, password, `✅ התשלום אושר ונוצרה סיסמה עבור ${esc(o.buyerName)}`, 'התשלום התקבל — תודה! המשחק שלכם הוקם ✅', joinCode);
+};
+/* Ayelet 11.11.26 */
+/* Free test game for the admin: a pending order is created and approved at once (total 0, test: true), for today.
+   A test game may be played with 2 groups (minGroups). Same rules and screens as a real game. */
+window.adminTestGame = async function (btn) {
+  const email = auth.currentUser && auth.currentUser.email;
+  if (!email) { alert('צריך להיות מחוברת לניהול.'); return; }
+  const today = israelGameDay();
+  if (!confirm(`ליצור משחק בדיקה חינם להיום (${formatDateHe(today)})?\nיופיעו כאן סיסמה למנהל המשחק וקוד הצטרפות לקבוצות.`)) return;
+  const credBox = document.getElementById('credBox');
+  btn.disabled = true; credBox.innerHTML = '<div class="cred">יוצרים משחק בדיקה…</div>';
+  const id = 'test' + Date.now().toString(36);
+  /* the order itself (same fields and rules as a customer's order) */
+  const o = { code: randomCode(), buyerName: 'משחק בדיקה', email, phone: '0500000000', participants: MIN_PARTICIPANTS, gameDate: today, total: 0, status: 'pending', createdAt: serverTimestamp() };
+  try {
+    await setDoc(doc(db, 'gameOrders', id), o);
+    const { uid: ownerUid, password } = await createOrderLogin(email);
+    const joinCode = await createJoinCode(id, today);
+    const batch = writeBatch(db);
+    batch.set(doc(db, 'familyGames', id), {
+      ownerUid, ownerEmail: email, buyerName: o.buyerName, phone: o.phone, test: true,
+      purchasedParticipants: o.participants, maxGroups: maxGroupsFor(o.participants), status: 'setup',
+      gameDate: today, accessFrom: Timestamp.fromDate(israelDayStart(today, GAME_OPEN_HOUR)), accessUntil: Timestamp.fromDate(israelDayEnd(today)),
+      orderId: id, orderCode: o.code, pricePaid: 0, createdAt: serverTimestamp(), ...(joinCode ? { joinCode } : {})
+    });
+    batch.update(doc(db, 'gameOrders', id), { status: 'paid', test: true, approvedAt: serverTimestamp(), amountPaid: 0, gameId: id });
+    await batch.commit();
+    await showCred(o, password, '🧪 משחק הבדיקה מוכן', 'משחק הבדיקה הוקם ✅', joinCode);
+    credBox.insertAdjacentHTML('afterbegin', `<div class="info"><h3>🧪 איך בודקים</h3><ol>
+      <li><strong>מנהל המשחק:</strong> בחלון גלישה בסתר (Ctrl+Shift+N) או בטלפון שלישי ← ”אני רוצה לשחק” ← ”אני מנהל המשחק” ← האימייל שלך + הסיסמה שלמטה ← ”פתיחת המשחק”. (בחלון הזה את נשארת מחוברת לניהול.)</li>
+      <li><strong>2 טלפונים = 2 קבוצות:</strong> בכל טלפון פותחים את הקישור ${joinCode ? `<span dir="ltr">${esc(SITE_URL)}#join=${joinCode}</span>` : '(הקוד יופיע אצל מנהל המשחק)'} ← שם קבוצה ← כמה משתתפים (מומלץ 2 בכל קבוצה, כדי ששלב 3 יוכל להחליף משתתף בכל שאלה).</li>
+      <li>משחקים את שלבים 1, 2, 3 עד הסוף. המשחק נסגר לבד ב־1:00 בלילה ונמחק אחרי יום, כמו משחק רגיל.</li></ol></div>`);
+  } catch (e) {
+    console.warn(e);
+    credBox.innerHTML = `<div class="cred warn">יצירת משחק הבדיקה נכשלה (${esc(e.code || e.message || '')}). נסי שוב.</div>`;
+  }
+  btn.disabled = false;
 };
 async function createJoinCode(gameId, gameDate) {
   for (let i = 0; i < 8; i++) {
@@ -1565,14 +1607,14 @@ function renderManager() {
   }).join('') || '<p class="smallnote">עדיין לא הצטרפו קבוצות.</p>';
   let stageHtml = '';
   if (m.state.stage === 'photos' && !m.state.photosOpen) {
-    stageHtml = `<div class="info"><h3>👀 שלב 1 — הקבוצות קוראות את ההוראות</h3><p>כל קבוצה רואה עכשיו את ההוראות ולוחצת ”הבנתי”. כשכולן הבינו — לוחצים ”כולם הבינו”, והמשחק נפתח לכולם.</p>${m.groups.length < MIN_GROUPS ? `<p class="warn">מחכים שלפחות ${MIN_GROUPS} קבוצות יצטרפו (כרגע ${m.groups.length}). המשחק צריך לפחות ${MIN_GROUPS} קבוצות.</p>` : ''}${gotItStatusHtml(m, 's1')}
+    stageHtml = `<div class="info"><h3>👀 שלב 1 — הקבוצות קוראות את ההוראות</h3><p>כל קבוצה רואה עכשיו את ההוראות ולוחצת ”הבנתי”. כשכולן הבינו — לוחצים ”כולם הבינו”, והמשחק נפתח לכולם.</p>${m.groups.length < minGroups(m.game) ? `<p class="warn">מחכים שלפחות ${minGroups(m.game)} קבוצות יצטרפו (כרגע ${m.groups.length}). המשחק צריך לפחות ${minGroups(m.game)} קבוצות.</p>` : ''}${gotItStatusHtml(m, 's1')}
       <button class="buy" type="button" ${m.groups.length ? '' : 'disabled'} onclick="window.managerOpenPhotos()">כולם הבינו — פותחים את המשחק ▶</button></div>`;
   } else if (m.state.stage === 'photos') {
     // בדיקות תקינות לפני ”המשך”: לפחות 3 קבוצות, כל קבוצה מלאה בדיוק לפי מה שנדרש ולחצה ”מוכנים”, ואין שמות כפולים
     const ready = m.groups.filter(gr => { const ps = per[gr.id] || []; return gr.ready && ps.length === requiredFor(m.state, gr, ps.length); }).length;
     const dups = duplicateNames(m.players, m.groups);
     let reason = '';
-    if (m.groups.length < MIN_GROUPS) reason = `מחכים שלפחות ${MIN_GROUPS} קבוצות יצטרפו (כרגע ${m.groups.length}). המשחק צריך לפחות ${MIN_GROUPS} קבוצות.`;
+    if (m.groups.length < minGroups(m.game)) reason = `מחכים שלפחות ${minGroups(m.game)} קבוצות יצטרפו (כרגע ${m.groups.length}). המשחק צריך לפחות ${minGroups(m.game)} קבוצות.`;
     else if (ready < m.groups.length) reason = `מחכים שכל הקבוצות יעלו את כל המשתתפים שלהן וילחצו ”העלינו ואנחנו מוכנים” (${ready} מתוך ${m.groups.length} מוכנות).`;
     else if (dups.length) reason = `יש שמות כפולים — כך אי־אפשר לבדוק תשובות: ${dups.map(esc).join('; ')}. בקשו מאחד מהם למחוק את עצמו ולהצטלם שוב עם כינוי (למשל ”משה כהן הגדול”).`;
     m.plan = reason ? null : assignEyeSets(m.players, m.groups.map(gr => gr.id));
@@ -1759,10 +1801,20 @@ const AI_TEST_ERRORS = {
   'refusal': 'אלקנה לא הצליח לענות על זה. נסו שוב.'
 };
 let aiTestStop = null;
+/* 0.1 second of silence as a WAV data URI - used to "unlock" the audio player inside a tap */
+function silentWav() {
+  const n = 800, buf = new Uint8Array(44 + n), v = new DataView(buf.buffer), s = (o, t) => [...t].forEach((c, i) => buf[o + i] = c.charCodeAt(0));
+  s(0, 'RIFF'); v.setUint32(4, 36 + n, true); s(8, 'WAVEfmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, 8000, true); v.setUint32(28, 8000, true); v.setUint16(32, 1, true); v.setUint16(34, 8, true); s(36, 'data'); v.setUint32(40, n, true);
+  buf.fill(128, 44);
+  return 'data:audio/wav;base64,' + btoa(String.fromCharCode(...buf));
+}
 window.aiTestAsk = async function () {
   const out = document.getElementById('aiTestOut'), btn = document.getElementById('aiTestBtn'), player = document.getElementById('aiTestAudio');
   if (aiTestStop) { aiTestStop(); aiTestStop = null; }
-  btn.disabled = true; player.hidden = true; player.removeAttribute('src');
+  btn.disabled = true; player.hidden = true;
+  /* Phones play sound only after a tap: play a short silence NOW (inside the tap), so Elkana's voice plays by itself later */
+  try { player.src = silentWav(); player.play().catch(() => { }); } catch (e) { }
   out.textContent = 'מתחברים…';
   const started = Date.now();
   try {
@@ -1790,6 +1842,11 @@ window.aiTestAsk = async function () {
         + `<p class="smallnote">✅ הטקסט הגיע מהשרת דרך Firebase בלבד (${secs} שניות).${d.audio ? ' 🔊 גם הקול הגיע.' : ''}</p>`
         + (d.audio ? '' : `<p class="warn">🔇 הקול לא נוצר בשרת${d.audioError ? ' (' + esc(d.audioError) + ')' : ''}.</p>`);
       if (d.audio) { player.src = d.audio; player.hidden = false; player.play().catch(() => { out.insertAdjacentHTML('beforeend', '<p>👆 לחצו ▶ כדי לשמוע את אלקנה.</p>'); }); }
+      /* Voice samples - the same line in several voices, so Ayelet can choose the clearest one */
+      if (Array.isArray(d.samples) && d.samples.length > 1) {
+        out.insertAdjacentHTML('beforeend', '<h3 style="margin:14px 0 4px">🎧 איזה קול הכי ברור?</h3><p class="smallnote">אותו משפט בקולות שונים — הקשיבו לכולם ותגידו לי איזו אות הכי מובנת.</p>'
+          + d.samples.map(s => `<p style="margin:8px 0 2px"><strong>קול ${esc(s.label)}</strong> <span class="smallnote">(${s.nikud ? 'עם ניקוד' : 'בלי ניקוד'})</span></p><audio controls preload="none" src="${esc(s.audio)}" style="width:100%"></audio>`).join(''));
+      }
     }, e => { clearTimeout(timer); console.warn('aiTest', e); out.innerHTML = '<p class="warn">❌ אי־אפשר לקרוא את התשובה (כנראה כללי האבטחה עוד לא פורסמו).</p>'; btn.disabled = false; });
   } catch (e) {
     console.warn('aiTest', e);
@@ -2868,7 +2925,7 @@ function whoGuessGroupTick() {
 
 // טלפון של קבוצה שרוענן באמצע המשחק — חוזר ישר למסך הקבוצה. משחק שכבר הסתיים (הכרזה על המנצחים) — לא חוזרים אליו לבד
 authReady.then(async user => {
-  if (!user || !user.isAnonymous || location.hash === '#admin' || location.hash === '#ai-test' || location.hash.startsWith('#join=')) return;
+  if (!user || !user.isAnonymous || location.hash === '#admin' || location.hash === '#ai-test' || /[?&]ai-test\b/.test(location.search) || location.hash.startsWith('#join=')) return;
   let gameId = null; try { gameId = localStorage.getItem(GROUP_KEY); } catch (e) { }
   if (!gameId) return;
   try {
