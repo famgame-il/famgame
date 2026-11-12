@@ -683,6 +683,9 @@ async function submitOrder(){
  if(!/^0\d{8,9}$/.test(phone)){phoneEl.setCustomValidity('מספר הטלפון לא תקין. לדוגמה: 050-1234567');phoneEl.reportValidity();return;}
  const name=document.getElementById('buyer').value.trim(),email=document.getElementById('email').value.trim().toLowerCase();
  if(!window.firebaseSubmitOrder){msg.textContent='המערכת עדיין נטענת — נסו שוב בעוד רגע.';return;}
+ /* Ayelet 12.11.26 - a coupon typed but not activated: activate it now; a wrong code stops the order (so nobody pays full price by mistake) */
+ const couponEl=document.getElementById('coupon');
+ if(normCoupon(couponEl.value)&&!couponPercent){await applyCoupon();if(!couponPercent){msg.textContent='קוד הקופון לא תקף — תקנו אותו או מחקו אותו, ואז שלחו שוב.';couponEl.focus();return;}}
  const order={buyerName:name,email,phone,participants:n,gameDate:dateEl.value,total:finalPrice(n,couponPercent)};
  if(couponPercent)order.coupon=normCoupon(document.getElementById('coupon').value);
  if(!pendingOrder){const n=new Uint32Array(1);crypto.getRandomValues(n);pendingOrder={id:'o'+Date.now().toString(36)+Math.random().toString(36).slice(2,8),code:String(100000+n[0]%900000),tried:false};}
@@ -767,7 +770,7 @@ window.firebaseSubmitOrder = async function (order, pending) {
       `שלום ${order.buyerName},\n\nההזמנה שלך נקלטה — תודה! 🎉\n\nמספר הזמנה: ${code}\nמספר משתתפים: ${order.participants}\nתאריך המשחק: ${date}\nלתשלום: ${total} ₪\n\nאיך משלמים:\n${payLine}\nבהערה לתשלום כותבים: הזמנה ${code}\n\nאחרי שנקבל את התשלום, נשלח לך למייל הזה שם משתמש וסיסמה — עד 24 שעות מהתשלום (בדרך כלל הרבה יותר מהר). לא קיבלת? החזר כספי מלא.${contactText()}\nהמשחק יהיה פתוח ביום ${date} בלבד, מ־6:00 בבוקר עד 1:00 בלילה.\n\nמשחק המשפחה`);
     const cfg = await getEmailCfg();
     if (cfg.adminEmail) await sendEmail(cfg.adminEmail, `הזמנה חדשה ${code} — ${order.buyerName}`,
-      `התקבלה הזמנה חדשה באתר:\n\nמספר הזמנה: ${code}\nשם: ${order.buyerName}\nטלפון: ${formatPhone(order.phone)}\nאימייל: ${order.email}\nמשתתפים: ${order.participants}\nתאריך המשחק: ${date}\nלתשלום: ${total} ₪\n\nכשהתשלום מגיע לביט — נכנסים לאזור הניהול ולוחצים ”התשלום התקבל”:\n${SITE_URL}#admin`);
+      `התקבלה הזמנה חדשה באתר:\n\nמספר הזמנה: ${code}\nשם: ${order.buyerName}\nטלפון: ${formatPhone(order.phone)}\nאימייל: ${order.email}\nמשתתפים: ${order.participants}\nתאריך המשחק: ${date}\nלתשלום: ${total} ₪\n${order.coupon ? `קופון: ${order.coupon}\n` : 'קופון: בלי\n'}\nכשהתשלום מגיע לביט — נכנסים לאזור הניהול ולוחצים ”התשלום התקבל”:\n${SITE_URL}#admin`);
   } catch (e) { console.warn(e); }
   return { code, bitPhone, bitLink, emailed };
 };
