@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>בדיקה | משחק משפחתי</title>
+<!-- Ayelet 12.11.26 - a small check page to send to people: does the site open + does Elkana's video play (shows nothing of the game itself) -->
+<style>
+/* Same colorful background as the site; the content sits on a white card */
+:root{--navy:#14345d}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;color:var(--navy);font-family:Arial,sans-serif;font-size:18px;line-height:1.7;
+  background:linear-gradient(-45deg,#ffc2d9,#ffe08a,#bfe3ff,#c7f0bd,#e2d1ff,#ffc2d9);background-size:400% 400%;background-attachment:fixed;animation:bgShift 24s ease-in-out infinite}
+@keyframes bgShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@media (prefers-reduced-motion:reduce){body{animation:none}}
+main{background:rgba(255,255,255,.94);border-radius:22px;padding:20px;max-width:420px;width:100%;text-align:center;box-shadow:0 6px 20px rgba(20,52,93,.1)}
+h1{font-size:26px;margin:0 0 6px}
+p{margin:6px 0}
+video{width:100%;max-width:300px;border-radius:16px;margin:12px auto 6px;display:block;background:#000}
+.small{font-size:15px;opacity:.85}
+/* the answer buttons */
+.btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+button{font:inherit;font-weight:800;border:0;border-radius:999px;padding:10px 20px;cursor:pointer;background:#1b7a43;color:#fff}
+button.no{background:#a33}
+button:focus-visible{outline:3px solid #ff6f00;outline-offset:2px}
+#ans{font-weight:800;margin-top:10px}
+</style>
+</head>
+<body>
+<main>
+  <h1>✅ האתר נפתח אצלכם!</h1>
+  <p>תודה שעזרתם לבדוק 🙏</p>
+  <p>לחצו על ▶ כדי לראות את אלקנה, המנחה שלנו (דמות AI). שימו לב שיש קול.</p>
+  <video src="elkana-intro.mp4" poster="e-welcome.jpg" controls playsinline preload="metadata"></video>
+  <p class="small">זו רק בדיקה, המשחק עצמו עוד מחכה לכם 😉</p>
+  <p><strong>הסרטון עבד, עם תמונה וקול?</strong></p>
+  <div class="btns">
+    <button type="button" onclick="ans('מעולה! הכול עובד אצלכם 🎉 אפשר לסגור את הדף.')">👍 כן, הכול עבד</button>
+    <button type="button" class="no" onclick="ans('תודה! כתבו למי ששלח לכם את הקישור איזה טלפון יש לכם ומה לא עבד.')">👎 משהו לא עבד</button>
+  </div>
+  <p id="ans" aria-live="polite"></p>
+</main>
+<script>
+/* show a short answer after pressing a button (nothing is saved or sent) */
+function ans(t) { document.getElementById('ans').textContent = t; }
+</script>
+</body>
+</html>

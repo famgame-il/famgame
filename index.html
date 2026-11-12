@@ -34,6 +34,11 @@ nav{display:flex;align-items:center;gap:clamp(10px,2vw,25px);flex-wrap:wrap}nav 
 .buy-top{display:none}
 /* (11.11.26, Ayelet: "I still scroll down and see the purchase part") - the form lives only on its own page */
 body:not(.buy-mode) #purchase{display:none!important}
+/* Ayelet 12.11.26 - a short personal note from Ayelet on the purchase page + WhatsApp button (number = the contact phone in admin) */
+.ayelet-note{background:#fff8e1;border:2px solid #f3d27a;border-radius:18px;padding:14px 16px;margin:0 0 16px;line-height:1.7}
+.ayelet-note strong{font-size:19px;color:var(--navy)}.ayelet-note p{margin:4px 0}
+.wa-btn{display:inline-flex;align-items:center;gap:6px;background:#1b7a43;color:#fff;font-weight:800;border-radius:999px;padding:9px 18px;text-decoration:none;margin-top:6px}
+.wa-btn:focus-visible{outline:3px solid var(--navy);outline-offset:2px}
 .buy-cta{text-align:center}.buy-cta .buy{font-size:22px;padding:14px 34px;margin-top:6px}
 body.buy-mode #siteContent>header,body.buy-mode main#home>:not(#purchase){display:none!important}
 body.buy-mode .buy-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 14px;font-weight:900;font-size:20px;color:var(--navy)}
@@ -285,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <details><summary>כמה משתתפים אפשר?</summary><p>בין 10 ל־100 משתתפים לאירוע, לפי המספר שרכשתם. כשהמכסה מתמלאת, אי־אפשר להוסיף עוד משתתפים או קבוצות.</p></details>
 <details><summary>מה עושים אם קוד ההצטרפות לא עובד?</summary><p>בודקים שהקלדתם את 6 הספרות נכון, ומבקשים את הקישור שוב ממי שרכש. האתר כותב בדיוק מה הבעיה: קוד שגוי, המשחק עוד לא נפתח היום (נפתח רק ביום המשחק מ־6:00), או שהמשחק מלא.</p></details><details><summary>איך משלמים ומקבלים גישה?</summary><p>אחרי שליחת ההזמנה מופיעות הוראות לתשלום בביט. אחרי שהתשלום מתקבל, נשלח אליכם במייל קישור הצטרפות עם קוד — שולחים אותו לכל הקבוצות.</p><p><span class="contact-line" data-contact></span></p></details><details><summary>מתי אפשר לשחק?</summary><p>המשחק פתוח רק בתאריך שבחרתם ברכישה — מ־6:00 בבוקר עד 1:00 בלילה. לפני התאריך ואחריו אי־אפשר להיכנס למשחק.</p></details></section>
 <section class="section buy-cta" id="buyCta"><h2>רוצים לשחק? 🎉</h2><p>בוחרים מספר משתתפים ותאריך — ופרטי הכניסה מגיעים במייל.</p><button class="buy" type="button" onclick="openBuyPage()">🛒 לרכישת המשחק</button></section>
-<section class="section" id="purchase"><div class="buy-top"><button class="game-btn" type="button" onclick="closeBuyPage()">← חזרה לאתר</button><span>משחק משפחתי 🕎</span></div><div class="head"><h2>רכישת המשחק</h2><p>בחרו את מספר המשתתפים ואת תאריך המשחק. ביום המשחק מתחלקים במקום לקבוצות של עד 5.</p></div><p class="smallnote" id="priceNote">מחיר נגיש, עם תקרה של 320 ₪ למשחק.</p>
+<section class="section" id="purchase"><div class="buy-top"><button class="game-btn" type="button" onclick="closeBuyPage()">← חזרה לאתר</button><span>משחק משפחתי 🕎</span></div><div class="ayelet-note"><strong>היי, אני איילת 👋</strong><p>תמיד אני זאתי שאחראית על הפעילויות במשפחה, והפעם הבאתי משהו חדש ויצירתי: משחק משפחתי עם מנחה AI.</p><p>המשחק הזה הולך לסדר לכם את תוכנית חנוכה 🕎</p><p>יש שאלה? נוח לכם יותר לדבר לפני שמשלמים? כתבו לי ישר לוואטסאפ, בכיף.</p><a class="wa-btn" data-wa hidden target="_blank" rel="noopener" href="#">💬 לכתוב לאיילת בוואטסאפ<span class="vh"> (נפתח בחלון חדש)</span></a></div><div class="head"><h2>רכישת המשחק</h2><p>בחרו את מספר המשתתפים ואת תאריך המשחק. ביום המשחק מתחלקים במקום לקבוצות של עד 5.</p></div><p class="smallnote" id="priceNote">מחיר נגיש, עם תקרה של 320 ₪ למשחק.</p>
 <div class="price-grid" id="priceGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px;margin:18px 0"></div><div class="trust-box">🤝 <strong>קנייה בטוחה:</strong> פרטי הכניסה נשלחים אליכם במייל עד 24 שעות מהתשלום (בדרך כלל הרבה יותר מהר). לא קיבלתם? החזר כספי מלא.<span class="contact-line" data-contact></span></div><div class="info"><form class="fields" id="orderForm" onsubmit="event.preventDefault();submitOrder()">
 <label for="people"><strong>מספר המשתתפים</strong></label><input id="people" type="number" min="10" max="100" step="1" value="30" required oninput="updateGroups()">
 <div class="purchase-summary" id="groupSummary">30 משתתפים</div>
@@ -786,6 +791,9 @@ window.fillContact = async function () {
   if (c.phone) parts.push(`📞 <a href="tel:${esc(c.phone)}" dir="ltr">${esc(formatPhone(c.phone))}</a>`);
   if (c.email) parts.push(`✉️ <a href="mailto:${esc(c.email)}" dir="ltr">${esc(c.email)}</a>`);
   document.querySelectorAll('[data-contact]').forEach(el => el.innerHTML = parts.length ? 'לכל שאלה או בירור — מתקשרים או שולחים מייל: ' + parts.join(' · ') : '');
+  /* the WhatsApp button on the purchase page (12.11.26) - Israeli number 05x -> 9725x; hidden when no phone is saved */
+  const digits = String(c.phone || '').replace(/\D/g, ''), wa = digits.startsWith('0') ? '972' + digits.slice(1) : digits;
+  document.querySelectorAll('[data-wa]').forEach(a => { if (wa.length >= 11) { a.href = 'https://wa.me/' + wa + '?text=' + encodeURIComponent('היי איילת, יש לי שאלה על משחק המשפחה 🙂'); a.hidden = false; } else a.hidden = true; });
 };
 window.fillContact();
 // ---------- מיילים אוטומטיים (EmailJS — שירות חינמי, ההגדרות נשמרות באזור הניהול) ----------
