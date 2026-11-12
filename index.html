@@ -446,6 +446,10 @@ function openStage(n,game){const s=(game&&stagesGame[n])||stages[n];clipSet=game
 function closeModal(){stopClip();clipState='ended';document.getElementById('modal').classList.remove('open')}
 // קופון הנחה: הקוד עצמו סודי — באתר נשמרת רק ”טביעת אצבע” שלו, כך שאי־אפשר לגלות אותו
 let couponPercent=0;
+/* Ayelet 12.11.26 - six coupon slots: 1 -> settings/coupon (+ couponSecret.current), n -> settings/coupon<n> (+ current<n>) */
+const COUPON_SLOTS=[1,2,3,4,5,6];
+const couponSlot=n=>n===1?'coupon':'coupon'+n;
+const couponCurrent=n=>n===1?'current':'current'+n;
 function finalPrice(n,percent){const base=getTotalPrice(n);return percent?Math.round(base*(100-percent)/100):base}
 function normCoupon(s){return String(s||'').trim().toUpperCase()}
 async function couponHash(code){const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(normCoupon(code)));return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('')}
@@ -454,8 +458,8 @@ async function applyCoupon(){
  if(!normCoupon(code)){msg.textContent='כתבו קוד קופון.';return}
  if(!window.firebaseGetCoupon){msg.textContent='המערכת עדיין נטענת — נסו שוב בעוד רגע.';return}
  msg.textContent='בודקים…';
- // יש שני מקומות לקופון (coupon, coupon2) — הקוד תקף אם הוא מתאים לאחד מהם
- const h=await couponHash(code),list=await Promise.all([window.firebaseGetCoupon('coupon'),window.firebaseGetCoupon('coupon2')]);
+ // יש שישה מקומות לקופון (coupon, coupon2 … coupon6) — הקוד תקף אם הוא מתאים לאחד מהם
+ const h=await couponHash(code),list=await Promise.all(COUPON_SLOTS.map(n=>window.firebaseGetCoupon(couponSlot(n))));
  const c=list.find(x=>x&&x.active&&x.hash===h);
  if(c){couponPercent=c.percent;msg.textContent=`✓ הקופון הופעל — ${c.percent}% הנחה!`}
  else{couponPercent=0;msg.textContent='הקוד לא תקף.'}
@@ -1093,8 +1097,8 @@ async function showAdminPanel(user) {
     <div class="info"><h3>💰 מחירון</h3><p class="smallnote">המחירים שמופיעים באתר ובטופס הרכישה. אפשר לשנות מתי שרוצים — הזמנות שכבר נשלחו מסומנות אם המחיר השתנה.</p>
       <div class="order-actions"><label>מחיר בסיס (₪)<input id="pcBase" type="number" min="1" style="width:90px"></label><label>עד כמה משתתפים בבסיס<input id="pcUpTo" type="number" min="10" style="width:80px"></label><label>תוספת לכל משתתף נוסף (₪)<input id="pcExtra" type="number" min="0" style="width:80px"></label><label>תקרה (₪, 0 = בלי תקרה)<input id="pcCap" type="number" min="0" style="width:90px"></label></div>
       <div class="order-actions" style="margin-top:8px"><button class="game-btn" type="button" onclick="window.savePricing()">שמירה</button></div><p id="pcMsg" class="smallnote" role="status"></p></div>
-    <div class="info"><h3>🎟️ קודי קופון (עד 2)</h3><p class="smallnote">אפשר שני קופונים שונים בבת אחת — לכל אחד קוד ואחוז הנחה משלו. לקוח שכותב אחד מהקודים בטופס הרכישה מקבל את ההנחה שלו (קופון אחד להזמנה). הקודים נשארים סודיים — רק מי שקיבל קוד ממך יכול להשתמש בו.</p>
-      ${[1, 2].map(n => `<p style="margin:10px 0 4px"><strong>קופון ${n}</strong></p><div class="order-actions"><label>קוד<input id="cpCode${n}" dir="ltr" maxlength="30" placeholder="למשל: ${n === 1 ? 'FAMILY5' : 'CHANUKA10'}" style="text-transform:uppercase"></label><label>אחוז הנחה<input id="cpPercent${n}" type="number" min="1" max="50" value="${n === 1 ? 5 : 10}" style="width:80px"></label><label><input id="cpActive${n}" type="checkbox" ${n === 1 ? 'checked' : ''}> פעיל</label><button class="game-btn" type="button" onclick="window.saveCoupon(${n})">שמירה</button></div><p id="cpMsg${n}" class="smallnote" role="status"></p>`).join('')}</div>
+    <div class="info"><h3>🎟️ קודי קופון (עד 6)</h3><p class="smallnote">אפשר עד שישה קופונים שונים בבת אחת — לכל אחד קוד ואחוז הנחה משלו. קופון שלא צריך — מורידים את הסימון ”פעיל” ושומרים. לקוח שכותב אחד מהקודים בטופס הרכישה מקבל את ההנחה שלו (קופון אחד להזמנה). הקודים נשארים סודיים — רק מי שקיבל קוד ממך יכול להשתמש בו.</p>
+      ${COUPON_SLOTS.map(n => `<p style="margin:10px 0 4px"><strong>קופון ${n}</strong></p><div class="order-actions"><label>קוד<input id="cpCode${n}" dir="ltr" maxlength="30" placeholder="למשל: ${['FAMILY5', 'CHANUKA10', 'FRIENDS10', 'SABA15', 'COUSINS10', 'VIP20'][n - 1]}" style="text-transform:uppercase"></label><label>אחוז הנחה<input id="cpPercent${n}" type="number" min="1" max="50" value="${n === 1 ? 5 : 10}" style="width:80px"></label><label><input id="cpActive${n}" type="checkbox" ${n === 1 ? 'checked' : ''}> פעיל</label><button class="game-btn" type="button" onclick="window.saveCoupon(${n})">שמירה</button></div><p id="cpMsg${n}" class="smallnote" role="status"></p>`).join('')}</div>
     <div class="info"><h3>📧 מיילים אוטומטיים</h3><p class="smallnote">כשההגדרות כאן מלאות: הלקוח מקבל מייל ”ההזמנה נקלטה”, את מקבלת מייל על כל הזמנה חדשה, ואחרי אישור תשלום אפשר לשלוח ללקוח את פרטי הכניסה בלחיצה אחת. ההגדרות נלקחות מחשבון EmailJS (הסבר במדריך).</p>
       <div class="fields"><label>האימייל שהלקוחות רואים (מופיע באתר, הלקוחות עונים אליו, והזמנות חדשות נשלחות אליו) — לא אימייל אישי<input id="emAdminEmail" type="email" dir="ltr"></label><label>Service ID<input id="emServiceId" dir="ltr" placeholder="service_xxxxxxx"></label><label>Template ID<input id="emTemplateId" dir="ltr" placeholder="template_xxxxxxx"></label><label>Public Key<input id="emPublicKey" dir="ltr"></label></div>
       <div class="order-actions" style="margin-top:10px"><button class="game-btn" type="button" onclick="window.saveEmailCfg()">שמירה</button><button class="game-btn" type="button" onclick="window.testEmail()">שליחת מייל בדיקה אליי</button></div><p id="emMsg" class="smallnote" role="status"></p></div>
@@ -1188,18 +1192,17 @@ window.savePricing = async function () {
 };
 // ---------- קופון: הקוד נשמר בסוד (רק למנהלת); לאתר הציבורי נשמרת רק ”טביעת אצבע” ----------
 let adminCoupons = {};
-// שני מקומות לקופון: settings/coupon (קופון 1) ו־settings/coupon2 (קופון 2). בציבור — רק טביעת אצבע (hash) של הקוד
+// שישה מקומות לקופון (12.11.26): settings/coupon (קופון 1), settings/coupon2 … settings/coupon6. בציבור — רק טביעת אצבע (hash) של הקוד
 window.firebaseGetCoupon = async function (slot = 'coupon') {
   try { const s = await getDoc(doc(db, 'settings', slot)); return s.exists() ? s.data() : null; } catch (e) { console.warn(e); return null; }
 };
-const couponSlot = n => n === 2 ? 'coupon2' : 'coupon';
 async function loadAdminCoupons() {
   try {
     const sec = await getDoc(doc(db, 'settings', 'couponSecret'));
     const d = sec.exists() ? sec.data() : {};
     adminCoupons = d.codes || {};
-    for (const n of [1, 2]) {
-      const pub = await window.firebaseGetCoupon(couponSlot(n)), cur = n === 2 ? d.current2 : d.current;
+    for (const n of COUPON_SLOTS) {
+      const pub = await window.firebaseGetCoupon(couponSlot(n)), cur = d[couponCurrent(n)];
       if (cur) document.getElementById('cpCode' + n).value = cur;
       if (pub) { document.getElementById('cpPercent' + n).value = pub.percent || 5; document.getElementById('cpActive' + n).checked = !!pub.active; }
     }
@@ -1208,14 +1211,14 @@ async function loadAdminCoupons() {
 window.saveCoupon = async function (n) {
   const msg = document.getElementById('cpMsg' + n), code = normCoupon(document.getElementById('cpCode' + n).value);
   const percent = parseInt(document.getElementById('cpPercent' + n).value, 10), active = document.getElementById('cpActive' + n).checked;
-  const other = normCoupon(document.getElementById('cpCode' + (3 - n)).value);
+  const twin = COUPON_SLOTS.find(m => m !== n && normCoupon(document.getElementById('cpCode' + m).value) === code);
   if (!code) { msg.textContent = 'כתבי קוד קופון.'; return; }
   if (!(percent >= 1 && percent <= 50)) { msg.textContent = 'אחוז ההנחה צריך להיות בין 1 ל־50.'; return; }
-  if (code === other) { msg.textContent = 'הקוד הזה כבר משמש לקופון השני. בחרי קוד אחר.'; return; }
+  if (twin) { msg.textContent = `הקוד הזה כבר משמש לקופון ${twin}. בחרי קוד אחר.`; return; }
   try {
     const codes = { ...adminCoupons, [code]: percent };
     const batch = writeBatch(db);
-    batch.set(doc(db, 'settings', 'couponSecret'), { codes, [n === 2 ? 'current2' : 'current']: code, updatedAt: serverTimestamp() }, { merge: true });
+    batch.set(doc(db, 'settings', 'couponSecret'), { codes, [couponCurrent(n)]: code, updatedAt: serverTimestamp() }, { merge: true });
     batch.set(doc(db, 'settings', couponSlot(n)), { active, percent, hash: await couponHash(code), updatedAt: serverTimestamp() });
     await batch.commit();
     adminCoupons = codes; renderOrders();
