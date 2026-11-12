@@ -1189,7 +1189,13 @@ window.savePricing = async function () {
     await setDoc(doc(db, 'settings', 'pricing'), { ...p, updatedAt: serverTimestamp() });
     setPricing(p); renderOrders();
     msg.textContent = 'נשמר ✓ — המחירים באתר התעדכנו. לדוגמה: ' + pricingExample();
-  } catch (e) { console.warn(e); msg.textContent = 'השמירה נכשלה. ודאי שכללי האבטחה פורסמו.'; }
+  } catch (e) {
+    console.warn(e);
+    /* Ayelet 12.11.26 - say why the save failed (usually: the admin login was replaced by another login in the same window) */
+    msg.textContent = e && e.code === 'permission-denied'
+      ? 'לא נשמר — המערכת לא מזהה אותך כמנהלת האתר. כנראה נכנסת באותו חלון גם כמנהלת משחק/לקוח. סגרי את החלון, פתחי חלון גלישה בסתר (Ctrl+Shift+N), היכנסי שוב לניהול ונסי שוב.'
+      : 'לא נשמר (' + ((e && e.code) || 'שגיאה') + '). בדקי חיבור לאינטרנט ונסי שוב.';
+  }
 };
 // ---------- קופון: הקוד נשמר בסוד (רק למנהלת); לאתר הציבורי נשמרת רק ”טביעת אצבע” ----------
 let adminCoupons = {};
