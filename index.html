@@ -152,7 +152,7 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
 .start-option .start-icon{font-size:32px;line-height:1}
 .start-option strong{font-size:19px}
 .start-option small{font-size:14px;line-height:1.5;max-width:270px}
-.start-purchase{margin-top:18px}.start-purchase [hidden]{display:none!important}/* Ayelet 13.11.26 - WhatsApp icon in the top bar next to "רכישה" */.head-wa{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:#fff1b8;border:2px solid #25D366;box-shadow:0 2px 8px #0002;vertical-align:middle;flex:none}.head-wa[hidden]{display:none!important}.head-wa .wa-ico{width:30px;height:30px}.start-purchase .buy{position:relative;padding-inline-start:46px!important}.start-purchase .wa-ico{position:absolute;inset-inline-start:8px;top:50%;width:30px;height:30px;transform:translateY(-50%);filter:drop-shadow(0 1px 2px #0004)}
+.start-purchase{margin-top:18px}.start-purchase [hidden]{display:none!important}/* Ayelet 13.11.26 - WhatsApp icon in the top bar next to "רכישה" */.head-wa{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:#fff1b8;border:2px solid #25D366;box-shadow:0 2px 8px #0002;vertical-align:middle;flex:none}.head-wa[hidden]{display:none!important}.head-wa .wa-ico{width:30px;height:30px}/* Ayelet 13.11.26 - on the phone the four top buttons (play, purchase, WhatsApp, back) stay in one row */@media(max-width:850px){.game-actions{flex-wrap:nowrap;width:100%;justify-content:center;gap:6px}.game-actions .game-btn,.game-actions .buy{padding:8px 9px;font-size:13px;white-space:nowrap;flex:0 1 auto;min-width:0}.head-wa{width:38px;height:38px}.head-wa .wa-ico{width:26px;height:26px}}@media(max-width:370px){.game-actions .game-btn,.game-actions .buy{padding:7px 6px;font-size:12px}.game-actions{gap:4px}}.start-purchase .buy{position:relative;padding-inline-start:46px!important}.start-purchase .wa-ico{position:absolute;inset-inline-start:8px;top:50%;width:30px;height:30px;transform:translateY(-50%);filter:drop-shadow(0 1px 2px #0004)}
 .start-screen[hidden],#siteContent[hidden]{display:none!important}
 @media(max-width:600px){.start-options{grid-template-columns:1fr}.start-option{min-height:120px}}
 /* תשלום בביט וניהול הזמנות */
@@ -246,7 +246,7 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
       </button>
     </div>
     <!-- Ayelet 13.11.26: instead of the purchase button - "for questions and details" opens Ayelet's WhatsApp (number = the contact phone in admin) -->
-    <div class="start-purchase"><a class="buy" data-wa hidden target="_blank" rel="noopener" href="#"><svg class="wa-ico" viewBox="0 0 32 32" aria-hidden="true"><path fill="#25D366" d="M16 2.5A13.4 13.4 0 0 0 4.4 22.6L2.6 29.4l7-1.8A13.4 13.4 0 1 0 16 2.5z"/><path fill="#fff" d="M23.3 19.5c-.4-.2-2.3-1.1-2.6-1.2-.4-.1-.6-.2-.9.2l-1.2 1.5c-.2.3-.4.3-.8.1a10.6 10.6 0 0 1-5.3-4.6c-.4-.7.4-.6 1.1-2 .1-.3 0-.5 0-.6l-1.2-2.8c-.3-.7-.6-.6-.9-.6h-.7c-.3 0-.7.1-1 .5-.4.4-1.4 1.3-1.4 3.2s1.4 3.7 1.6 4c.2.3 2.7 4.2 6.6 5.8 2.5 1 3.4 1.1 4.7.9.8-.1 2.3-.9 2.6-1.9.3-.9.3-1.7.2-1.9-.1-.2-.4-.3-.8-.5z"/></svg>שאלות? לחצו כאן</a></div>
+    <div class="start-purchase"><a class="buy" data-wa target="_blank" rel="noopener" href="#"><svg class="wa-ico" viewBox="0 0 32 32" aria-hidden="true"><path fill="#25D366" d="M16 2.5A13.4 13.4 0 0 0 4.4 22.6L2.6 29.4l7-1.8A13.4 13.4 0 1 0 16 2.5z"/><path fill="#fff" d="M23.3 19.5c-.4-.2-2.3-1.1-2.6-1.2-.4-.1-.6-.2-.9.2l-1.2 1.5c-.2.3-.4.3-.8.1a10.6 10.6 0 0 1-5.3-4.6c-.4-.7.4-.6 1.1-2 .1-.3 0-.5 0-.6l-1.2-2.8c-.3-.7-.6-.6-.9-.6h-.7c-.3 0-.7.1-1 .5-.4.4-1.4 1.3-1.4 3.2s1.4 3.7 1.6 4c.2.3 2.7 4.2 6.6 5.8 2.5 1 3.4 1.1 4.7.9.8-.1 2.3-.9 2.6-1.9.3-.9.3-1.7.2-1.9-.1-.2-.4-.3-.8-.5z"/></svg>שאלות? לחצו כאן</a></div>
   </div>
   <!-- Ayelet 13.11.26: Elkana (cut out of his background) points up at "איך המשחק עובד?" -->
   <img class="start-elkana" src="./how-elkana-point.webp" width="640" height="637" alt="אלקנה החשמונאי, מנחה ה־AI של המשחק, מחייך ומצביע למעלה על הכפתור איך המשחק עובד">
@@ -255,7 +255,7 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
 <header>
 <a class="brand" href="#home" style="text-decoration:none;color:inherit"><span class="emoji">🏡</span><span>משחק משפחתי<small>מכירים, מתחברים, משחקים</small></span></a>
 <nav><button onclick="goTo('how')">איך זה עובד?</button><button onclick="goTo('before')">מה צריך?</button><button onclick="goTo('who')">למי זה מתאים?</button><button onclick="goTo('faq')">שאלות נפוצות</button></nav>
-<div class="game-actions"><button class="game-btn" onclick="openGameAccess('choose')">▶️ אני רוצה לשחק</button><button class="buy" onclick="goTo('purchase')">🛒 רכישה</button><a class="head-wa" data-wa hidden target="_blank" rel="noopener" href="#" aria-label="שאלות? כתבו לאיילת בוואטסאפ" title="שאלות? כתבו לנו בוואטסאפ"><svg class="wa-ico" viewBox="0 0 32 32" aria-hidden="true"><path fill="#25D366" d="M16 2.5A13.4 13.4 0 0 0 4.4 22.6L2.6 29.4l7-1.8A13.4 13.4 0 1 0 16 2.5z"/><path fill="#fff" d="M23.3 19.5c-.4-.2-2.3-1.1-2.6-1.2-.4-.1-.6-.2-.9.2l-1.2 1.5c-.2.3-.4.3-.8.1a10.6 10.6 0 0 1-5.3-4.6c-.4-.7.4-.6 1.1-2 .1-.3 0-.5 0-.6l-1.2-2.8c-.3-.7-.6-.6-.9-.6h-.7c-.3 0-.7.1-1 .5-.4.4-1.4 1.3-1.4 3.2s1.4 3.7 1.6 4c.2.3 2.7 4.2 6.6 5.8 2.5 1 3.4 1.1 4.7.9.8-.1 2.3-.9 2.6-1.9.3-.9.3-1.7.2-1.9-.1-.2-.4-.3-.8-.5z"/></svg></a><button class="game-btn" id="backToStart" type="button" onclick="backToStart()">← חזרה</button></div>
+<div class="game-actions"><button class="game-btn" onclick="openGameAccess('choose')">▶️ אני רוצה לשחק</button><button class="buy" onclick="goTo('purchase')">🛒 רכישה</button><a class="head-wa" data-wa target="_blank" rel="noopener" href="#" aria-label="שאלות? כתבו לאיילת בוואטסאפ" title="שאלות? כתבו לנו בוואטסאפ"><svg class="wa-ico" viewBox="0 0 32 32" aria-hidden="true"><path fill="#25D366" d="M16 2.5A13.4 13.4 0 0 0 4.4 22.6L2.6 29.4l7-1.8A13.4 13.4 0 1 0 16 2.5z"/><path fill="#fff" d="M23.3 19.5c-.4-.2-2.3-1.1-2.6-1.2-.4-.1-.6-.2-.9.2l-1.2 1.5c-.2.3-.4.3-.8.1a10.6 10.6 0 0 1-5.3-4.6c-.4-.7.4-.6 1.1-2 .1-.3 0-.5 0-.6l-1.2-2.8c-.3-.7-.6-.6-.9-.6h-.7c-.3 0-.7.1-1 .5-.4.4-1.4 1.3-1.4 3.2s1.4 3.7 1.6 4c.2.3 2.7 4.2 6.6 5.8 2.5 1 3.4 1.1 4.7.9.8-.1 2.3-.9 2.6-1.9.3-.9.3-1.7.2-1.9-.1-.2-.4-.3-.8-.5z"/></svg></a><button class="game-btn" id="backToStart" type="button" onclick="backToStart()">← חזרה</button></div>
 </header>
 <main id="home">
 
@@ -870,6 +870,11 @@ function contactText() {
   const parts = [c.phone ? formatPhone(c.phone) : '', c.email || ''].filter(Boolean);
   return parts.length ? `\nלשאלות ובירורים: ${parts.join(' · ')}` : '';
 }
+/* Ayelet 13.11.26 - the WhatsApp buttons show at once (not after the number loads): the number is remembered on the device, and a tap before it loads waits for it */
+const WA_TEXT = 'היי איילת, יש לי שאלה על משחק המשפחה 🙂';
+function setWaLinks(wa) { document.querySelectorAll('[data-wa]').forEach(a => { if (wa && wa.length >= 11) { a.href = 'https://wa.me/' + wa + '?text=' + encodeURIComponent(WA_TEXT); a.hidden = false; } else if (wa === '') a.hidden = true; }); }
+try { const w = localStorage.getItem('familyGame.wa'); if (w) setWaLinks(w); } catch (e) {}
+document.addEventListener('click', async e => { const a = e.target.closest && e.target.closest('a[data-wa]'); if (!a || a.getAttribute('href') !== '#') return; e.preventDefault(); const win = window.open('', '_blank'); await window.fillContact(); if (a.getAttribute('href') !== '#') { if (win) win.location = a.href; else location.href = a.href; } else if (win) win.close(); });
 window.fillContact = async function () {
   const c = await loadContact(), parts = [];
   if (c.phone) parts.push(`📞 <a href="tel:${esc(c.phone)}" dir="ltr">${esc(formatPhone(c.phone))}</a>`);
@@ -877,7 +882,7 @@ window.fillContact = async function () {
   document.querySelectorAll('[data-contact]').forEach(el => el.innerHTML = parts.length ? 'לכל שאלה או בירור — מתקשרים או שולחים מייל: ' + parts.join(' · ') : '');
   /* the WhatsApp button on the purchase page (12.11.26) - Israeli number 05x -> 9725x; hidden when no phone is saved */
   const digits = String(c.phone || '').replace(/\D/g, ''), wa = digits.startsWith('0') ? '972' + digits.slice(1) : digits;
-  document.querySelectorAll('[data-wa]').forEach(a => { if (wa.length >= 11) { a.href = 'https://wa.me/' + wa + '?text=' + encodeURIComponent('היי איילת, יש לי שאלה על משחק המשפחה 🙂'); a.hidden = false; } else a.hidden = true; });
+  setWaLinks(wa.length >= 11 ? wa : ''); try { if (wa.length >= 11) localStorage.setItem('familyGame.wa', wa); else localStorage.removeItem('familyGame.wa'); } catch (e) {}
 };
 window.fillContact();
 // ---------- מיילים אוטומטיים (EmailJS — שירות חינמי, ההגדרות נשמרות באזור הניהול) ----------
