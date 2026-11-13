@@ -152,7 +152,7 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
 .start-option .start-icon{font-size:32px;line-height:1}
 .start-option strong{font-size:19px}
 .start-option small{font-size:14px;line-height:1.5;max-width:270px}
-.start-purchase{margin-top:18px}
+.start-purchase{margin-top:18px}.start-purchase [hidden]{display:none!important}
 .start-screen[hidden],#siteContent[hidden]{display:none!important}
 @media(max-width:600px){.start-options{grid-template-columns:1fr}.start-option{min-height:120px}}
 /* תשלום בביט וניהול הזמנות */
@@ -212,7 +212,7 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
 .start-screen .start-option.primary{--runC:#5aa9ff}
 .start-screen .start-option.primary::before{animation-delay:-1.3s}
 @keyframes runLight{to{--runA:360deg}}
-.start-screen .start-purchase .buy{background:#fff1b8;color:#14345d;border:2px solid #fff;box-shadow:0 4px 14px #0005}
+.start-screen .start-purchase .buy{display:inline-block;text-decoration:none;background:#fff1b8;color:#14345d;border:2px solid #fff;box-shadow:0 4px 14px #0005}
 .start-elkana{display:block;width:min(100%,460px);height:auto;margin:6px auto -4px;transform-origin:50% 100%;filter:drop-shadow(0 6px 18px #0007);animation:elkanaJab 2.2s ease-in-out infinite}
 @keyframes elkanaJab{0%,58%,100%{transform:none}68%{transform:translateY(-16px) rotate(-2.5deg)}78%{transform:none}86%{transform:translateY(-9px) rotate(-1.5deg)}94%{transform:none}}
 @media(prefers-reduced-motion:reduce){.start-elkana,.start-screen .start-option::before{animation:none}}
@@ -234,7 +234,8 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
         <small>לאחר הרכישה — כל קבוצה נכנסת עם הקוד שלה</small>
       </button>
     </div>
-    <div class="start-purchase"><button class="buy" type="button" onclick="enterSiteAndPurchase()">🛒 לרכישת המשחק</button></div>
+    <!-- Ayelet 13.11.26: instead of the purchase button - "for questions and details" opens Ayelet's WhatsApp (number = the contact phone in admin) -->
+    <div class="start-purchase"><a class="buy" data-wa hidden target="_blank" rel="noopener" href="#">💬 לבירורים נוספים ולפרטים לחצו כאן</a></div>
   </div>
   <!-- Ayelet 13.11.26: Elkana (cut out of his background) points up at "איך המשחק עובד?" -->
   <img class="start-elkana" src="./how-elkana-point.webp" width="640" height="637" alt="אלקנה החשמונאי, מנחה ה־AI של המשחק, מחייך ומצביע למעלה על הכפתור איך המשחק עובד">
