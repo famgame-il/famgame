@@ -196,27 +196,48 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
 .crop-stage{position:relative;touch-action:none;user-select:none;overflow:hidden;margin:10px 0;border-radius:12px}.crop-stage img{display:block;width:100%;height:auto;pointer-events:none}.crop-rect{position:absolute;border:3px solid #ffc34b;border-radius:8px;box-shadow:0 0 0 9999px #0009;cursor:move;touch-action:none}
 .gender-pick{display:flex;gap:10px}.gender-pick label{flex:1;display:flex;gap:8px;align-items:center;justify-content:center;border:2px solid #e8dfd2;border-radius:12px;padding:12px;font-weight:800;cursor:pointer}.gender-pick input{width:auto}
 .host-name{display:block;font-size:12px;color:#8a6d00;font-weight:700;margin-bottom:2px;letter-spacing:.2px}
-</style></head><body>
+/* Ayelet 13.11.26 - new start screen: night-city background, see-through buttons with a light running around their frame
+   (yellow on "איך המשחק עובד?", blue on "אני רוצה לשחק"), and Elkana at the bottom pointing up at the explain button */
+@property --runA{syntax:'<angle>';initial-value:0deg;inherits:false}
+.start-screen{display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;padding:0;overflow:hidden;background:linear-gradient(#0d1430aa,#0d143066 45%,#0d1430cc),url(./how-start-city.jpg) center/cover no-repeat #1d2a5e}
+.start-screen .start-card{background:none;border:0;box-shadow:none;color:#fff;width:min(760px,100%);margin:0 auto;padding:20px 16px 6px;position:relative;z-index:2}
+.start-screen .start-card h1{color:#fff;font-size:clamp(23px,4vw,40px);margin:0 0 4px;text-shadow:0 2px 10px #0008}
+.start-screen .start-card>p{color:#eef0ff;font-size:clamp(14px,2vw,18px);margin:0 0 14px;text-shadow:0 1px 6px #0008}
+.start-screen .start-options{grid-template-columns:1fr 1fr;gap:12px}
+.start-screen .start-option{position:relative;min-height:0;padding:14px 8px;border-radius:18px;background:#ffffff26;border:2px solid #ffffffb3;color:#fff;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.start-screen .start-option small,.start-screen .start-option strong{color:#fff}
+.start-screen .start-option small{font-size:12.5px}
+.start-screen .start-option::before{content:"";position:absolute;inset:-5px;border-radius:22px;padding:4px;background:conic-gradient(from var(--runA),transparent 0 62%,var(--runC) 80%,#fff 88%,var(--runC) 92%,transparent 100%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);animation:runLight 2.6s linear infinite;pointer-events:none;filter:drop-shadow(0 0 6px var(--runC))}
+.start-screen .start-option.explain{--runC:#ffd34d}
+.start-screen .start-option.primary{--runC:#5aa9ff}
+.start-screen .start-option.primary::before{animation-delay:-1.3s}
+@keyframes runLight{to{--runA:360deg}}
+.start-screen .start-purchase .buy{background:#fff1b8;color:#14345d;border:2px solid #fff;box-shadow:0 4px 14px #0005}
+.start-elkana{display:block;width:min(100%,460px);height:auto;margin:6px auto -4px;transform-origin:50% 100%;filter:drop-shadow(0 6px 18px #0007);animation:elkanaJab 2.2s ease-in-out infinite}
+@keyframes elkanaJab{0%,58%,100%{transform:none}68%{transform:translateY(-16px) rotate(-2.5deg)}78%{transform:none}86%{transform:translateY(-9px) rotate(-1.5deg)}94%{transform:none}}
+@media(prefers-reduced-motion:reduce){.start-elkana,.start-screen .start-option::before{animation:none}}
+@media(min-width:900px){.start-elkana{width:380px}}</style></head><body>
 <section class="start-screen" id="startScreen">
   <div class="start-card">
-    <div style="font-size:42px;margin-bottom:10px" aria-hidden="true">🏡</div>
-    <h1>ברוכים הבאים למשחק המשפחתי!</h1>
-    <p>משחק מוכן מראש, בלי שום הכנות: מתחלקים לקבוצות, כל קבוצה משחקת מהטלפון שלה, והאתר מסביר כל שלב.</p>
+    <h1>ברוכים הבאים! 👋</h1>
+    <p>משחק משפחתי ללא הכנה מראש.</p>
     <div id="resumeBox" hidden></div>
     <div class="start-options">
       <button class="start-option explain" type="button" onclick="enterSiteAndExplain()">
         <span class="start-icon" aria-hidden="true">👀</span>
         <strong>איך המשחק עובד?</strong>
-        <small>הסבר קצר, שלושת השלבים ושאלות נפוצות</small>
+        <small>הסבר מפורט — מה אתם מקבלים</small>
       </button>
       <button class="start-option primary" type="button" onclick="startPlaying()">
         <span class="start-icon" aria-hidden="true">▶️</span>
         <strong>אני רוצה לשחק</strong>
-        <small>כל קבוצה מצטרפת עם קוד ההצטרפות</small>
+        <small>לאחר הרכישה — כל קבוצה נכנסת עם הקוד שלה</small>
       </button>
     </div>
     <div class="start-purchase"><button class="buy" type="button" onclick="enterSiteAndPurchase()">🛒 לרכישת המשחק</button></div>
   </div>
+  <!-- Ayelet 13.11.26: Elkana (cut out of his background) points up at "איך המשחק עובד?" -->
+  <img class="start-elkana" src="./how-elkana-point.webp" width="640" height="637" alt="אלקנה החשמונאי, מנחה ה־AI של המשחק, מחייך ומצביע למעלה על הכפתור איך המשחק עובד">
 </section>
 <div id="siteContent" hidden>
 <header>
@@ -3464,4 +3485,13 @@ function famCloseDoc(keepFocus){ if (!famDocOpen) return; famDocOpen.classList.r
 document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && famDocOpen) famCloseDoc(); });
 </script>
 <script src="nagish.js" defer data-statement="accessibility.html" data-main="#home" data-mobile="footer" data-mobile-slot="footer"></script>
-</body></html>
+<script>
+/* Ayelet 13.11.26: the blue accessibility button shows only inside the site itself - not on the start screen and not inside the game.
+   (The accessibility statement page stays linked from the site footer.) */
+setInterval(function () {
+  var host = document.getElementById('nagish-host'); if (!host) return;
+  var vis = function (id) { var e = document.getElementById(id); return !!(e && !e.hidden && e.offsetParent !== null); };
+  var hide = vis('startScreen') || vis('playScreen');
+  host.style.display = hide ? 'none' : '';
+}, 400);
+</script></body></html>
