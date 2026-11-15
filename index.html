@@ -172,6 +172,14 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
 /* תשלום בביט וניהול הזמנות */
 .pw-wrap{position:relative;display:block}.pw-wrap input{padding-left:46px!important}.pw-eye{position:absolute;left:6px;top:50%;transform:translateY(-50%);border:0;background:none;font-size:20px;cursor:pointer;padding:6px;line-height:1}
 .trust-box{background:#eaf7ec;border:2px solid #b7e0c0;border-radius:16px;padding:14px 16px;margin:0 0 16px;line-height:1.7}.contact-line{display:block}[data-contact] a{color:inherit;font-weight:800}footer [data-contact]{opacity:.9}.pay-opt{background:#fff;border:1px solid #cfe8d4;border-radius:12px;padding:10px 14px;margin:8px 0}.pay-opt p{margin:6px 0}.bit-box{background:#eaf7ec;border-radius:16px;padding:18px;line-height:1.8}.bit-box h3{margin:0 0 8px}.bit-box ol{margin:8px 0;padding-inline-start:22px}.bit-box[hidden],#adminScreen[hidden],#orderForm[hidden]{display:none!important}
+/* Ayelet 16.11.26 - the admin orders report */
+.admin-sum{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;background:#f4f8ff;border:1px solid #d6e2f5;border-radius:12px;padding:10px 14px;margin:0 0 10px}
+.orders-wrap{overflow-x:auto}.orders-table{width:100%;border-collapse:collapse;font-size:15px;min-width:640px}
+.orders-table th{text-align:start;background:#14345d;color:#fff;padding:8px;font-weight:800;position:sticky;top:0}.orders-table td{padding:8px;border-bottom:1px solid #e8dfd2;vertical-align:top}
+.orders-table tr.pending td{background:#fffaf0}.orders-table tr.cancelled td{opacity:.65}.orders-table tr.past td{color:#555}.orders-table tr.order-detail td{background:#fbf8f3;padding:0 6px}
+.orders-table .game-btn{margin:0;padding:4px 10px;font-size:14px;white-space:nowrap}.soon{background:#d9f0dd;border-radius:10px;padding:1px 7px;font-size:12px;font-weight:800}
+.admin-group{margin:22px 0 6px}.admin-sec>summary{cursor:pointer;font-weight:900;font-size:18px;color:var(--navy)}.admin-sec[open]>summary{margin-bottom:8px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .order{border:2px solid #e8dfd2;border-radius:14px;padding:14px;margin:10px 0;background:#fff}.order.pending{border-color:#ffc34b;background:#fffaf0}.order.cancelled{opacity:.7}
 .order-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-weight:900}.badge{border-radius:20px;padding:3px 10px;font-size:13px;font-weight:800}.badge.pending{background:#fff0c7}.badge.paid{background:#d9f0dd}.badge.cancelled{background:#f3e3e3}
 .order-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:4px 14px;margin:8px 0;font-size:15px;word-break:break-word}.order-codes{background:#fff8e1;border:1px solid #f3c64b;border-radius:12px;padding:8px 12px;margin:6px 0;font-size:15px;word-break:break-word}.order-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}.order-actions input{font:inherit;padding:9px;border:1px solid #ddd2c0;border-radius:10px}
@@ -1188,24 +1196,28 @@ async function showAdminPanel(user) {
       ${logout}</div>`;
     return;
   }
+  /* Ayelet 16.11.26 - "a really tidy report, now it is a mess": the orders report first; every setting in a box that opens with a click */
   adminBox().innerHTML = `<div class="order-head" style="margin-bottom:12px"><span>מחוברת כ־<span dir="ltr">${esc(user.email || '')}</span></span><span>${logout} <a class="game-btn" href="#" style="text-decoration:none">← לאתר</a></span></div>
-    <div class="info"><h3>🧪 משחק בדיקה (חינם)</h3><p class="smallnote">משחק אמיתי להיום, בלי רכישה ובלי תשלום — כדי לבדוק את שלבים 1, 2, 3 בעצמך. אפשר לשחק עם 2 קבוצות בלבד (2 טלפונים), ומנהל המשחק במחשב או בטלפון שלישי.</p>
-      <button class="game-btn" type="button" onclick="window.adminTestGame(this)">🧪 יצירת משחק בדיקה להיום</button></div>
+    <div id="credBox"></div>
+    <div class="info"><h3>📋 הזמנות</h3><div id="adminSum"></div><div class="admin-filter" id="adminFilter"></div><div id="ordersList"><p class="smallnote">טוענים הזמנות…</p></div></div>
+    <h3 class="admin-group">⚙️ הגדרות וכלים <span class="smallnote">(לחיצה על כותרת פותחת אותה)</span></h3>
+    <details class="info admin-sec"><summary>🧪 משחק בדיקה (חינם)</summary><p class="smallnote">משחק אמיתי להיום, בלי רכישה ובלי תשלום — כדי לבדוק את שלבים 1, 2, 3 בעצמך. אפשר לשחק עם 2 קבוצות בלבד (2 טלפונים), ומנהל המשחק במחשב או בטלפון שלישי.</p>
+      <button class="game-btn" type="button" onclick="window.adminTestGame(this)">🧪 יצירת משחק בדיקה להיום</button></details>
     <div class="info" id="aiUsageBox"><h3>🤖 הקרדיט של אלקנה (Anthropic)</h3><p class="smallnote">טוענים…</p></div>
-    <div class="info"><h3>💳 תשלום בביט</h3><p class="smallnote">מה שתשמרי כאן מוצג ללקוחות אחרי שליחת הזמנה.</p>
+    <details class="info admin-sec"><summary>💳 תשלום בביט</summary><p class="smallnote">מה שתשמרי כאן מוצג ללקוחות אחרי שליחת הזמנה.</p>
       <label><strong>מספר הביט</strong><div class="order-actions"><input id="bitPhoneInput" type="tel" inputmode="tel" placeholder="050-1234567"></div></label>
       <label><strong>קישור לתשלום (רשות) — למשל קישור לקבוצה בפייבוקס</strong><div class="order-actions"><input id="bitLinkInput" type="url" dir="ltr" placeholder="https://..." style="flex:1;min-width:220px"></div></label>
       <p class="smallnote">הדביקי כאן קישור תשלום (קבוצה בפייבוקס, ביט עסקי או חברת סליקה) — הלקוח יקבל כפתור גדול שפותח ישר את התשלום. אם שמור גם מספר ביט, הלקוח יראה את שתי האפשרויות ויבחר.</p>
-      <button class="game-btn" type="button" onclick="window.saveBitPhone()">שמירה</button><p id="bitMsg" class="smallnote" role="status"></p></div>
-    <div class="info"><h3>💰 מחירון</h3><p class="smallnote">המחירים שמופיעים באתר ובטופס הרכישה. אפשר לשנות מתי שרוצים — הזמנות שכבר נשלחו מסומנות אם המחיר השתנה.</p>
+      <button class="game-btn" type="button" onclick="window.saveBitPhone()">שמירה</button><p id="bitMsg" class="smallnote" role="status"></p></details>
+    <details class="info admin-sec"><summary>💰 מחירון</summary><p class="smallnote">המחירים שמופיעים באתר ובטופס הרכישה. אפשר לשנות מתי שרוצים — הזמנות שכבר נשלחו מסומנות אם המחיר השתנה.</p>
       <div class="order-actions"><label>מחיר בסיס (₪)<input id="pcBase" type="number" min="1" style="width:90px"></label><label>עד כמה משתתפים בבסיס<input id="pcUpTo" type="number" min="10" style="width:80px"></label><label>תוספת לכל משתתף נוסף (₪)<input id="pcExtra" type="number" min="0" style="width:80px"></label><label>תקרה (₪, 0 = בלי תקרה)<input id="pcCap" type="number" min="0" style="width:90px"></label></div>
-      <div class="order-actions" style="margin-top:8px"><button class="game-btn" type="button" onclick="window.savePricing()">שמירה</button></div><p id="pcMsg" class="smallnote" role="status"></p></div>
-    <div class="info"><h3>🎟️ קודי קופון (עד 6)</h3><p class="smallnote">אפשר עד שישה קופונים שונים בבת אחת — לכל אחד קוד ואחוז הנחה משלו. קופון שלא צריך — מורידים את הסימון ”פעיל” ושומרים. לקוח שכותב אחד מהקודים בטופס הרכישה מקבל את ההנחה שלו (קופון אחד להזמנה). הקודים נשארים סודיים — רק מי שקיבל קוד ממך יכול להשתמש בו.</p>
-      ${COUPON_SLOTS.map(n => `<p style="margin:10px 0 4px"><strong>קופון ${n}</strong></p><div class="order-actions"><label>קוד<input id="cpCode${n}" dir="ltr" maxlength="30" placeholder="למשל: ${['FAMILY5', 'CHANUKA10', 'FRIENDS10', 'SABA15', 'COUSINS10', 'VIP20'][n - 1]}" style="text-transform:uppercase"></label><label>אחוז הנחה<input id="cpPercent${n}" type="number" min="1" max="50" value="${n === 1 ? 5 : 10}" style="width:80px"></label><label><input id="cpActive${n}" type="checkbox" ${n === 1 ? 'checked' : ''}> פעיל</label><button class="game-btn" type="button" onclick="window.saveCoupon(${n})">שמירה</button></div><p id="cpMsg${n}" class="smallnote" role="status"></p>`).join('')}</div>
-    <div class="info"><h3>📧 מיילים אוטומטיים</h3><p class="smallnote">כשההגדרות כאן מלאות: הלקוח מקבל מייל ”ההזמנה נקלטה”, את מקבלת מייל על כל הזמנה חדשה, ואחרי אישור תשלום אפשר לשלוח ללקוח את פרטי הכניסה בלחיצה אחת. ההגדרות נלקחות מחשבון EmailJS (הסבר במדריך).</p>
+      <div class="order-actions" style="margin-top:8px"><button class="game-btn" type="button" onclick="window.savePricing()">שמירה</button></div><p id="pcMsg" class="smallnote" role="status"></p></details>
+    <details class="info admin-sec"><summary>🎟️ קודי קופון (עד 6)</summary><p class="smallnote">אפשר עד שישה קופונים שונים בבת אחת — לכל אחד קוד ואחוז הנחה משלו. קופון שלא צריך — מורידים את הסימון ”פעיל” ושומרים. לקוח שכותב אחד מהקודים בטופס הרכישה מקבל את ההנחה שלו (קופון אחד להזמנה). הקודים נשארים סודיים — רק מי שקיבל קוד ממך יכול להשתמש בו.</p>
+      ${COUPON_SLOTS.map(n => `<p style="margin:10px 0 4px"><strong>קופון ${n}</strong></p><div class="order-actions"><label>קוד<input id="cpCode${n}" dir="ltr" maxlength="30" placeholder="למשל: ${['FAMILY5', 'CHANUKA10', 'FRIENDS10', 'SABA15', 'COUSINS10', 'VIP20'][n - 1]}" style="text-transform:uppercase"></label><label>אחוז הנחה<input id="cpPercent${n}" type="number" min="1" max="50" value="${n === 1 ? 5 : 10}" style="width:80px"></label><label><input id="cpActive${n}" type="checkbox" ${n === 1 ? 'checked' : ''}> פעיל</label><button class="game-btn" type="button" onclick="window.saveCoupon(${n})">שמירה</button></div><p id="cpMsg${n}" class="smallnote" role="status"></p>`).join('')}</details>
+    <details class="info admin-sec"><summary>📧 מיילים אוטומטיים</summary><p class="smallnote">כשההגדרות כאן מלאות: הלקוח מקבל מייל ”ההזמנה נקלטה”, את מקבלת מייל על כל הזמנה חדשה, ואחרי אישור תשלום אפשר לשלוח ללקוח את פרטי הכניסה בלחיצה אחת. ההגדרות נלקחות מחשבון EmailJS (הסבר במדריך).</p>
       <div class="fields"><label>האימייל שהלקוחות רואים (מופיע באתר, הלקוחות עונים אליו, והזמנות חדשות נשלחות אליו) — לא אימייל אישי<input id="emAdminEmail" type="email" dir="ltr"></label><label>Service ID<input id="emServiceId" dir="ltr" placeholder="service_xxxxxxx"></label><label>Template ID<input id="emTemplateId" dir="ltr" placeholder="template_xxxxxxx"></label><label>Public Key<input id="emPublicKey" dir="ltr"></label></div>
-      <div class="order-actions" style="margin-top:10px"><button class="game-btn" type="button" onclick="window.saveEmailCfg()">שמירה</button><button class="game-btn" type="button" onclick="window.testEmail()">שליחת מייל בדיקה אליי</button></div><p id="emMsg" class="smallnote" role="status"></p></div>
-    <div id="credBox"></div><div class="admin-filter" id="adminFilter"></div><div id="ordersList"><p class="smallnote">טוענים הזמנות…</p></div>`;
+      <div class="order-actions" style="margin-top:10px"><button class="game-btn" type="button" onclick="window.saveEmailCfg()">שמירה</button><button class="game-btn" type="button" onclick="window.testEmail()">שליחת מייל בדיקה אליי</button></div><p id="emMsg" class="smallnote" role="status"></p></details>
+    <div id="adminTools"></div>`;
   window.loadAiUsage();
   try { const s = await getDoc(doc(db, 'settings', 'payment')); if (s.exists()) { document.getElementById('bitPhoneInput').value = formatPhone(s.data().bitPhone || ''); document.getElementById('bitLinkInput').value = s.data().bitLink || ''; } } catch (e) { console.warn(e); }
   await loadPricing();
@@ -1214,8 +1226,8 @@ async function showAdminPanel(user) {
   await loadAdminCoupons();
   emailCfgCache = null; const em = await getEmailCfg();
   [['emAdminEmail', 'adminEmail'], ['emServiceId', 'serviceId'], ['emTemplateId', 'templateId'], ['emPublicKey', 'publicKey']].forEach(([id, k]) => document.getElementById(id).value = em[k] || '');
-  document.getElementById('credBox').insertAdjacentHTML('beforebegin', '<div class="info"><h3>🧹 פרטיות</h3><p class="smallnote">יום אחרי כל משחק נמחק לבד כל התוכן שלו — תמונות, שמות, קבוצות ותשובות. ההזמנות נשארות לרישום התשלומים.</p><button class="game-btn" type="button" onclick="window.adminCleanup(false)">ניקוי עכשיו</button><p id="cleanMsg" class="smallnote" role="status"></p></div>'
-    + '<div class="info"><h3>🛠️ תקלות אחרונות</h3><p class="smallnote">אם משהו לא עבד אצל לקוח — בטלפון של קבוצה, אצל מנהל המשחק או באתר — זה נרשם כאן לבד, עם השעה, השלב וסוג המכשיר. יומן ישן מחודש נמחק לבד.</p><div id="errLog"></div><div class="order-actions"><button class="game-btn" type="button" onclick="window.loadErrorLog()">↻ רענון</button><button class="game-btn" type="button" onclick="window.clearErrorLog()">🗑️ מחיקת היומן</button></div></div>');
+  document.getElementById('adminTools').insertAdjacentHTML('beforeend', '<details class="info admin-sec"><summary>🧹 פרטיות — ניקוי אוטומטי</summary><p class="smallnote">יום אחרי כל משחק נמחק לבד כל התוכן שלו — תמונות, שמות, קבוצות ותשובות. ההזמנות נשארות לרישום התשלומים.</p><button class="game-btn" type="button" onclick="window.adminCleanup(false)">ניקוי עכשיו</button><p id="cleanMsg" class="smallnote" role="status"></p></details>'
+    + '<details class="info admin-sec"><summary>🛠️ תקלות אחרונות</summary><p class="smallnote">אם משהו לא עבד אצל לקוח — בטלפון של קבוצה, אצל מנהל המשחק או באתר — זה נרשם כאן לבד, עם השעה, השלב וסוג המכשיר. יומן ישן מחודש נמחק לבד.</p><div id="errLog"></div><div class="order-actions"><button class="game-btn" type="button" onclick="window.loadErrorLog()">↻ רענון</button><button class="game-btn" type="button" onclick="window.clearErrorLog()">🗑️ מחיקת היומן</button></div></details>');
   window.adminCleanup(true); window.loadErrorLog();
   if (adminUnsub) adminUnsub();
   // הרשימה מתעדכנת בזמן אמת — הזמנה חדשה מופיעה מיד בלי לרענן
@@ -1231,17 +1243,51 @@ async function showAdminPanel(user) {
 }
 let adminFilterChosen = false;
 window.setAdminFilter = function (f) { adminFilter = f; adminFilterChosen = true; renderOrders(); };
+/* Ayelet 16.11.26 - a tidy report: a summary line, a table (game date, customer, phone, participants, amount, status),
+   "פרטים" opens the full order card with its actions. Test games have their own tab, never mixed with real orders. */
+const isTestOrder = o => !!o.test || o.buyerName === 'משחק בדיקה';
+const adminOpenRows = new Set();
+function orderAmount(o) { return o.status === 'paid' && o.amountPaid != null ? Number(o.amountPaid) || 0 : orderPrice(o).total; }
 function renderOrders() {
-  const counts = { pending: 0, paid: 0, cancelled: 0 }; adminOrders.forEach(o => counts[o.status] = (counts[o.status] || 0) + 1);
-  /* (11.11.26, Ayelet: "all the test games disappeared") - the list opened on "waiting for payment", which was empty.
-     Nothing waiting -> open on "all", so every order is seen */
-  if (!adminFilterChosen && adminFilter === 'pending' && !counts.pending) adminFilter = 'all';
-  const tabs = [['pending', `ממתינות לתשלום (${counts.pending})`], ['paid', `שולמו (${counts.paid})`], ['cancelled', `בוטלו (${counts.cancelled})`], ['all', `הכול (${adminOrders.length})`]];
-  document.getElementById('adminFilter').innerHTML = tabs.map(([k, label]) => `<button type="button" class="game-btn ${adminFilter === k ? 'on' : ''}" onclick="window.setAdminFilter('${k}')">${label}</button>`).join('');
-  const list = adminOrders.filter(o => adminFilter === 'all' || o.status === adminFilter);
-  document.getElementById('ordersList').innerHTML = list.map(orderCard).join('') || '<p class="smallnote">אין הזמנות ברשימה הזו.</p>';
+  const today = israelGameDay(), real = adminOrders.filter(o => !isTestOrder(o)), tests = adminOrders.filter(isTestOrder);
+  const counts = { pending: 0, paid: 0, cancelled: 0 }; real.forEach(o => counts[o.status] = (counts[o.status] || 0) + 1);
+  const paid = real.filter(o => o.status === 'paid'), upcoming = paid.filter(o => o.gameDate >= today);
+  const income = paid.reduce((s, o) => s + orderAmount(o), 0);
+  document.getElementById('adminSum').innerHTML = `<div class="admin-sum">
+    <span><b>${real.length}</b> הזמנות</span><span>✅ שולמו: <b>${counts.paid}</b> · <b>${income.toLocaleString('he-IL')} ₪</b></span>
+    <span>⏳ ממתינות לתשלום: <b>${counts.pending}</b></span><span>📅 משחקים קרובים: <b>${upcoming.length}</b></span>
+    <span><button class="game-btn" type="button" onclick="window.adminExportCsv()">⬇️ ייצוא לאקסל</button></span></div>`;
+  if (!adminFilterChosen && adminFilter === 'pending' && !counts.pending) adminFilter = 'paid';
+  const tabs = [['pending', `⏳ ממתינות (${counts.pending})`], ['paid', `✅ שולמו (${counts.paid})`], ['cancelled', `✖ בוטלו (${counts.cancelled})`], ['all', `הכול (${real.length})`], ['test', `🧪 משחקי בדיקה (${tests.length})`]];
+  document.getElementById('adminFilter').innerHTML = tabs.map(([k, label]) => `<button type="button" class="game-btn ${adminFilter === k ? 'on' : ''}" aria-pressed="${adminFilter === k}" onclick="window.setAdminFilter('${k}')">${label}</button>`).join('');
+  const list = (adminFilter === 'test' ? tests : real.filter(o => adminFilter === 'all' || o.status === adminFilter))
+    /* upcoming games first (nearest first), then past games (latest first) */
+    .sort((a, b) => { const fa = a.gameDate >= today, fb = b.gameDate >= today; return fa !== fb ? (fa ? -1 : 1) : fa ? String(a.gameDate).localeCompare(String(b.gameDate)) : String(b.gameDate).localeCompare(String(a.gameDate)); });
+  const bulk = adminFilter === 'test' && tests.length ? `<p><button class="game-btn danger" type="button" onclick="window.adminDeleteAllTests()">🗑️ מחיקת כל משחקי הבדיקה (${tests.length})</button></p>` : '';
+  document.getElementById('ordersList').innerHTML = bulk + (list.length ? `<div class="orders-wrap"><table class="orders-table"><thead><tr><th>תאריך המשחק</th><th>לקוח</th><th>טלפון</th><th>משתתפים</th><th>סכום</th><th>מצב</th><th><span class="sr-only">פרטים</span></th></tr></thead><tbody>${list.map(o => {
+    const past = o.gameDate < today, open = adminOpenRows.has(o.id);
+    return `<tr class="${esc(o.status)}${past ? ' past' : ''}"><td>${formatDateHe(o.gameDate)}${!past && o.status === 'paid' ? ' <span class="soon">קרוב</span>' : ''}</td><td><b>${esc(o.buyerName)}</b><br><span class="smallnote">הזמנה ${esc(o.code)}${o.dataDeletedAt ? ' · 🧹 הנתונים נמחקו' : ''}</span></td>
+      <td><a href="tel:${esc(o.phone)}" dir="ltr">${esc(formatPhone(o.phone))}</a></td><td>${esc(o.participants)}</td><td>${orderAmount(o).toLocaleString('he-IL')} ₪</td>
+      <td><span class="badge ${esc(o.status)}">${STATUS_LABEL[o.status] || esc(o.status)}</span></td>
+      <td><button class="game-btn" type="button" aria-expanded="${open}" aria-controls="od-${esc(o.id)}" onclick="window.toggleOrderRow('${esc(o.id)}', this)">${open ? 'סגירה ▴' : 'פרטים ▾'}</button></td></tr>
+      <tr class="order-detail" id="od-${esc(o.id)}" ${open ? '' : 'hidden'}><td colspan="7">${orderCard(o)}</td></tr>`;
+  }).join('')}</tbody></table></div>` : '<p class="smallnote">אין הזמנות ברשימה הזו.</p>');
   fillOrderCodes();
 }
+window.toggleOrderRow = function (id, btn) {
+  const row = document.getElementById('od-' + id); if (!row) return;
+  const open = row.hidden; row.hidden = !open; open ? adminOpenRows.add(id) : adminOpenRows.delete(id);
+  btn.setAttribute('aria-expanded', String(open)); btn.textContent = open ? 'סגירה ▴' : 'פרטים ▾';
+};
+// ייצוא כל ההזמנות האמיתיות לקובץ שנפתח באקסל (CSV בעברית)
+window.adminExportCsv = function () {
+  const rows = [['קוד הזמנה', 'שם', 'טלפון', 'אימייל', 'תאריך המשחק', 'משתתפים', 'סכום (₪)', 'מצב', 'קופון', 'הוזמן']];
+  adminOrders.filter(o => !isTestOrder(o)).forEach(o => rows.push([o.code, o.buyerName, formatPhone(o.phone), o.email, o.gameDate, o.participants, orderAmount(o), STATUS_LABEL[o.status] || o.status, o.coupon || '',
+    o.createdAt ? o.createdAt.toDate().toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem' }) : '']));
+  const csv = '﻿' + rows.map(r => r.map(v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"').join(',')).join('\r\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = 'הזמנות-משחק-המשפחה-' + israelGameDay() + '.csv'; document.body.appendChild(a); a.click(); a.remove();
+};
 // המחיר הנכון להזמנה — כולל הנחת קופון רק אם הקוד שהלקוח כתב הוא אחד מהקודים שהגדרת
 function orderPrice(o) {
   const c = o.coupon && adminCoupons[normCoupon(o.coupon)];
@@ -1258,8 +1304,9 @@ function orderCard(o) {
   if (o.status === 'paid') actions += `<button class="game-btn" type="button" onclick="window.adminNewPassword('${o.id}')">🔑 סיסמה חדשה ללקוח</button>`;
   if (o.status !== 'cancelled') actions += `<span><input type="date" id="date-${o.id}" value="${esc(o.gameDate)}"> <button class="game-btn" type="button" onclick="window.adminChangeDate('${o.id}')">שינוי תאריך</button></span>`;
   if (o.status !== 'cancelled') actions += `<span><input type="number" id="people-${o.id}" min="${MIN_PARTICIPANTS}" max="${MAX_PARTICIPANTS}" value="${esc(o.participants)}" style="width:70px" aria-label="מספר משתתפים"> <button class="game-btn" type="button" onclick="window.adminChangePeople('${o.id}')">שינוי מספר משתתפים</button></span>`;
-  if (o.status === 'paid') actions += `<button class="game-btn" type="button" onclick="window.adminWipeData('${o.id}')">🧹 מחיקת נתוני המשחק</button><button class="game-btn" type="button" onclick="window.adminCancel('${o.id}')">✖ ביטול ההזמנה</button>`;
-  if (o.status !== 'paid') actions += `<button class="game-btn danger" type="button" onclick="window.adminDeleteOrder('${o.id}')">🗑️ מחיקת ההזמנה לגמרי</button>`;
+  /* Ayelet 16.11.26 - "one button that deletes the game's data" (window.adminDeleteGame decides what to delete) */
+  if (o.status === 'paid' && !isTestOrder(o)) actions += `<button class="game-btn" type="button" onclick="window.adminCancel('${o.id}')">✖ ביטול ההזמנה</button>`;
+  actions += `<button class="game-btn danger" type="button" onclick="window.adminDeleteGame('${o.id}')">🗑️ מחיקת נתוני המשחק</button>`;
   return `<div class="order ${esc(o.status)}"><div class="order-head"><span>הזמנה ${esc(o.code)} · ${esc(o.buyerName)}</span><span class="badge ${esc(o.status)}">${STATUS_LABEL[o.status] || esc(o.status)}</span></div>
     <div class="order-grid"><span>📅 תאריך המשחק: <b>${formatDateHe(o.gameDate)}</b></span><span>👥 ${esc(o.participants)} משתתפים</span><span>💰 לתשלום: <b>${total.toLocaleString('he-IL')} ₪</b> ${mismatch}</span><span>📞 <a href="tel:${esc(o.phone)}" dir="ltr">${esc(formatPhone(o.phone))}</a></span><span>✉️ <span dir="ltr">${esc(o.email)}</span></span><span>🕒 הוזמן: ${created}</span>${couponInfo}${wiped}</div>
     ${o.status === 'paid' ? `<div class="order-codes" id="jc-${esc(o.id)}" data-game="${esc(o.gameId || o.id)}">👥 קוד ההצטרפות למשתתפים: <span class="smallnote">טוענים…</span></div>` : ''}
@@ -1538,6 +1585,44 @@ window.adminCancel = async function (id) {
     await batch.commit();
   }
   catch (e) { console.warn(e); alert('הביטול נכשל. ודאי שכללי האבטחה פורסמו, ונסי שוב.'); }
+};
+/* Ayelet 16.11.26 - ONE delete button:
+   a real paid order -> the game's content is deleted (photos, names, recordings, groups, answers); the order + payment stay for the records.
+   a test game / an order that was not paid -> everything is deleted (the game and the order). */
+async function deleteGameAndOrder(o) {
+  const gameId = o.gameId || (isTestOrder(o) ? o.id : null);
+  if (gameId) await wipeGameContent(gameId);
+  const batch = writeBatch(db);
+  if (gameId) batch.delete(doc(db, 'familyGames', gameId));
+  batch.delete(doc(db, 'gameOrders', o.id));
+  await batch.commit();
+}
+window.adminDeleteGame = async function (id) {
+  const o = adminOrders.find(x => x.id === id); if (!o) return;
+  const keepOrder = o.status === 'paid' && !isTestOrder(o);
+  const openNow = (o.gameId || isTestOrder(o)) && await gameIsOpenNow(o.gameId || id);
+  const warn = openNow ? '⚠ המשחק הזה פתוח היום! אם משחקים בו עכשיו — הוא ייעצר.\n\n' : '';
+  if (!confirm(keepOrder
+    ? `${warn}למחוק את נתוני המשחק של ${o.buyerName} (הזמנה ${o.code})?\nיימחקו: תמונות, שמות, הקלטות, קבוצות ותשובות. אי אפשר לשחזר.\nההזמנה והתשלום נשארים ברשימה.`
+    : `${warn}למחוק לגמרי את ${isTestOrder(o) ? 'משחק הבדיקה' : 'ההזמנה'} של ${o.buyerName} (${o.code})?\nיימחקו המשחק, כל הנתונים שלו וההזמנה עצמה. אי אפשר לשחזר.`)) return;
+  try {
+    if (keepOrder) {
+      const gameId = o.gameId || id;
+      await wipeGameContent(gameId);
+      const batch = writeBatch(db);
+      batch.update(doc(db, 'familyGames', gameId), { cleanedAt: serverTimestamp() });
+      batch.update(doc(db, 'gameOrders', id), { dataDeletedAt: serverTimestamp() });
+      await batch.commit();
+    } else await deleteGameAndOrder(o);
+    adminOpenRows.delete(id);
+  } catch (e) { console.warn(e); alert('המחיקה נכשלה. ודאי שכללי האבטחה פורסמו, ונסי שוב.'); }
+};
+window.adminDeleteAllTests = async function () {
+  const tests = adminOrders.filter(isTestOrder); if (!tests.length) return;
+  if (!confirm(`למחוק את כל ${tests.length} משחקי הבדיקה, עם כל הנתונים שלהם?\nאי אפשר לשחזר. הזמנות אמיתיות לא נמחקות.`)) return;
+  let failed = 0;
+  for (const o of tests) { try { await deleteGameAndOrder(o); } catch (e) { console.warn(e); failed++; } }
+  if (failed) alert(`${failed} משחקי בדיקה לא נמחקו. נסי שוב.`);
 };
 // הזמנה שבוטלה (או הזמנה ממתינה שלא תשולם) — נעלמת מהרשימה לתמיד
 window.adminDeleteOrder = async function (id) {
