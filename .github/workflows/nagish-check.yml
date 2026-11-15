@@ -1,0 +1,33 @@
+# בדיקת נגישות אוטומטית: כל יום ראשון ב-07:00 (שעון ישראל), ובכל פעם שמעלים קבצים.
+# הבדיקה מורידה תמיד את הגרסה העדכנית של axe-core, כך שהכללים מתעדכנים לבד.
+# לא שולח מייל. הדוח המלא נשמר בלשונית Actions. את רוב מה שחסר כפתור הנגישות מתקן לבד באתר.
+name: בדיקת נגישות
+on:
+  schedule:
+    - cron: '0 5 * * 0'
+  push:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      NAGISH_URLS: https://www.getfamgame.com/ https://www.getfamgame.com/accessibility.html
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-save playwright axe-core@latest
+      - run: npx playwright install --with-deps chromium
+      - name: wait for GitHub Pages
+        if: github.event_name == 'push'
+        run: sleep 90
+      - run: node .github/nagish-check.mjs
+      - name: save last check date
+        run: |
+          git config user.name "nagish-check"
+          git config user.email "actions@users.noreply.github.com"
+          git add nagish-status.json
+          git diff --cached --quiet || (git commit -m "בדיקת נגישות: עדכון תאריך [skip ci]" && git pull --rebase -q && git push)
