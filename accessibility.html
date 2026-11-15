@@ -65,7 +65,7 @@ footer a{color:#fff}
 <li><a href="#contact">פנייה בנושא נגישות</a></li>
 </ul></aside>
 <main id="main">
-<p class="updated" id="lastUpdated">עודכן לאחרונה: 11 בנובמבר 2026</p>
+<p class="updated" id="lastUpdated">עודכן לאחרונה: 16 בנובמבר 2026</p>
 
 <h2 id="level">רמת הנגישות</h2>
 <p>האתר מותאם להנחיות התקן הישראלי ת"י 5568, המבוסס על הנחיות WCAG 2.0 ברמה AA, ולתקנות שוויון זכויות לאנשים עם מוגבלות (התאמות נגישות לשירות), התשע"ג–2013. האתר נבדק בכלי הבדיקה axe ו-IBM Equal Access, במחשב ובטלפון.</p>
@@ -77,11 +77,11 @@ footer a{color:#fff}
 <li>ניגודיות צבעים מספקת, וגופן קריא.</li>
 <li>האתר מתאים לטלפון ולמחשב, ואפשר להגדיל את הטקסט עד 200% בלי לאבד תוכן.</li>
 <li>אפשר לעצור את סרטוני ההסבר הקצרים ואת האנימציות.</li>
-<li>את המשחק מנחה אלקנה החשמונאי — דמות AI. כל מה שהוא אומר בקול מופיע גם בכתב בבועה, ואפשר לשמוע אותו שוב בכפתור 🔁. את הסרטונים שלו אפשר לעצור, להחזיר 5 שניות אחורה ולראות שוב בכפתור 🎬.</li>
+<li>את המשחק מנחה אלקנה החשמונאי — דמות AI. כל מה שהוא אומר בקול מופיע גם בכתב בבועה, ואפשר לשמוע אותו שוב בכפתור 🔁. בסרטונים שלו יש כתוביות בתוך התמונה, ואפשר לעצור אותם, להחזיר 5 שניות אחורה ולראות שוב בכפתור 🎬.</li>
 </ul>
 
 <h2 id="menu">תפריט הנגישות</h2>
-<p>בתחתית המסך יש כפתור נגישות כחול. לחיצה עליו פותחת את "תפריט נגישות", ובו:</p>
+<p>במחשב יש לשונית נגישות כחולה בצד המסך. בטלפון, וגם במסך הפתיחה ובתוך המשחק, יש כפתור כחול "♿ נגישות" בתחתית העמוד. לחיצה עליו פותחת את "תפריט נגישות", ובו:</p>
 <ul>
 <li>הגדלה והקטנה של הטקסט</li>
 <li>ניגודיות גבוהה וגווני אפור</li>
@@ -107,7 +107,21 @@ footer a{color:#fff}
 </div>
 </main>
 </div>
-<footer><a href="./">חזרה לדף הבית</a></footer>
+<footer><a href="./">חזרה לדף הבית</a> · <button type="button" onclick="window.nagishOpen&&nagishOpen()" style="font:inherit;font-weight:bold;background:#1F4FA8;color:#fff;border:0;border-radius:999px;padding:6px 16px;cursor:pointer">♿ נגישות</button></footer>
 <script src="nagish.js" defer data-statement="accessibility.html" data-main="#main" data-mobile="footer" data-mobile-slot="footer"></script>
+<script>
+/* Ayelet 16.11.26 - the date moves by itself after a clean weekly accessibility check (nagish-status.json, written by .github/nagish-check.mjs).
+   While the check finds problems that the standard requires fixing, the date stays. */
+(function () {
+  var el = document.getElementById('lastUpdated'); if (!el) return;
+  var M = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
+  var m = /(\d{1,2}) ב(\S+) (\d{4})/.exec(el.textContent), cur = m ? new Date(+m[3], M.indexOf(m[2]), +m[1]) : new Date(0);
+  fetch('nagish-status.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (s) {
+    if (!s || s.lawIssues !== 0 || !s.lastCheck) return;
+    var p = s.lastCheck.split('-').map(Number), d = new Date(p[0], p[1] - 1, p[2]);
+    if (d > cur) el.textContent = 'עודכן לאחרונה: ' + p[2] + ' ב' + M[p[1] - 1] + ' ' + p[0] + ' (בדיקת נגישות שבועית)';
+  }).catch(function () { });
+})();
+</script>
 </body>
 </html>

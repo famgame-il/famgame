@@ -113,6 +113,9 @@ body.buy-mode #purchase{margin-top:14px}
 .learn-title{text-align:center;font-size:24px;margin:6px 0 10px;color:var(--navy)}.quick-tip{background:#e3f7e7;border:2px solid #2ec4a6;border-radius:14px;padding:8px 12px;margin:0 0 10px;font-weight:bold;font-size:17px;text-align:center;line-height:1.5}
 .gotit-btn{font:inherit;font-size:24px;font-weight:900;color:#fff;background:linear-gradient(135deg,#2ec4a6,#1fa98d);border:0;border-radius:999px;padding:14px 46px;cursor:pointer;box-shadow:0 5px 14px #1fa98d55}.gotit-btn:hover{filter:brightness(1.05)}
 .gotit{text-align:center;margin:12px 0;padding:12px;border-radius:16px;background:#eaf6ff;border:2px solid #4facfe}.gotit p{margin:0 0 6px;font-weight:bold}.gotit.done{background:#e3f7e7;border-color:#2ec4a6;font-weight:bold;font-size:18px}
+/* Ayelet 16.11.26 - the accessibility menu button at the bottom of the page (start screen, game, footer) */
+.nagish-bottom{text-align:center;margin:18px 0 6px}.nagish-open{font:inherit;font-size:15px;font-weight:bold;background:#1F4FA8;color:#fff;border:0;border-radius:999px;padding:8px 18px;cursor:pointer}.nagish-open:focus-visible{outline:3px solid #ffbf47;outline-offset:2px}
+footer .nagish-bottom{margin:6px 0 0;display:block}
 /* Ayelet 16.11.26 - stage 2 "מה ראיתם?" */
 .see-pic{display:block;width:100%;max-width:720px;margin:0 auto;padding:0;border:0;background:none;cursor:zoom-in;border-radius:14px;overflow:hidden;box-shadow:0 3px 12px #0002}.see-pic img{display:block;width:100%;height:auto}
 .see-pic-title{text-align:center;margin:6px 0}.see-zoom-hint{text-align:center;margin:4px 0 8px}
@@ -258,6 +261,8 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
     </div>
     <!-- Ayelet 13.11.26: instead of the purchase button - "for questions and details" opens Ayelet's WhatsApp (number = the contact phone in admin) -->
     <div class="start-purchase"><a class="buy" data-wa target="_blank" rel="noopener" href="#"><svg class="wa-ico" viewBox="0 0 32 32" aria-hidden="true"><path fill="#25D366" d="M16 2.5A13.4 13.4 0 0 0 4.4 22.6L2.6 29.4l7-1.8A13.4 13.4 0 1 0 16 2.5z"/><path fill="#fff" d="M23.3 19.5c-.4-.2-2.3-1.1-2.6-1.2-.4-.1-.6-.2-.9.2l-1.2 1.5c-.2.3-.4.3-.8.1a10.6 10.6 0 0 1-5.3-4.6c-.4-.7.4-.6 1.1-2 .1-.3 0-.5 0-.6l-1.2-2.8c-.3-.7-.6-.6-.9-.6h-.7c-.3 0-.7.1-1 .5-.4.4-1.4 1.3-1.4 3.2s1.4 3.7 1.6 4c.2.3 2.7 4.2 6.6 5.8 2.5 1 3.4 1.1 4.7.9.8-.1 2.3-.9 2.6-1.9.3-.9.3-1.7.2-1.9-.1-.2-.4-.3-.8-.5z"/></svg>שאלות? לחצו כאן</a></div>
+    <!-- Ayelet 16.11.26: the accessibility menu is reachable here too - a button at the bottom (not a floating tab) -->
+    <p class="nagish-bottom"><button type="button" class="nagish-open" onclick="window.nagishOpen&&nagishOpen()">♿ נגישות</button></p>
   </div>
   <!-- Ayelet 13.11.26: Elkana (cut out of his background) points up at "איך המשחק עובד?" -->
   <img class="start-elkana" src="./how-elkana-point.webp" width="640" height="637" alt="אלקנה החשמונאי, מנחה ה־AI של המשחק, מחייך ומצביע למעלה על הכפתור איך המשחק עובד">
@@ -396,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <p class="smallnote">בשליחת ההזמנה את/ה מאשר/ת את <a href="#" onclick="famOpenDoc('termsModal');return false">התקנון ומדיניות הביטול</a> ואת <a href="#" onclick="famOpenDoc('privacyModal');return false">מדיניות הפרטיות</a>.</p>
 <button class="buy" type="submit" id="orderButton">שליחת הזמנה ומעבר לתשלום בביט</button><p id="purchaseMsg" aria-live="polite"></p>
 </form><div class="bit-box" id="bitBox" hidden></div><p class="smallnote">התשלום בביט. שם המשתמש והסיסמה נשלחים רק אחרי שהתשלום מתקבל.</p></div></section>
-</main><footer><a href="#admin" title="משחק משפחתי" style="color:inherit;text-decoration:none;font-weight:900">משחק משפחתי 🕎</a><span>מכירים, מתחברים, משחקים.</span><span data-contact></span><span class="fam-legal-links"><button type="button" onclick="famOpenDoc('termsModal')">תקנון ומדיניות ביטול</button> · <button type="button" onclick="famOpenDoc('privacyModal')">מדיניות פרטיות</button> · <a href="accessibility.html" style="color:inherit">הצהרת נגישות</a></span></footer>
+</main><footer><a href="#admin" title="משחק משפחתי" style="color:inherit;text-decoration:none;font-weight:900">משחק משפחתי 🕎</a><span>מכירים, מתחברים, משחקים.</span><span data-contact></span><span class="fam-legal-links"><button type="button" onclick="famOpenDoc('termsModal')">תקנון ומדיניות ביטול</button> · <button type="button" onclick="famOpenDoc('privacyModal')">מדיניות פרטיות</button> · <a href="accessibility.html" style="color:inherit">הצהרת נגישות</a></span><span class="nagish-bottom"><button type="button" class="nagish-open" onclick="window.nagishOpen&&nagishOpen()">♿ נגישות</button></span></footer>
 <style>.fam-legal-links button{background:none;border:0;color:inherit;font:inherit;text-decoration:underline;cursor:pointer;padding:0}</style>
 </div>
 <!-- אזור ניהול הזמנות — נפתח בכתובת האתר עם #admin בסוף -->
@@ -1610,7 +1615,8 @@ function stopPlay() { playUnsubs.forEach(u => u()); playUnsubs = []; }
 function showPlay(html) {
   closeModal(); closeGameAccess();
   ['startScreen', 'siteContent', 'adminScreen'].forEach(id => document.getElementById(id).hidden = true);
-  const p = document.getElementById('playScreen'); p.hidden = false; p.innerHTML = html;
+  /* Ayelet 16.11.26 ("in the game the floating button disturbs - put it at the very bottom of the page") */
+  const p = document.getElementById('playScreen'); p.hidden = false; p.innerHTML = html + '<p class="nagish-bottom"><button type="button" class="nagish-open" onclick="window.nagishOpen&&nagishOpen()">♿ נגישות</button></p>';
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 window.leavePlay = function () {
@@ -3778,12 +3784,14 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && famD
 </script>
 <script src="nagish.js" defer data-statement="accessibility.html" data-main="#home" data-mobile="footer" data-mobile-slot="footer"></script>
 <script>
-/* Ayelet 13.11.26: the blue accessibility button shows only inside the site itself - not on the start screen and not inside the game.
-   (The accessibility statement page stays linked from the site footer.) */
+/* Ayelet 13.11.26: the floating blue tab shows only inside the site itself - not on the start screen and not inside the game.
+   16.11.26 (accessibility check): there the menu opens from the blue "♿ נגישות" button at the bottom of the page (nagishOpen) -
+   so only the floating tab is hidden, the menu itself keeps working */
 setInterval(function () {
   var host = document.getElementById('nagish-host'); if (!host) return;
   var vis = function (id) { var e = document.getElementById(id); return !!(e && !e.hidden && e.offsetParent !== null); };
   var hide = vis('startScreen') || vis('playScreen');
-  host.style.display = hide ? 'none' : '';
+  host.style.display = '';
+  var fab = host.shadowRoot && host.shadowRoot.querySelector('.fab'); if (fab) fab.style.visibility = hide ? 'hidden' : '';
 }, 400);
 </script></body></html>
