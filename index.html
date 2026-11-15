@@ -113,6 +113,17 @@ body.buy-mode #purchase{margin-top:14px}
 .learn-title{text-align:center;font-size:24px;margin:6px 0 10px;color:var(--navy)}.quick-tip{background:#e3f7e7;border:2px solid #2ec4a6;border-radius:14px;padding:8px 12px;margin:0 0 10px;font-weight:bold;font-size:17px;text-align:center;line-height:1.5}
 .gotit-btn{font:inherit;font-size:24px;font-weight:900;color:#fff;background:linear-gradient(135deg,#2ec4a6,#1fa98d);border:0;border-radius:999px;padding:14px 46px;cursor:pointer;box-shadow:0 5px 14px #1fa98d55}.gotit-btn:hover{filter:brightness(1.05)}
 .gotit{text-align:center;margin:12px 0;padding:12px;border-radius:16px;background:#eaf6ff;border:2px solid #4facfe}.gotit p{margin:0 0 6px;font-weight:bold}.gotit.done{background:#e3f7e7;border-color:#2ec4a6;font-weight:bold;font-size:18px}
+/* Ayelet 16.11.26 - stage 2 "מה ראיתם?" */
+.see-pic{display:block;width:100%;max-width:720px;margin:0 auto;padding:0;border:0;background:none;cursor:zoom-in;border-radius:14px;overflow:hidden;box-shadow:0 3px 12px #0002}.see-pic img{display:block;width:100%;height:auto}
+.see-pic-title{text-align:center;margin:6px 0}.see-zoom-hint{text-align:center;margin:4px 0 8px}
+.see-q{max-width:560px;margin:0 auto;text-align:center}.see-q h3{margin:4px 0 10px;font-size:20px;color:var(--navy)}.see-num{margin:6px 0 0;font-weight:bold;color:#2e7d32}
+.see-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}.see-opts.one{grid-template-columns:1fr}
+.see-opt{font:inherit;font-size:16px;font-weight:bold;padding:12px 8px;border-radius:14px;border:2px solid #c9d6e6;background:#fff;color:var(--navy);cursor:pointer;min-height:52px}.see-opt.on{background:#ffe0ef;border-color:#d81b72;box-shadow:0 0 0 3px #d81b7233}
+.see-worth{margin:10px 0 6px;font-weight:bold;color:#a8400a}.see-next{margin:4px auto 0;display:block}.see-next:disabled{opacity:.5;cursor:not-allowed}
+.see-zoom{position:fixed;inset:0;z-index:9000;background:#111;overflow:auto;-webkit-overflow-scrolling:touch}.see-zoom img{display:block;width:calc(100% * var(--z,1));max-width:none;height:auto}
+.see-zoom-bar{position:sticky;top:0;left:0;display:flex;gap:8px;justify-content:center;padding:8px;background:#111d;z-index:1}.see-zoom-bar button{font:inherit;font-size:17px;font-weight:bold;border:0;border-radius:12px;padding:8px 14px;background:#fff;color:#123;cursor:pointer}
+.step-flash.pink .sf-card{background:#ffd6e8}
+.see-review ol{padding-inline-start:20px}.see-review li{margin:6px 0}
 .assoc-many{text-align:center;margin:2px auto 8px;max-width:520px;background:#fff3c4;border:2px solid #ffc34b;border-radius:12px;padding:6px 10px;font-weight:bold;color:var(--navy);line-height:1.5}
 .stages-intro{text-align:center;padding:18px 16px 4px}.stages-intro .game-title{margin:0 0 8px;font-size:36px;background:none;-webkit-text-fill-color:var(--navy);color:var(--navy)}.stages-intro p{margin:0 auto;max-width:680px;font-size:20px;font-weight:bold;color:var(--navy);line-height:1.6}
 .stage-headline{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;padding:16px 12px 14px;margin:0 0 14px;border-radius:22px;color:#fff;box-shadow:0 6px 18px #0002;background:linear-gradient(135deg,#ff7aa8,#ff9f43)}
@@ -350,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="step-circle s3"><span class="sn">3</span><span class="si">👥</span><h3>ביום המשחק</h3><p>מתחלקים לקבוצות, וכל קבוצה מצטרפת עם הקוד.</p></div>
 <div class="step-circle s4"><span class="sn">4</span><span class="si">🎉</span><h3>משחקים!</h3><p>אלקנה החשמונאי (דמות AI) מסביר, מצחיק ומעביר בין השלבים — לבד.</p></div>
 </div><p class="smallnote" style="text-align:center;margin-top:14px">המשחק פתוח רק בתאריך שבחרתם, מ־6:00 בבוקר עד 1:00 בלילה.</p></section>
-<section class="section" id="who"><div class="head"><h2>למי זה מתאים?</h2><p>במיוחד למשפחות עם ילדים — גדולים וקטנים משחקים יחד 🧒👴</p></div><div class="who-chips"><span>🏡 משפחות עם ילדים</span><span>🧑‍🤝‍🧑 חברים</span><span>💼 צוותי עבודה</span><span>🏫 כיתות ומחזורים</span><span>🎉 וכל קבוצה</span></div><p style="text-align:center;margin:12px 0 0">🕍 מותאם לציבור הדתי</p></section>
+<section class="section" id="who"><div class="head"><h2>למי זה מתאים?</h2><p>במיוחד למשפחות עם ילדים — גדולים וקטנים משחקים יחד 🧒👴</p></div><div class="who-chips"><span>🏡 משפחות עם ילדים</span><span>🧑‍🤝‍🧑 חברים</span><span>👴 סבא, סבתא והנכדים</span><span>🕎 חגים ואירועים משפחתיים</span><span>🎉 וכל קבוצה</span></div><p style="text-align:center;margin:12px 0 0">🕍 מותאם לציבור הדתי</p></section>
 <section class="section" id="faq"><div class="head"><h2>שאלות נפוצות</h2></div>
 <details><summary>האם צריך להכין משהו מראש?</summary><p><strong>לא.</strong> המשחק מוכן מראש. לא מכינים תמונות, שאלות או חומרי משחק — האתר מנחה אתכם במהלך המשחק.</p></details>
 <details><summary>כמה אנשים בכל קבוצה?</summary><p>בכל קבוצה 3 עד 5 משתתפים, ולפחות 4 קבוצות — כלומר המשחק מתאים ל־12 משתתפים ומעלה. האתר לא מאפשר לרשום פחות מ־3 או יותר מ־5 בקבוצה — אם אתם יותר, מתחלקים לשתי קבוצות. <strong>כדאי לערבב בכל קבוצה גדולים וילדים</strong> — ככה כולם משחקים יחד.</p></details>
@@ -361,7 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <details><summary>מתי המשחק מתחיל ומי מעביר לשלב הבא?</summary><p>המשחק מתחיל כשכל הקבוצות מוכנות: אם הגיעו כל המשתתפים שהוזמנו — מיד. אם הגיעו פחות — כל הקבוצות לוחצות ”כולנו כאן — מתחילים” (אחרי כמה דקות אלקנה, דמות ה־AI, מתחיל בעצמו, ומי שצריך עוד רגע לוחץ ”רגע, עוד לא!”). בין השלבים אלקנה מעביר הלאה לבד — כשכל הקבוצות סיימו או כשהזמן נגמר.</p></details>
 <details><summary>ומה אם משהו נתקע?</summary><p>לא נתקע 🙂 לכל שלב יש שעון, והשרת מעביר הלאה גם אם קבוצה לא סיימה. ויש בכל טלפון כפתור ”המשחק תקוע?” — אם רוב הקבוצות לוחצות, ממשיכים.</p></details>
 <details><summary>כל קבוצה משחקת לבד בטלפון שלה?</summary><p>כל קבוצה משחקת מהטלפון שלה — אבל כולם משחקים יחד. האתר מערבב בין כל הקבוצות: בשלב 1 כל קבוצה מזהה תמונות של בני משפחה מהקבוצות האחרות, ובשלב 3 שומעת הקלטות של הקבוצות האחרות. קבוצה אף פעם לא מקבלת את התמונות או ההקלטות של עצמה. בשלב 2 כל הקבוצות מקבלות את אותן תמונות ושאלות, ובסוף משווים בין כולן.</p></details>
-<details><summary>כמה זמן לוקח המשחק?</summary><p>בערך 40–50 דקות: הצטרפות וצילום (5–10 דקות), שלב 1 — מי זה במשפחה (2–5 דקות), שלב 2 — מה ראיתם? (עד 5 דקות), שלב 3 — מי אמר את זה (10–20 דקות, תלוי במספר המשתתפים), וההכרזה על המנצחים.</p></details>
+<details><summary>כמה זמן לוקח המשחק?</summary><p>בערך 40–50 דקות: הצטרפות וצילום (5–10 דקות), שלב 1 — מי זה במשפחה (2–5 דקות), שלב 2 — מה ראיתם? (עד 6 דקות), שלב 3 — מי אמר את זה (10–20 דקות, תלוי במספר המשתתפים), וההכרזה על המנצחים.</p></details>
 <details><summary>האם חייבים מקרן?</summary><p>לא. כל קבוצה רואה ושומעת את אלקנה (דמות AI) בטלפון שלה.</p></details>
 <details><summary>אילו תמונות צריך לצלם?</summary><p>רק בשלב 1: כל משתתף מצטלם בטלפון של הקבוצה — פנים מקרוב — כשהמשחק מבקש. מישהו מהקבוצה מצלם אותו (או סלפי). בשלב 2 התמונות מגיעות מהאתר — לא מצלמים כלום. בשלב 3 לא מצלמים, רק מקליטים.</p></details>
 <details><summary>מה עושים בשלב 2?</summary><p>מקבלים מהאתר תמונה מלאה בפרטים, ומתחתיה שאלות עליה — אחת בכל פעם, עם 4 תשובות לבחירה. למשל: ”מה השעה בשעון?” או ”למי יש יום הולדת היום?”. כל פרט קטן חשוב, ומי שעונה נכון ויותר זריז מקבל יותר נקודות. גם ילדים נהנים מאוד מהשלב הזה 🔍</p></details>
@@ -426,7 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ההסבר הציבורי של שלב 1 שומר על הסוד (בלי ”עיניים”). את ההסבר המלא רואים רק השחקנים, בתוך המשחק (stagesGame / clipsGame)
 const stages={
 1:{title:'מי זה במשפחה? 🕵️',desc:'כל משתתף מצטלם בטלפון של הקבוצה — ואז, באופן מסתורי, התמונות מקבלות תפנית... 🌀 צריך לזהות מי זה, נגד השעון! כל זיהוי נכון = נקודה.',steps:['מתי: מיד אחרי שהקבוצה מצטרפת למשחק. מי: כל משתתף בקבוצה, אחד אחרי השני.','איך: כותבים את השם המלא שלו, ומישהו מהקבוצה מצלם אותו מקרוב (או סלפי) בטלפון של הקבוצה — רק את הפנים. התמונה עולה לאתר לבד.','כולם הצטלמו? לוחצים ”העלינו ואנחנו מוכנים” ומחכים לשאר הקבוצות.','כשכולם מוכנים, אלקנה (דמות ה־AI) מפעיל את השעון — והתמונות מקבלות תפנית מסתורית 🌀','🔀 האתר מערבב את התמונות של כל הקבוצות: כל קבוצה מקבלת רק תמונות של בני משפחה מהקבוצות האחרות — אף פעם לא של עצמה. כל קבוצה בטלפון שלה, אבל משחקים עם כולם!','התמונות רצות על המסך ועוצרות — כותבים מי זה.','כל זיהוי נכון = נקודה. התמונות נמחקות מהאתר יום אחרי המשחק. מה בדיוק קורה? תגלו כשתשחקו 😉']},
-2:{title:'מה ראיתם? 🔍',desc:'3 תמונות מלאות בפרטים, ועל כל תמונה 8 שאלות. התמונה נשארת למעלה, ומתחתיה מגיעה שאלה אחת בכל פעם עם 4 תשובות לבחירה. כל פרט קטן חשוב — ומי שעונה נכון ויותר זריז מקבל יותר נקודות!',steps:['כל הקבוצות מקבלות את אותן תמונות מהאתר — לא מצלמים כלום בשלב הזה.','מסתכלים טוב על התמונה: מי יושב איפה, מה כתוב על השלט, מה השעה בשעון… כל פרט קטן יכול להיות שאלה!','מתחת לתמונה מופיעה שאלה עם 4 תשובות. בוחרים תשובה ולוחצים ”הבא” — ומגיעה השאלה הבאה. התמונה נשארת על המסך, לא צריך לגלול.','אחרי 8 שאלות — לוחצים ”הבא” ועוברים לתמונה הבאה. כל קבוצה מתקדמת בקצב שלה.','⏱️ יש 4 וחצי דקות לכל השלב. כל תשובה נכונה = עד 100 נקודות — מי שעונה מהר יותר מקבל יותר. תשובה לא נכונה = 0, אז לא כדאי לנחש סתם!','בסוף רואים מי ענה הכי הרבה תשובות נכונות והכי מהר 🥇🥈🥉']},
+2:{title:'מה ראיתם? 🔍',desc:'3 תמונות מלאות בפרטים, ועל כל תמונה 7–8 שאלות. התמונה נשארת למעלה, ומתחתיה מגיעה שאלה אחת בכל פעם עם 4 תשובות לבחירה. כל פרט קטן חשוב — ומי שעונה נכון ויותר זריז מקבל יותר נקודות!',steps:['כל הקבוצות מקבלות את אותן תמונות מהאתר — לא מצלמים כלום בשלב הזה.','מסתכלים טוב על התמונה: מי יושב איפה, מה כתוב על השלט, מה השעה בשעון… כל פרט קטן יכול להיות שאלה!','מתחת לתמונה מופיעה שאלה עם 4 תשובות. בוחרים תשובה ולוחצים ”הבא” — ומגיעה השאלה הבאה. התמונה נשארת על המסך, לא צריך לגלול.','אחרי השאלה האחרונה — לוחצים ”הבא” ועוברים לתמונה הבאה. כל קבוצה מתקדמת בקצב שלה.','⏱️ יש 6 דקות לכל השלב, ו⚡ המהירות קובעת: כל תשובה נכונה = עד 100 נקודות, וכל שנייה שעוברת היא שווה פחות. תשובה לא נכונה = 0, אז לא כדאי לנחש סתם!','בסוף רואים מי ענה הכי הרבה תשובות נכונות והכי מהר 🥇🥈🥉']},
 3:{title:'מי אמר את זה?! 🎙️',desc:'10 שאלות מצחיקות — למשל ”אם היית יכול לנסוע בזמן, לאן היית נוסע?”. בכל קבוצה, על כל שאלה עונה בקול משתתף אחר (עד 20 שניות). האתר משנה את הקולות ומערבב אותם, וכל קבוצה צריכה לנחש מי אמר מה!',steps:['על כל שאלה עונה משתתף אחד מהקבוצה — כל פעם מישהו אחר. הוא מקליט תשובה של עד 20 שניות, כמו הודעה קולית. השם נשמר בסוד.','מעודדים להיות מקוריים, מצחיקים ומפתיעים — אבל אף אחד לא חייב לספר משהו אישי.','אחרי שכולם ענו, האתר משנה את הקולות ומערבב את ההקלטות של כל הקבוצות 🔀 — כל קבוצה בטלפון שלה, אבל משחקים עם כולם!','לכל שאלה כל קבוצה שומעת הקלטות של הקבוצות האחרות (אף פעם לא של עצמה) וכותבת מי לדעתה אמר כל אחת. כשיש הרבה משתתפים — שומעים מבחר אקראי, כדי שיישאר כיף וקצר.','בסוף — מיד התוצאות: מי אמר מה, כל זיהוי נכון = נקודה, וטבלת הניקוד של כל המשחק עם הקבוצה המנצחת! 🏆']}
 };
 // ההסבר המלא של שלב 1 — רק לשחקנים, בתוך המשחק
@@ -476,7 +487,7 @@ const clips={
  {art:'👀',text:'מסתכלים טוב: מי יושב איפה? מה כתוב על השלט? מה השעה?',ms:3800},
  {art:'❓ 🅰️🅱️',text:'מתחת לתמונה — שאלה אחת עם 4 תשובות. בוחרים ולוחצים ”הבא”',ms:4000},
  {art:'⚡',text:'מי שעונה נכון ויותר זריז — מקבל יותר נקודות!',ms:3400},
- {art:'⏱️ <span data-count>270</span>',text:'4 וחצי דקות — 3 תמונות, 8 שאלות על כל אחת',ms:3600,count:270},
+ {art:'⏱️ <span data-count>360</span>',text:'6 דקות — 3 תמונות, 7–8 שאלות על כל אחת. ⚡ המהירות קובעת!',ms:3600,count:360},
  {art:'🏆 🥈 🥉',text:'בסוף: מי ענה הכי הרבה תשובות נכונות והכי מהר!',ms:3400}],
 3:[{art:'🎙️ 10',text:'עשר שאלות מצחיקות — על כל שאלה עונה משתתף אחר מהקבוצה',ms:4000},
  {art:'⏳ 🚀',text:'למשל: אם היית יכול לנסוע בזמן — לאן היית נוסע?',ms:4000},
@@ -1749,11 +1760,13 @@ function startTicker() {
     if (managerCtx && left < -6000) window.managerRevealResults();
   }, 500);
 }
+/* Ayelet 16.11.26 - every stage gives points now (speed in stages 1-2, 100 for a correct guess in stage 3); old results (no points) - the old way */
+const ptsOf = r => (r && r.points != null ? r.points : (r && r.score) || 0);
 function scoreboard(stageResults, title) {
-  const rows = Object.entries(stageResults || {}).map(([id, r]) => ({ id, ...r })).sort((a, b) => b.score - a.score);
+  const rows = Object.entries(stageResults || {}).map(([id, r]) => ({ id, ...r })).sort((a, b) => ptsOf(b) - ptsOf(a));
   // תיקו = אותו מקום ואותה מדליה
-  const scores = [...new Set(rows.map(r => r.score))];
-  const row = r => { const place = scores.indexOf(r.score); return `<div class="group-item"><span>${['🥇', '🥈', '🥉'][place] || (place + 1) + '.'} ${esc(r.name)}</span><strong>${r.score} ${r.score === 1 ? 'נקודה' : 'נקודות'} (מתוך ${r.total})</strong></div>`; };
+  const scores = [...new Set(rows.map(ptsOf))];
+  const row = r => { const place = scores.indexOf(ptsOf(r)); return `<div class="group-item"><span>${['🥇', '🥈', '🥉'][place] || (place + 1) + '.'} ${esc(r.name)}</span><strong>${r.points != null ? `${r.points} נקודות (${r.score} נכונים מתוך ${r.total})` : `${r.score} ${r.score === 1 ? 'נקודה' : 'נקודות'} (מתוך ${r.total})`}</strong></div>`; };
   return `<div class="info"><h3>${title || '🏆 טבלת הניקוד — שלב 1'}</h3>${rows.map(row).join('')}</div>`;
 }
 // טבלת הניקוד הכוללת: שלב 1 (נקודה לכל זיהוי נכון) + שלב 2 (3/2/1 לפי מקום) + שלב 3 (נקודה לכל זיהוי נכון)
@@ -1762,7 +1775,7 @@ function totalRows(results) {
   const res = results || {}, rows = {};
   STAGE_KEYS.forEach((k, i) => Object.entries(res[k] || {}).forEach(([id, v]) => {
     const row = rows[id] = rows[id] || { id, name: v.name, s: [], total: 0 };
-    row.s[i] = Number(k === 'stage2' ? v.points : v.score) || 0; row.total += row.s[i];
+    row.s[i] = Number(v.points != null ? v.points : v.score) || 0; row.total += row.s[i];
   }));
   return Object.values(rows).sort((a, b) => b.total - a.total || String(a.name).localeCompare(String(b.name)));
 }
@@ -1772,7 +1785,7 @@ function totalsTable(results, myId, title) {
   return `<div class="info"><h3>${title}</h3><table class="totals"><thead><tr><th></th><th style="text-align:start">קבוצה</th>${cols.map(i => `<th>שלב ${i + 1}</th>`).join('')}<th>סה״כ</th></tr></thead><tbody>${rows.map(r => {
     const p = tops.indexOf(r.total);
     return `<tr class="${r.id === myId ? 'me' : p === 0 ? 'win' : ''}"><td>${MEDALS[p] || p + 1}</td><td class="n">${esc(r.name)}${r.id === myId ? ' (אתם)' : ''}</td>${cols.map(i => `<td>${r.s[i] || 0}</td>`).join('')}<td class="t">${r.total}</td></tr>`;
-  }).join('')}</tbody></table>${cols.includes(1) ? '<p class="smallnote">בשלב 2: מקום ראשון = 3 נקודות, שני = 2, שלישי = 1.</p>' : ''}</div>`;
+  }).join('')}</tbody></table>${rows.some(r => r.s.some(x => x > 20)) ? '<p class="smallnote">⚡ כל תשובה נכונה = עד 100 נקודות. בשלבים 1 ו־2 מי שענה מהר יותר קיבל יותר.</p>' : cols.includes(1) ? '<p class="smallnote">בשלב 2: מקום ראשון = 3 נקודות, שני = 2, שלישי = 1.</p>' : ''}</div>`;
 }
 // ההכרזה החגיגית בסוף המשחק — לכולם באותו רגע
 function finaleHtml(results, myId) {
@@ -1939,7 +1952,7 @@ window.openJoin = function (code) {
 // תיבת ”מה עושים עכשיו?” — צעדים ממוספרים: מה שבוצע מסומן ✓, והצעד הנוכחי מודגש
 // כותרת חגיגית לפני כל שלב: ”בואו נראה כמה אתם מכירים... בעיניים / בידע / בשמיעה”
 /* Ayelet 13.11.26 - stage 1 without "בעיניים": the eyes come as a surprise with the character */
-const STAGE_HEADLINES = { 1: ['', '', 'c1'], 2: ['בידע!', '💭', 'c2'], 3: ['בשמיעה!', '🎙️', 'c3'] };
+const STAGE_HEADLINES = { 1: ['', '', 'c1'], 2: ['בעין חדה!', '🔍', 'c2'], 3: ['בשמיעה!', '🎙️', 'c3'] };
 function stageHeadline(n) {
   const [word, icon, cls] = STAGE_HEADLINES[n];
   return `<div class="stage-headline ${cls}"><span class="sh-num">שלב ${n}</span><span class="sh-top">בואו נראה כמה אתם מכירים…</span>${word ? `<span class="sh-word">${word} ${icon}</span>` : ''}</div>`;
@@ -2277,6 +2290,8 @@ function transitionText(st) {
   if (s === 'photos' && st.photosOpen) return ['📸', 'מצטלמים!', 'כל משתתף בתורו'];
   if (s === 'eyes') return ['👀', 'שלב 1 מתחיל!', 'של מי העיניים?'];
   if (s === 'eyesDone' || s === 'assocDone' || s === 'whoDone') return ['🏆', 'התוצאות!', s === 'eyesDone' ? 'שלב 1' : s === 'assocDone' ? 'שלב 2' : 'שלב 3'];
+  /* Ayelet 16.11.26 - stage 2 "מה ראיתם?" */
+  if (s === 'assoc' && st.see) return ['🔍', 'שלב 2 מתחיל!', 'מה ראיתם? ⚡ המהירות קובעת'];
   if (s === 'assoc') return ['💭', `תמונה ${(st.assocRound || 0) + 1} מתוך ${(st.assocImages || []).length || 8}`, 'מה זה מזכיר לכם?'];
   if (s === 'assocCheck') return ['⏰', 'הזמן נגמר!', 'אלקנה בודק את התשובות'];
   if (s === 'whoRecord') return ['🎙️', 'מקליטים!', 'שלב 3 — חלק א׳'];
@@ -2284,9 +2299,12 @@ function transitionText(st) {
   return null;
 }
 function showTransition(c) {
-  const t = c.state && transitionText(c.state); if (!t) return;
+  const t = c.state && transitionText(c.state); if (t) flashCard(t);
+}
+/* Ayelet 16.11.26 - also used inside stage 2 ("תמונה הבאה" - a pink card, cls 'pink') */
+function flashCard(t, cls) {
   const old = document.getElementById('stepFlash'); if (old) old.remove();
-  const el = document.createElement('div'); el.id = 'stepFlash'; el.className = 'step-flash'; el.setAttribute('role', 'status');
+  const el = document.createElement('div'); el.id = 'stepFlash'; el.className = 'step-flash' + (cls ? ' ' + cls : ''); el.setAttribute('role', 'status');
   el.innerHTML = `<div class="sf-card"><div class="sf-icon" aria-hidden="true">${t[0]}</div><div class="sf-title">${esc(t[1])}</div><div class="sf-sub">${esc(t[2])}</div></div>`;
   document.body.appendChild(el);
   setTimeout(() => el.classList.add('out'), 1500);
@@ -2431,7 +2449,7 @@ function hostListen(c) {
 const HOST_MOMENT_STAGES = {
   welcome: ['photos'], groupJoined: ['photos'], photosOpen: ['photos'], askAllHere: ['photos'], startSoon: ['photos'], hold: ['photos'],
   everyoneHere: ['photos', 'eyes'], stage1Start: ['photos', 'eyes'],
-  eyesDone: ['eyesDone'], assocIntro: ['assocIntro'], assocJudging: ['assoc', 'assocCheck'], assocDone: ['assocDone'],
+  eyesDone: ['eyesDone'], assocIntro: ['assocIntro'], assocJudging: ['assoc', 'assocCheck'], assocStart: ['assoc'], assocDone: ['assocDone'],
   whoIntro: ['whoIntro'], whoGuessStart: ['whoGuess'], whoDone: ['whoDone'],
   final: ['final'], finalIntro: ['final'], finalGroup: ['final'], finalWinners: ['final'], thanks: ['final'],
 };
@@ -2562,7 +2580,7 @@ function renderGroup() {
     const mine = c.results && c.results.stage1 && c.results.stage1[c.uid];
     if (!mine) { main.innerHTML = '<p>מחשבים את התוצאות…</p>'; return; }
     const eyesOf = Object.fromEntries(((c.assignment && c.assignment.items) || []).map((it, i) => [it.pid, charCard(eyeCharFor(c.uid, i), it.eyes)]));
-    main.innerHTML = `<div class="now-box" style="text-align:center"><p style="font-size:24px;margin:0"><strong>🎉 קיבלתם ${mine.score} ${mine.score === 1 ? 'נקודה' : 'נקודות'} מתוך ${mine.total}!</strong></p></div>`
+    main.innerHTML = `<div class="now-box" style="text-align:center"><p style="font-size:24px;margin:0"><strong>🎉 ${mine.points != null ? `קיבלתם ${mine.points} נקודות — ${mine.score} זיהויים נכונים מתוך ${mine.total}!` : `קיבלתם ${mine.score} ${mine.score === 1 ? 'נקודה' : 'נקודות'} מתוך ${mine.total}!`}</strong></p></div>`
       + mine.details.map((d, i) => `<div class="member eyes-card"><strong>${d.ok ? '✅ נכון!' : '❌ לא נכון'} — תמונה ${i + 1}</strong>${eyesOf[d.pid] || ''}<p style="margin:4px 0">כתבתם: ”${esc(d.guess || '—')}”<br>אלה העיניים של: <strong>${esc(d.real)}</strong></p></div>`).join('')
       + scoreboard(c.results.stage1, '🏆 טבלת הניקוד — שלב 1') + nextStepHtml(c);
   } else if (['assocIntro', 'assoc', 'assocCheck', 'assocDone'].includes(c.state.stage)) {
@@ -2830,6 +2848,7 @@ function assocLandMs(st) { return st && st.assocStartedAt ? st.assocStartedAt.to
 function assocEndMs(st) { return st && st.assocStartedAt ? st.assocStartedAt.toMillis() + (st.assocSeconds || ASSOC_SPIN + ASSOC_SECS) * 1000 : 0; }
 function assocClock(st) { return fmtClock(Math.min(((st.assocSeconds || ASSOC_SPIN + ASSOC_SECS) - ASSOC_SPIN) * 1000, assocEndMs(st) - Date.now())); }
 function assocTick(st) {
+  if (st.see) return seeTick(st);
   const left = assocEndMs(st) - Date.now();
   document.querySelectorAll('[data-countdown]').forEach(el => { el.textContent = assocClock(st); el.closest('.timer-bar')?.classList.toggle('urgent', left < 10000); });
   if (groupCtx) assocGroupTick();
@@ -2986,6 +3005,8 @@ window.assocFinishCheck = async function () {
 // --- טלפון של קבוצה ---
 function renderGroupAssoc(main) {
   const c = groupCtx, st = c.state, a = c.assoc || {};
+  /* Ayelet 16.11.26 - stage 2 is now "מה ראיתם?" (renderGroupSee). The old code below stays only for old games */
+  if (st.stage === 'assocIntro' || st.see || a.see) return renderGroupSee(main);
   if (st.stage === 'assocIntro') {
     c.assocBuilt = null;
     const secs = st.assocSecsPlan || ASSOC_SECS;
@@ -3072,6 +3093,191 @@ window.assocRemove = function (i) {
   const c = groupCtx; if (!c || c.assocOver || Date.now() >= assocEndMs(c.state)) return;
   const r = c.state.assocRound; c.assocAns[r].splice(i, 1); renderAssocList(); saveAssoc(r);
 };
+
+/* ---------- Ayelet 16.11.26 - stage 2 "מה ראיתם?" ----------
+   3 pictures full of details (files s2-*.jpg next to index.html), 7-8 questions on each, 4 answers to pick from.
+   The picture stays on top (a tap opens it big, with zoom), under it one question at a time -> pick -> "הבא".
+   One clock of 6 minutes for the whole stage, every group at its own pace. Speed decides: a correct answer = 100 points at the start -> 50 at the end.
+   Answers: assoc/{uid}_{picture}_{question} = { a } (the server counts the time of the last pick). The correct answers are only on the server
+   (engine-core SEE_KEY - the same order as here!). After the last "הבא": groups/{uid}.seeDone - when all groups did, the stage ends.
+   Where the group is (question number + picks) is kept on the phone (localStorage), so a refresh continues from the same place */
+const SEE_SECS = 360;
+const SEE_PICS = [
+  { src: 's2-entrance.jpg', alt: 'כניסה לבניין בחנוכה: אבא ושני ילדים מדליקים נרות ליד השולחן', qs: [
+    ['איזה יום של חנוכה היום?', ['השני', 'הראשון', 'השלישי', 'השמיני']],
+    ['מה מספר הבניין?', ['16', '3', '14', '12']],
+    ['של מי האופניים?', ['יונתן', 'אורי', 'אבא', 'השכן']],
+    ['מה שם המשפחה שלהם?', ['כהן', 'לוי', 'אברמון', 'בראון']],
+    ['באיזו קומה הם גרים?', ['1', '2', '3', '5']],
+    ['איזה שכן לא היה בבית הרבה זמן?', ['לוי', 'כהן', 'רוזן', 'זמיר']],
+    ['מי לא מרגיש טוב?', ['יונתן', 'אורי', 'אבא', 'אף אחד']],
+    ['ברשימת המשימות, איזו משימה לא תסומן היום?', ['להדליק נרות', 'לקנות סופגניות', 'כולן יסומנו', 'להשקות את הפרחים']],
+  ] },
+  { src: 's2-sabba.jpg', alt: 'סבא, אבא והנכדים סביב שולחן חנוכה', qs: [
+    ['באיזו עיר האירוע?', ['ירושלים', 'צפת', 'חברון', 'בני ברק']],
+    ['מי אבא של משה?', ['סבא', 'אהרן', 'דניאל', 'רפאל']],
+    ['מי היה באירוע וכבר הלך?', ['דוד', 'אורי', 'יונתן', 'אליהו']],
+    ['מתי יצא העיתון שסבא קורא?', ['היום', 'אתמול', 'לפני חודש', 'לפני שבוע']],
+    ['למי יש פריט חדש?', ['דניאל', 'סבא', 'אהרן', 'רפאל']],
+    ['מה התאריך והשעה של האירוע?', ['ב׳ בטבת תשפ״ה, 4:10', 'כ״ה בכסלו תשפ״ה, 10:00 בלילה', 'ב׳ בטבת תשפ״ה, 10:00 בלילה', 'ט״ז בכסלו תשפ״ה, 4:10']],
+    ['מי כבר אכל סופגנייה?', ['משה ואהרן', 'אורי ורפאל', 'משה, אהרן, רפאל ואורי', 'רק רפאל']],
+  ] },
+  { src: 's2-salon.jpg', alt: 'שני אבות וילדים בסלון מצטלמים עם הטלפונים', qs: [
+    ['לכמה מהמשתתפים יש משקפיים?', ['1', '2', '3', '4']],
+    ['במה עוסקים יהודה וחיים?', ['יהודה רופא, חיים צייר', 'יהודה צלם, חיים רופא', 'יהודה רופא, חיים צלם', 'שניהם רופאים']],
+    ['מה הייתה הפעילות שעסקו בה קודם?', ['נגינה', 'כדורגל', 'אפיית עוגיות', 'ציור']],
+    ['מי קיבל את התה שלו ראשון?', ['חיים', 'יהודה', 'הילד עם הטלפון הכחול', 'הילד עם המשקפיים']],
+    ['מה הקשר בין יהודה לחיים?', ['אחים', 'גיסים', 'בני דודים', 'שכנים']],
+    ['איזו ארוחה הם אכלו לפני כן?', ['חלבית', 'פרווה', 'בשרית', 'לא אכלו']],
+    ['מי כבר אכל סופגנייה?', ['הילד עם הטלפון הכחול', 'הילד שבקצה השמאלי', 'הילד עם המשקפיים', 'הילד שבקצה הימני']],
+    ['מי היה לאחרונה אצל רופא?', ['חיים', 'יהודה', 'הילד עם הטלפון הכחול', 'הילד עם המשקפיים']],
+  ] },
+];
+const SEE_LIST = SEE_PICS.flatMap((p, pi) => p.qs.map(([q, a], qi) => ({ pi, qi, q, a })));
+function seeEndMs(st) { return st && st.assocStartedAt ? st.assocStartedAt.toMillis() + (st.assocSeconds || SEE_SECS) * 1000 : 0; }
+// כמה שווה עכשיו תשובה נכונה: 100 בהתחלה ← 50 בסוף השעון (כמו בשרת)
+function seeWorth(st) {
+  const start = st && st.assocStartedAt ? st.assocStartedAt.toMillis() : Date.now();
+  const f = Math.min(1, Math.max(0, (Date.now() - start) / ((st.assocSeconds || SEE_SECS) * 1000)));
+  return Math.round(100 - 50 * f);
+}
+const seeLocalKey = c => 'famSee_' + c.gameId + '_' + c.uid;
+function seeSaveLocal(c) { try { localStorage.setItem(seeLocalKey(c), JSON.stringify(c.see)); } catch (e) { } }
+function seeLoad(c, key) {
+  if (c.see && c.see.key === key) return;
+  let s = null; try { s = JSON.parse(localStorage.getItem(seeLocalKey(c)) || 'null'); } catch (e) { }
+  c.see = s && s.key === key ? s : { key, pos: 0, picks: {} };
+  if (s && s.key === key) return;
+  // מכשיר אחר / אחרי ניקוי: ממשיכים מהשאלה הראשונה שעוד לא נענתה (לפי מה שנשמר בשרת)
+  Promise.all(SEE_LIST.map(it => getDoc(doc(db, 'familyGames', c.gameId, 'assoc', c.uid + '_' + it.pi + '_' + it.qi)).then(d => d.exists() ? d.data().a : null).catch(() => null)))
+    .then(vals => {
+      if (groupCtx !== c || !c.see || c.see.key !== key || c.see.pos) return;
+      vals.forEach((v, i) => { if (Number.isInteger(v)) c.see.picks[i] = v; });
+      const first = vals.findIndex(v => !Number.isInteger(v));
+      c.see.pos = first < 0 ? SEE_LIST.length : first; seeSaveLocal(c); renderSeeStep(true);
+    });
+}
+function renderGroupSee(main) {
+  const c = groupCtx, st = c.state, a = c.assoc || {};
+  if (st.stage === 'assocIntro') {
+    c.seeBuilt = null;
+    SEE_PICS.forEach(p => { const im = new Image(); im.src = p.src; }); // טוענים מראש — כדי שהתמונה תופיע מיד כשהשלב מתחיל
+    videoGate(main, c, 's2', ['elkana-stage2.mp4'], 'e-instructions.jpg', 'אלקנה (דמות AI) מסביר את שלב 2 🔊', stageHeadline(2) + LEARN_TITLE + nowBox('שלב 2 — מה ראיתם? 🔍', [
+      '3 תמונות מלאות בפרטים — כל הקבוצות מקבלות את אותן תמונות.',
+      'התמונה נשארת למעלה. 👆 לחיצה עליה מגדילה אותה — ככה רואים כל פרט קטן.',
+      'מתחת לתמונה: שאלה אחת עם 4 תשובות. בוחרים תשובה ולוחצים ”הבא” — ומגיעה השאלה הבאה.',
+      `⏱️ ${secsText(SEE_SECS)} לכל השלב. ⚡ המהירות קובעת: תשובה נכונה שווה 100 נקודות בהתחלה, ופחות ופחות ככל שהזמן עובר (עד 50). תשובה לא נכונה = 0.`,
+      'כל קבוצה מתקדמת בקצב שלה. כשכולן סיימו (או כשהשעון נגמר) — רואים מי ראה הכי טוב 🏆'], 0)
+      , gotItHtml(c, 's2'), !!(c.group.gotIt && c.group.gotIt.s2));
+    return;
+  }
+  if (st.stage === 'assocDone' || st.stage === 'assocCheck') { c.seeBuilt = null; return renderSeeResults(main, c, a); }
+  // השלב פעיל: בונים את המסך פעם אחת (כדי שהתמונה לא תהבהב), ואז רק מחליפים את השאלה
+  const key = st.assocStartedAt ? st.assocStartedAt.toMillis() : null;
+  if (!key) { main.innerHTML = '<p>מתחילים…</p>'; return; }
+  seeLoad(c, key);
+  if (c.seeBuilt === key && document.getElementById('seeQ')) return;
+  c.seeBuilt = key; c.seeOver = false;
+  /* no "מה עושים?" box here (explained before the stage) - so the picture, the question and "הבא" fit on one phone screen */
+  main.innerHTML = `${timerBar(fmtClock(seeEndMs(st) - Date.now()), `עד ${secsText(SEE_SECS)} לכל השלב`)}
+    <div id="seePic"></div><div id="seeQ"></div>`;
+  renderSeeStep();
+}
+function renderSeeStep(scroll) {
+  const c = groupCtx, st = c && c.state, s = c && c.see, box = document.getElementById('seeQ'), picBox = document.getElementById('seePic');
+  if (!box || !picBox || !s) return;
+  if (s.pos >= SEE_LIST.length || c.group.seeDone) {
+    picBox.innerHTML = ''; picBox.dataset.pi = '';
+    box.innerHTML = '<div class="now-box" style="text-align:center"><p style="font-size:20px;margin:0"><strong>✅ סיימתם את כל השאלות!</strong></p><p style="margin:6px 0 0">מחכים לשאר הקבוצות (או לסוף השעון) — ואז רואים מי ראה הכי טוב 🏆</p></div>';
+    if (s.pos >= SEE_LIST.length && !c.group.seeDone && !c.seeDoneSent) { c.seeDoneSent = true; updateGroupDoc(c, { seeDone: true, seeDoneAt: serverTimestamp() }).catch(e => { console.warn(e); c.seeDoneSent = false; }); }
+    return;
+  }
+  if (c.seeOver) { box.innerHTML = '<div class="now-box" style="text-align:center"><p style="margin:0"><strong>⏰ הזמן נגמר! אלקנה סופר את הנקודות…</strong></p></div>'; return; }
+  const it = SEE_LIST[s.pos], pic = SEE_PICS[it.pi], pick = s.picks[s.pos];
+  const last = s.pos === SEE_LIST.length - 1, lastOfPic = !last && SEE_LIST[s.pos + 1].pi !== it.pi;
+  if (picBox.dataset.pi !== String(it.pi)) {
+    picBox.dataset.pi = String(it.pi);
+    picBox.innerHTML = `<p class="see-pic-title"><strong>🖼️ תמונה ${it.pi + 1} מתוך ${SEE_PICS.length}</strong></p>
+      <button type="button" class="see-pic" onclick="window.seeZoom()" aria-label="הגדלת התמונה"><img src="${pic.src}" alt="${esc(pic.alt)}"></button>
+      <p class="smallnote see-zoom-hint">👆 לחצו על התמונה כדי להגדיל</p>`;
+    if (scroll !== false && s.pos) scrollTop();
+  }
+  const long = it.a.some(t => t.length > 16);
+  box.innerHTML = `<div class="see-q"><p class="see-num">שאלה ${it.qi + 1} מתוך ${pic.qs.length}</p><h3>${esc(it.q)}</h3>
+    <div class="see-opts${long ? ' one' : ''}">${it.a.map((t, i) => `<button type="button" class="see-opt${pick === i ? ' on' : ''}" aria-pressed="${pick === i}" onclick="window.seePick(${i})">${esc(t)}</button>`).join('')}</div>
+    <p class="see-worth">⚡ תשובה נכונה שווה עכשיו <strong data-worth>${seeWorth(st)}</strong> נקודות</p>
+    <button class="buy see-next" type="button" id="seeNextBtn" onclick="window.seeNext()" ${pick == null ? 'disabled' : ''}>${last ? 'סיימנו ✓' : lastOfPic ? 'לתמונה הבאה ◀' : 'הבא ◀'}</button>
+    <p class="smallnote" id="seeHint" style="text-align:center;margin:6px 0 0">${pick == null ? 'בוחרים תשובה — ואז ”הבא”' : 'אפשר עוד להחליף תשובה עד שלוחצים ”הבא”'}</p></div>`;
+}
+window.seePick = function (i) {
+  const c = groupCtx, s = c && c.see; if (!s || c.seeOver || s.pos >= SEE_LIST.length || Date.now() >= seeEndMs(c.state)) return;
+  const it = SEE_LIST[s.pos];
+  s.picks[s.pos] = i; seeSaveLocal(c);
+  document.querySelectorAll('#seeQ .see-opt').forEach((b, j) => { b.classList.toggle('on', j === i); b.setAttribute('aria-pressed', String(j === i)); });
+  const btn = document.getElementById('seeNextBtn'); if (btn) btn.disabled = false;
+  const hint = document.getElementById('seeHint'); if (hint) hint.textContent = 'אפשר עוד להחליף תשובה עד שלוחצים ”הבא”';
+  // נשמר מיד בשרת — הזמן של התשובה = הבחירה האחרונה
+  c.seeSave = setDoc(doc(db, 'familyGames', c.gameId, 'assoc', c.uid + '_' + it.pi + '_' + it.qi), { a: i });
+  c.seeSave.catch(e => { console.warn(e); const h = document.getElementById('seeHint'); if (h) h.textContent = 'השמירה נכשלה — בדקו את החיבור ובחרו שוב.'; });
+};
+window.seeNext = async function () {
+  const c = groupCtx, s = c && c.see; if (!s || c.seeOver || s.pos >= SEE_LIST.length || s.picks[s.pos] == null) return;
+  const btn = document.getElementById('seeNextBtn'); if (btn) btn.disabled = true;
+  try { if (c.seeSave) await c.seeSave; }
+  catch (e) { const h = document.getElementById('seeHint'); if (h) h.textContent = 'השמירה נכשלה — בדקו את החיבור ובחרו שוב.'; if (btn) btn.disabled = false; return; }
+  const from = SEE_LIST[s.pos]; s.pos++; c.seeSave = null; seeSaveLocal(c);
+  if (s.pos < SEE_LIST.length && SEE_LIST[s.pos].pi !== from.pi) flashCard(['🖼️', 'תמונה הבאה!', `תמונה ${SEE_LIST[s.pos].pi + 1} מתוך ${SEE_PICS.length}`], 'pink');
+  renderSeeStep();
+};
+function seeTick(st) {
+  const left = seeEndMs(st) - Date.now();
+  document.querySelectorAll('[data-countdown]').forEach(el => { el.textContent = fmtClock(left); el.closest('.timer-bar')?.classList.toggle('urgent', left < 30000); });
+  const w = seeWorth(st); document.querySelectorAll('[data-worth]').forEach(el => { if (el.textContent !== String(w)) el.textContent = w; });
+  const c = groupCtx;
+  if (c && left <= 0 && !c.seeOver && document.getElementById('seeQ')) { c.seeOver = true; seeZoomClose(); renderSeeStep(); }
+}
+// התמונה בגדול: על כל המסך, עם הגדלה (כפתורים, או לחיצה כפולה) וגלילה בתוך התמונה
+window.seeZoom = function () {
+  const c = groupCtx, s = c && c.see; if (!s || s.pos >= SEE_LIST.length) return;
+  const pic = SEE_PICS[SEE_LIST[s.pos].pi];
+  seeZoomClose();
+  const ov = document.createElement('div'); ov.id = 'seeZoom'; ov.className = 'see-zoom'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', 'התמונה בגדול');
+  ov.dir = 'ltr'; // simple scroll numbers for keeping the center when zooming (the buttons bar stays right-to-left)
+  ov.innerHTML = `<div class="see-zoom-bar" dir="rtl"><button type="button" onclick="window.seeZoomBy(1)" aria-label="הגדלה">➕</button><button type="button" onclick="window.seeZoomBy(-1)" aria-label="הקטנה">➖</button><button type="button" onclick="window.seeZoomClose()">✕ סגירה — חזרה לשאלה</button></div><img src="${pic.src}" alt="${esc(pic.alt)}" ondblclick="window.seeZoomBy(0)">`;
+  ov.style.setProperty('--z', '1');
+  document.body.appendChild(ov); document.body.style.overflow = 'hidden';
+  ov.querySelector('.see-zoom-bar button:last-child').focus();
+  ov.onkeydown = e => { if (e.key === 'Escape') seeZoomClose(); };
+};
+const SEE_ZOOMS = [1, 1.6, 2.4, 3.2];
+window.seeZoomBy = function (d) {
+  const ov = document.getElementById('seeZoom'); if (!ov) return;
+  const cur = SEE_ZOOMS.indexOf(Number(ov.style.getPropertyValue('--z')) || 1);
+  const next = d === 0 ? (cur > 0 ? 0 : 2) : Math.min(SEE_ZOOMS.length - 1, Math.max(0, cur + d));
+  // שומרים על אותו מרכז כשמגדילים
+  const cx = (ov.scrollLeft + ov.clientWidth / 2) / ov.scrollWidth, cy = (ov.scrollTop + ov.clientHeight / 2) / ov.scrollHeight;
+  ov.style.setProperty('--z', String(SEE_ZOOMS[next]));
+  ov.scrollLeft = cx * ov.scrollWidth - ov.clientWidth / 2; ov.scrollTop = cy * ov.scrollHeight - ov.clientHeight / 2;
+};
+function seeZoomClose() { const ov = document.getElementById('seeZoom'); if (ov) { ov.remove(); document.body.style.overflow = ''; } }
+window.seeZoomClose = seeZoomClose;
+// התוצאות: מקומות + כמה נקודות קיבלתם + מה בחרתם בכל שאלה ומה הייתה התשובה הנכונה
+function renderSeeResults(main, c, a) {
+  const mine = (a.standings || []).find(r => r.id === c.uid);
+  if (!a.see || !a.standings) { main.innerHTML = '<div class="now-box" style="text-align:center"><p style="margin:0"><strong>⏰ הזמן נגמר! אלקנה סופר את הנקודות…</strong></p></div>'; return; }
+  // בונים מחדש רק כשמשהו השתנה — כדי לא לסגור תמונה שפתחו לראות מה נכון
+  const sig = (a.standings || []).length + ':' + !!(c.results && c.results.stage2) + ':' + tsMs(c.state.nextAt);
+  if (c.seeResSig === sig && main.querySelector('#seeRes')) return;
+  c.seeResSig = sig;
+  const key = a.key || {}, marks = (mine && mine.marks) || {}; // key = {'0': [...], '1': [...], '2': [...]}
+  const scores = [...new Set((a.podium || []).map(p => p.score))];
+  const podium = `<div class="podium">${(a.podium || []).map(p => { const pl = scores.indexOf(p.score); return `<div class="podium-row p${pl + 1}"><span class="podium-medal">${MEDALS[pl] || ''}</span><span><strong>מקום ${PLACE_NAMES[pl] || pl + 1}: ${esc(p.name)}</strong><br>${p.score} נקודות · ${p.correct} ${p.correct === 1 ? 'תשובה נכונה' : 'תשובות נכונות'}</span></div>`; }).join('')}</div>`;
+  const review = SEE_PICS.map((pic, pi) => `<details class="info see-review"><summary><strong>🖼️ תמונה ${pi + 1} — מה בחרתם ומה נכון</strong></summary><img src="${pic.src}" alt="${esc(pic.alt)}" style="width:100%;border-radius:12px;margin:6px 0"><ol>${pic.qs.map(([q, opts], qi) => {
+    const m = marks[pi + '_' + qi], ok = (key[pi] || [])[qi], right = m === ok;
+    return `<li>${m == null ? '⏳' : right ? '✅' : '❌'} ${esc(q)}<br><span class="smallnote">${m == null ? 'לא הספקתם לענות' : 'בחרתם: ' + esc(opts[m])}${!right && ok != null ? ` · התשובה: <strong>${esc(opts[ok])}</strong>` : ''}</span></li>`;
+  }).join('')}</ol></details>`).join('');
+  main.innerHTML = `<div id="seeRes"><div class="now-box" style="text-align:center"><p style="font-size:22px;margin:0"><strong>🏆 התוצאות של שלב 2!</strong></p>${mine ? `<p style="margin:6px 0 0;font-size:18px">קיבלתם <strong>${mine.points} נקודות</strong> — ${mine.correct} תשובות נכונות מתוך ${mine.total} 🎉</p>` : ''}</div>${podium}${review}${c.results && c.results.stage2 ? totalsTable(c.results, c.uid, '📊 הניקוד הכולל עד עכשיו') : ''}${nextStepHtml(c)}</div>`;
+}
 
 // ---------- שלב 3: ”מי אמר את זה?!” ----------
 // כל משתתף מקליט תשובות קוליות קצרות (עד 20 שניות) ל־7 השאלות. ההקלטה נשמרת רגילה — הקול משתנה רק בהשמעה (מהירות + גובה).
@@ -3311,7 +3517,7 @@ function renderGroupWho(main) {
     if (c.whoBuilt === 'done' && main.querySelector('#whoDone')) return;
     c.whoBuilt = 'done'; whoStopAudio();
     const byQ = {}; (mine.details || []).forEach(d => (byQ[d.q] = byQ[d.q] || []).push(d));
-    main.innerHTML = `<div id="whoDone"><div class="now-box" style="text-align:center"><p style="font-size:24px;margin:0"><strong>🎉 קיבלתם ${mine.score} ${mine.score === 1 ? 'נקודה' : 'נקודות'} מתוך ${mine.total} בשלב 3!</strong></p></div>`
+    main.innerHTML = `<div id="whoDone"><div class="now-box" style="text-align:center"><p style="font-size:24px;margin:0"><strong>🎉 ${mine.points != null ? `קיבלתם ${mine.points} נקודות בשלב 3 — ${mine.score} ניחושים נכונים מתוך ${mine.total}!` : `קיבלתם ${mine.score} ${mine.score === 1 ? 'נקודה' : 'נקודות'} מתוך ${mine.total} בשלב 3!`}</strong></p></div>`
       + Object.keys(byQ).map(q => `<div class="info"><h3>🎙️ ${esc(WHO_SAID_QUESTIONS[q].title)}</h3>${byQ[q].map((d, i) => `<div class="who-item"><div><strong>${d.ok ? '✅ נכון!' : '❌ לא נכון'} — הקלטה ${i + 1}</strong><br>כתבתם: ”${esc(d.guess || '—')}”<br>אמר/ה: <strong>${esc(d.real)}</strong></div><button class="game-btn" type="button" data-label="▶ בקול האמיתי" onclick="window.whoPlay('${esc(d.rid)}', 1, this)">▶ בקול האמיתי</button></div>`).join('')}</div>`).join('')
       /* (11.11.26, Ayelet: "the winners video comes after we already see who won") - no total table here; it is kept for after the video */
       + scoreboard(c.results.stage3, '🏆 טבלת הניקוד — שלב 3') + '<div class="now-box" style="text-align:center"><p style="font-size:20px;margin:0"><strong>🥁 מי ניצח במשחק כולו? זה סוד — עוד רגע ההכרזה הגדולה!</strong></p></div>' + nextStepHtml(c) + '</div>';
