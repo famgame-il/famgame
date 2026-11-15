@@ -549,7 +549,8 @@ function closeModal(){const m=document.getElementById('modal'),was=m.classList.c
 // קופון הנחה: הקוד עצמו סודי — באתר נשמרת רק ”טביעת אצבע” שלו, כך שאי־אפשר לגלות אותו
 let couponPercent=0;
 /* Ayelet 12.11.26 - six coupon slots: 1 -> settings/coupon (+ couponSecret.current), n -> settings/coupon<n> (+ current<n>) */
-const COUPON_SLOTS=[1,2,3,4,5,6];
+/* Ayelet 16.11.26: 8 coupons (were 6) */
+const COUPON_SLOTS=[1,2,3,4,5,6,7,8];
 const couponSlot=n=>n===1?'coupon':'coupon'+n;
 const couponCurrent=n=>n===1?'current':'current'+n;
 function finalPrice(n,percent){const base=getTotalPrice(n);return percent?Math.round(base*(100-percent)/100):base}
@@ -1212,8 +1213,8 @@ async function showAdminPanel(user) {
     <details class="info admin-sec"><summary>💰 מחירון</summary><p class="smallnote">המחירים שמופיעים באתר ובטופס הרכישה. אפשר לשנות מתי שרוצים — הזמנות שכבר נשלחו מסומנות אם המחיר השתנה.</p>
       <div class="order-actions"><label>מחיר בסיס (₪)<input id="pcBase" type="number" min="1" style="width:90px"></label><label>עד כמה משתתפים בבסיס<input id="pcUpTo" type="number" min="10" style="width:80px"></label><label>תוספת לכל משתתף נוסף (₪)<input id="pcExtra" type="number" min="0" style="width:80px"></label><label>תקרה (₪, 0 = בלי תקרה)<input id="pcCap" type="number" min="0" style="width:90px"></label></div>
       <div class="order-actions" style="margin-top:8px"><button class="game-btn" type="button" onclick="window.savePricing()">שמירה</button></div><p id="pcMsg" class="smallnote" role="status"></p></details>
-    <details class="info admin-sec"><summary>🎟️ קודי קופון (עד 6)</summary><p class="smallnote">אפשר עד שישה קופונים שונים בבת אחת — לכל אחד קוד ואחוז הנחה משלו. קופון שלא צריך — מורידים את הסימון ”פעיל” ושומרים. לקוח שכותב אחד מהקודים בטופס הרכישה מקבל את ההנחה שלו (קופון אחד להזמנה). הקודים נשארים סודיים — רק מי שקיבל קוד ממך יכול להשתמש בו.</p>
-      ${COUPON_SLOTS.map(n => `<p style="margin:10px 0 4px"><strong>קופון ${n}</strong></p><div class="order-actions"><label>קוד<input id="cpCode${n}" dir="ltr" maxlength="30" placeholder="למשל: ${['FAMILY5', 'CHANUKA10', 'FRIENDS10', 'SABA15', 'COUSINS10', 'VIP20'][n - 1]}" style="text-transform:uppercase"></label><label>אחוז הנחה<input id="cpPercent${n}" type="number" min="1" max="50" value="${n === 1 ? 5 : 10}" style="width:80px"></label><label><input id="cpActive${n}" type="checkbox" ${n === 1 ? 'checked' : ''}> פעיל</label><button class="game-btn" type="button" onclick="window.saveCoupon(${n})">שמירה</button></div><p id="cpMsg${n}" class="smallnote" role="status"></p>`).join('')}</details>
+    <details class="info admin-sec"><summary>🎟️ קודי קופון (עד 8)</summary><p class="smallnote">אפשר עד שמונה קופונים שונים בבת אחת — לכל אחד קוד ואחוז הנחה משלו. קופון שלא צריך — מורידים את הסימון ”פעיל” ושומרים. לקוח שכותב אחד מהקודים בטופס הרכישה מקבל את ההנחה שלו (קופון אחד להזמנה). הקודים נשארים סודיים — רק מי שקיבל קוד ממך יכול להשתמש בו.</p>
+      ${COUPON_SLOTS.map(n => `<p style="margin:10px 0 4px"><strong>קופון ${n}</strong></p><div class="order-actions"><label>קוד<input id="cpCode${n}" dir="ltr" maxlength="30" placeholder="למשל: ${['FAMILY5', 'CHANUKA10', 'FRIENDS10', 'SABA15', 'COUSINS10', 'VIP20', 'MAZALTOV10', 'SUMMER15'][n - 1]}" style="text-transform:uppercase"></label><label>אחוז הנחה<input id="cpPercent${n}" type="number" min="1" max="50" value="${n === 1 ? 5 : 10}" style="width:80px"></label><label><input id="cpActive${n}" type="checkbox" ${n === 1 ? 'checked' : ''}> פעיל</label><button class="game-btn" type="button" onclick="window.saveCoupon(${n})">שמירה</button></div><p id="cpMsg${n}" class="smallnote" role="status"></p>`).join('')}</details>
     <details class="info admin-sec"><summary>📧 מיילים אוטומטיים</summary><p class="smallnote">כשההגדרות כאן מלאות: הלקוח מקבל מייל ”ההזמנה נקלטה”, את מקבלת מייל על כל הזמנה חדשה, ואחרי אישור תשלום אפשר לשלוח ללקוח את פרטי הכניסה בלחיצה אחת. ההגדרות נלקחות מחשבון EmailJS (הסבר במדריך).</p>
       <div class="fields"><label>האימייל שהלקוחות רואים (מופיע באתר, הלקוחות עונים אליו, והזמנות חדשות נשלחות אליו) — לא אימייל אישי<input id="emAdminEmail" type="email" dir="ltr"></label><label>Service ID<input id="emServiceId" dir="ltr" placeholder="service_xxxxxxx"></label><label>Template ID<input id="emTemplateId" dir="ltr" placeholder="template_xxxxxxx"></label><label>Public Key<input id="emPublicKey" dir="ltr"></label></div>
       <div class="order-actions" style="margin-top:10px"><button class="game-btn" type="button" onclick="window.saveEmailCfg()">שמירה</button><button class="game-btn" type="button" onclick="window.testEmail()">שליחת מייל בדיקה אליי</button></div><p id="emMsg" class="smallnote" role="status"></p></details>
@@ -1247,7 +1248,19 @@ window.setAdminFilter = function (f) { adminFilter = f; adminFilterChosen = true
    "פרטים" opens the full order card with its actions. Test games have their own tab, never mixed with real orders. */
 const isTestOrder = o => !!o.test || o.buyerName === 'משחק בדיקה';
 const adminOpenRows = new Set();
+/* the coupon the customer used: the code + its discount; a code that is not one of the coupons -> "לא תקף" */
+function couponCell(o) {
+  if (!o.coupon) return '<span class="smallnote">—</span>';
+  const pct = orderPrice(o).percent;
+  return pct ? `<b dir="ltr">${esc(o.coupon)}</b><br><span class="smallnote">−${pct}%</span>` : `<span dir="ltr">${esc(o.coupon)}</span><br><span class="warn" style="font-size:12px">לא תקף</span>`;
+}
 function orderAmount(o) { return o.status === 'paid' && o.amountPaid != null ? Number(o.amountPaid) || 0 : orderPrice(o).total; }
+/* how many orders used each coupon (orders that were not cancelled) */
+function couponUse(orders) {
+  const n = {}; orders.filter(o => o.coupon && o.status !== 'cancelled').forEach(o => { const k = normCoupon(o.coupon); n[k] = (n[k] || 0) + 1; });
+  const list = Object.entries(n).sort((a, b) => b[1] - a[1]);
+  return list.length ? `<span style="flex-basis:100%">🎟️ קופונים: ${list.map(([k, c]) => `<b dir="ltr">${esc(k)}</b> × ${c}`).join(' · ')}</span>` : '';
+}
 function renderOrders() {
   const today = israelGameDay(), real = adminOrders.filter(o => !isTestOrder(o)), tests = adminOrders.filter(isTestOrder);
   const counts = { pending: 0, paid: 0, cancelled: 0 }; real.forEach(o => counts[o.status] = (counts[o.status] || 0) + 1);
@@ -1256,7 +1269,7 @@ function renderOrders() {
   document.getElementById('adminSum').innerHTML = `<div class="admin-sum">
     <span><b>${real.length}</b> הזמנות</span><span>✅ שולמו: <b>${counts.paid}</b> · <b>${income.toLocaleString('he-IL')} ₪</b></span>
     <span>⏳ ממתינות לתשלום: <b>${counts.pending}</b></span><span>📅 משחקים קרובים: <b>${upcoming.length}</b></span>
-    <span><button class="game-btn" type="button" onclick="window.adminExportCsv()">⬇️ ייצוא לאקסל</button></span></div>`;
+    <span><button class="game-btn" type="button" onclick="window.adminExportCsv()">⬇️ ייצוא לאקסל</button></span>${couponUse(real)}</div>`;
   if (!adminFilterChosen && adminFilter === 'pending' && !counts.pending) adminFilter = 'paid';
   const tabs = [['pending', `⏳ ממתינות (${counts.pending})`], ['paid', `✅ שולמו (${counts.paid})`], ['cancelled', `✖ בוטלו (${counts.cancelled})`], ['all', `הכול (${real.length})`], ['test', `🧪 משחקי בדיקה (${tests.length})`]];
   document.getElementById('adminFilter').innerHTML = tabs.map(([k, label]) => `<button type="button" class="game-btn ${adminFilter === k ? 'on' : ''}" aria-pressed="${adminFilter === k}" onclick="window.setAdminFilter('${k}')">${label}</button>`).join('');
@@ -1264,13 +1277,13 @@ function renderOrders() {
     /* upcoming games first (nearest first), then past games (latest first) */
     .sort((a, b) => { const fa = a.gameDate >= today, fb = b.gameDate >= today; return fa !== fb ? (fa ? -1 : 1) : fa ? String(a.gameDate).localeCompare(String(b.gameDate)) : String(b.gameDate).localeCompare(String(a.gameDate)); });
   const bulk = adminFilter === 'test' && tests.length ? `<p><button class="game-btn danger" type="button" onclick="window.adminDeleteAllTests()">🗑️ מחיקת כל משחקי הבדיקה (${tests.length})</button></p>` : '';
-  document.getElementById('ordersList').innerHTML = bulk + (list.length ? `<div class="orders-wrap"><table class="orders-table"><thead><tr><th>תאריך המשחק</th><th>לקוח</th><th>טלפון</th><th>משתתפים</th><th>סכום</th><th>מצב</th><th><span class="sr-only">פרטים</span></th></tr></thead><tbody>${list.map(o => {
+  document.getElementById('ordersList').innerHTML = bulk + (list.length ? `<div class="orders-wrap"><table class="orders-table"><thead><tr><th>תאריך המשחק</th><th>לקוח</th><th>טלפון</th><th>משתתפים</th><th>קופון</th><th>סכום</th><th>מצב</th><th><span class="sr-only">פרטים</span></th></tr></thead><tbody>${list.map(o => {
     const past = o.gameDate < today, open = adminOpenRows.has(o.id);
     return `<tr class="${esc(o.status)}${past ? ' past' : ''}"><td>${formatDateHe(o.gameDate)}${!past && o.status === 'paid' ? ' <span class="soon">קרוב</span>' : ''}</td><td><b>${esc(o.buyerName)}</b><br><span class="smallnote">הזמנה ${esc(o.code)}${o.dataDeletedAt ? ' · 🧹 הנתונים נמחקו' : ''}</span></td>
-      <td><a href="tel:${esc(o.phone)}" dir="ltr">${esc(formatPhone(o.phone))}</a></td><td>${esc(o.participants)}</td><td>${orderAmount(o).toLocaleString('he-IL')} ₪</td>
+      <td><a href="tel:${esc(o.phone)}" dir="ltr">${esc(formatPhone(o.phone))}</a></td><td>${esc(o.participants)}</td><td>${couponCell(o)}</td><td>${orderAmount(o).toLocaleString('he-IL')} ₪</td>
       <td><span class="badge ${esc(o.status)}">${STATUS_LABEL[o.status] || esc(o.status)}</span></td>
       <td><button class="game-btn" type="button" aria-expanded="${open}" aria-controls="od-${esc(o.id)}" onclick="window.toggleOrderRow('${esc(o.id)}', this)">${open ? 'סגירה ▴' : 'פרטים ▾'}</button></td></tr>
-      <tr class="order-detail" id="od-${esc(o.id)}" ${open ? '' : 'hidden'}><td colspan="7">${orderCard(o)}</td></tr>`;
+      <tr class="order-detail" id="od-${esc(o.id)}" ${open ? '' : 'hidden'}><td colspan="8">${orderCard(o)}</td></tr>`;
   }).join('')}</tbody></table></div>` : '<p class="smallnote">אין הזמנות ברשימה הזו.</p>');
   fillOrderCodes();
 }
