@@ -1092,7 +1092,8 @@ const errSeen = new Set(), rawWarn = console.warn.bind(console); let errCount = 
    Not faults: no permission to read (an old closed game, before signing in), the phone did not allow sound yet,
    a short internet drop / a request that was stopped. These are not logged, and old ones are not shown. */
 const NOISE_CODES = new Set(['permission-denied', 'unavailable', 'cancelled', 'deadline-exceeded', 'aborted', 'resource-exhausted']);
-const NOISE_MSG = /NotAllowedError|play\(\) (request|failed)|interrupted by|user didn't interact|AbortError|Failed to fetch|Load failed|NetworkError|network ?error|offline|ResizeObserver|^Script error\.?$|The operation was aborted|Missing or insufficient permissions/i;
+const NOISE_MSG = /NotAllowedError|play\(\) (request|failed)|interrupted by|user didn't interact|AbortError|Failed to fetch|Load failed|NetworkError|network ?error|offline|ResizeObserver|^Script error\.?$|The operation was aborted|Missing or insufficient permissions|preload assets/i;
+/* Ayelet 15.11.26: "Preload assets timed out" is not from our code (a browser add-on / outside script) - not a fault, hidden */
 function isNoise(e) { return NOISE_CODES.has(String((e && e.code) || '')) || NOISE_MSG.test(String((e && (e.msg || e.message || e.reason)) || e || '')); }
 function logError(err, where) {
   try {
