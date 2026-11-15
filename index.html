@@ -528,8 +528,12 @@ function toggleClip(){
  else playClip(0);
 }
 // game=true: ההסבר המלא לשחקנים בתוך המשחק; אחרת — ההסבר הציבורי (ששומר על הסוד)
-function openStage(n,game){const s=(game&&stagesGame[n])||stages[n];clipSet=game&&clipsGame[n]?clipsGame:clips;document.getElementById('pill').textContent='שלב '+n+' מתוך 3';document.getElementById('title').textContent=s.title;document.getElementById('desc').textContent=s.desc;document.getElementById('steps').innerHTML=s.steps.map(x=>'<li>'+x+'</li>').join('');document.getElementById('video').style.display='block';document.getElementById('video').className='video s'+n;document.getElementById('videoTitle').textContent='הסבר קצר: '+s.title;document.getElementById('modal').classList.add('open');clipStage=n;playClip(0)}
-function closeModal(){stopClip();clipState='ended';document.getElementById('modal').classList.remove('open')}
+function openStage(n,game){const s=(game&&stagesGame[n])||stages[n];clipSet=game&&clipsGame[n]?clipsGame:clips;document.getElementById('pill').textContent='שלב '+n+' מתוך 3';document.getElementById('title').textContent=s.title;document.getElementById('desc').textContent=s.desc;document.getElementById('steps').innerHTML=s.steps.map(x=>'<li>'+x+'</li>').join('');document.getElementById('video').style.display='block';document.getElementById('video').className='video s'+n;document.getElementById('videoTitle').textContent='הסבר קצר: '+s.title;document.getElementById('modal').classList.add('open');clipStage=n;playClip(0);
+/* Ayelet 16.11.26 - accessibility check: focus moves into the explanation (and comes back to the card when it closes); Tab stays inside it */
+modalBackTo=document.activeElement;setTimeout(()=>{const b=document.querySelector('#modal .close');if(b)b.focus()},50)}
+let modalBackTo=null;
+document.addEventListener('keydown',e=>{const m=document.getElementById('modal');if(e.key!=='Tab'||!m||!m.classList.contains('open'))return;const f=[...m.querySelectorAll('button,a[href],[tabindex]:not([tabindex="-1"])')].filter(x=>x.offsetParent!==null);if(!f.length)return;const a=f[0],z=f[f.length-1];if(!m.contains(document.activeElement)){e.preventDefault();a.focus();}else if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus();}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus();}});
+function closeModal(){const m=document.getElementById('modal'),was=m.classList.contains('open');stopClip();clipState='ended';m.classList.remove('open');if(was&&modalBackTo&&modalBackTo.focus){modalBackTo.focus();modalBackTo=null}}
 // קופון הנחה: הקוד עצמו סודי — באתר נשמרת רק ”טביעת אצבע” שלו, כך שאי־אפשר לגלות אותו
 let couponPercent=0;
 /* Ayelet 12.11.26 - six coupon slots: 1 -> settings/coupon (+ couponSecret.current), n -> settings/coupon<n> (+ current<n>) */
@@ -615,7 +619,10 @@ function openGameAccess(mode){
  if(mode==='join'||mode==='choose'){if(window.openJoin)window.openJoin('');return;}
  document.getElementById('gameAccessModal').classList.add('open');
  if(mode==='choose')renderPlayChooser();else renderManagerLogin();
+ /* Ayelet 16.11.26 - accessibility: focus into the window, back to where it was when it closes */
+ gaBackTo=document.activeElement;setTimeout(()=>{const f=document.querySelector('#gameAccessModal input,#gameAccessModal button');if(f)f.focus()},50);
 }
+let gaBackTo=null;
 function renderPlayChooser(){
  document.getElementById('gameAccessTitle').textContent='מי אתם?';
  document.getElementById('gameAccessIntro').textContent='בוחרים לפי מה שקיבלתם:';
@@ -623,7 +630,7 @@ function renderPlayChooser(){
 }
 // העין שליד הסיסמה: מראה / מסתירה את מה שהוקלד
 function togglePw(id,btn){const i=document.getElementById(id),show=i.type==='password';i.type=show?'text':'password';btn.textContent=show?'🙈':'👁️';btn.setAttribute('aria-label',show?'הסתרת הסיסמה':'הצגת הסיסמה');btn.title=btn.getAttribute('aria-label');}
-function closeGameAccess(){document.getElementById('gameAccessModal').classList.remove('open')}
+function closeGameAccess(){const m=document.getElementById('gameAccessModal'),was=m.classList.contains('open');m.classList.remove('open');if(was&&gaBackTo&&gaBackTo.focus){gaBackTo.focus();gaBackTo=null}}
 function renderManagerLogin(){
  document.getElementById('gameAccessTitle').textContent='כניסת מנהל המשחק';
  document.getElementById('gameAccessIntro').textContent='היכנסו עם כתובת האימייל והסיסמה שהוגדרו למנהל המשחק.';
