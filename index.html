@@ -175,7 +175,7 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
 /* Ayelet 16.11.26 - "count exactly" box + confirm checkbox in the order form */
 .count-tip{background:linear-gradient(180deg,#fff8fb,#fff);border:2px solid #f0a9c4;border-radius:16px;padding:14px 16px;line-height:1.7;color:#3e4f66}.count-tip strong{color:var(--navy)}.count-tip ul{margin:8px 0;padding-inline-start:20px}.count-tip li{margin:6px 0}.count-tip p{margin:4px 0 0;font-weight:800;color:#a8346a}
 .count-confirm{display:flex;gap:10px;align-items:flex-start;background:#fff0c7;border-radius:12px;padding:12px 14px;line-height:1.6;cursor:pointer}.count-confirm input{width:22px!important;height:22px;flex:none;margin-top:2px;accent-color:#e9558c}
-.net-tip{background:linear-gradient(180deg,#f5fbff,#fff);border:2px solid #9bcdf3;border-radius:16px;padding:14px 16px;line-height:1.7;color:#3e4f66}.net-tip strong{color:var(--navy)}.net-tip p{margin:6px 0 10px}
+.net-tip{background:linear-gradient(180deg,#f5fbff,#fff);border:2px solid #9bcdf3;border-radius:16px;padding:14px 16px;line-height:1.7;color:#3e4f66}.net-tip strong{color:var(--navy)}.net-tip p{margin:6px 0 10px}.buy-check{background:#fff;border-radius:12px;padding:10px 12px;margin-top:6px}.buy-check p{margin:4px 0}
 /* Ayelet 16.11.26 - the admin orders report */
 .admin-sum{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;background:#f4f8ff;border:1px solid #d6e2f5;border-radius:12px;padding:10px 14px;margin:0 0 10px}
 .orders-wrap{overflow-x:auto}.orders-table{width:100%;border-collapse:collapse;font-size:15px;min-width:640px}
@@ -409,7 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <li><strong>⏳ לא מוסיפים ”ליתר ביטחון”.</strong> המשחק מחכה שכל המשתתפים שנרכשו יצטרפו. אם תרשמו יותר ממי שיגיע, המשחק יחכה בהתחלה עד שתאשרו ש”כולנו כאן”.</li></ul>
 <p>💡 כמה שהמספר מדויק יותר — המשחק מתחיל מהר יותר וזורם יותר.</p></div>
 <!-- Ayelet 16.11.26 - internet is needed; checked on filtered phones, but check every phone in advance -->
-<div class="net-tip" role="note" aria-labelledby="netTipTitle"><strong id="netTipTitle">📶 צריך אינטרנט בכל טלפון</strong><p>המשחק עובד דרך האינטרנט, אז כל טלפון של קבוצה צריך קליטה טובה (וויי־פיי או גלישה). <strong>המשחק נבדק גם במכשירים מסוננים</strong> — אבל כל סינון קצת שונה, ולכן <strong>כדאי לבדוק מראש כל טלפון</strong> שישמש קבוצה. 📧 במייל ההזמנה תקבלו קישור לבדיקה קצרה — שולחים אותו לכל המשפחה, וכל אחד בודק את הטלפון שלו בכמה שניות 😊</p></div>
+<div class="net-tip" role="note" aria-labelledby="netTipTitle"><strong id="netTipTitle">📶 צריך אינטרנט בכל טלפון</strong><p>המשחק עובד דרך האינטרנט, אז כל טלפון של קבוצה צריך קליטה טובה (וויי־פיי או גלישה). <strong>המשחק נבדק גם במכשירים מסוננים</strong> — אבל כל סינון קצת שונה, ולכן <strong>כדאי לבדוק מראש כל טלפון</strong> שישמש קבוצה. 📧 במייל ההזמנה תקבלו קישור לבדיקה קצרה — שולחים אותו לכל המשפחה, וכל אחד בודק את הטלפון שלו בכמה שניות 😊</p><div id="buyCheck" class="buy-check" aria-live="polite"><span class="smallnote">🔌 בודקים שהמכשיר הזה מתאים למשחק…</span></div></div>
 <p class="smallnote"><strong>🤖 בלי מנהל משחק:</strong> אלקנה החשמונאי, דמות AI, מנחה את כל המשחק בכל הטלפונים — כולם משחקים.</p>
 <label for="gameDate"><strong>תאריך המשחק</strong></label><input id="gameDate" type="date" required oninput="this.setCustomValidity('')">
 <p class="smallnote">המשחק יהיה פתוח רק בתאריך הזה — מ־6:00 בבוקר עד 1:00 בלילה.</p>
@@ -497,7 +497,14 @@ window.addEventListener('popstate',()=>{if(window.inGroupGame&&window.inGroupGam
 function enterSiteAndExplain(){enterSite();window.scrollTo({top:0,behavior:"instant"})}
 /* Ayelet 11.11.26: "the purchase should open a real new page, like the accessibility statement - there is too much scrolling".
    A page of its own inside the site: only the purchase form (+ the footer with terms/privacy), "← חזרה לאתר" and the phone's back button return */
-function openBuyPage(){closeModal();closeGameAccess();document.getElementById('startScreen').hidden=true;document.getElementById('siteContent').hidden=false;document.body.classList.add('buy-mode');window.scrollTo({top:0,behavior:'instant'});if(!(history.state&&history.state.screen==='buy'))history.pushState({screen:'buy'},'');}
+function openBuyPage(){closeModal();closeGameAccess();document.getElementById('startScreen').hidden=true;document.getElementById('siteContent').hidden=false;document.body.classList.add('buy-mode');window.scrollTo({top:0,behavior:'instant'});if(!(history.state&&history.state.screen==='buy'))history.pushState({screen:'buy'},'');runBuyCheck();}
+/* Ayelet 16.11.26 - a must: whoever buys gets a quick check of this device. A blocked device sees what to ask the filter company to open,
+   and cannot send the order (it would fail anyway - the order is saved on the same server) */
+let buyCheckRan=false;window.buyCheckFatal=false;
+function runBuyCheck(){if(buyCheckRan)return;buyCheckRan=true;let n=0;const go=async()=>{const out=document.getElementById('buyCheck');if(!out)return;
+ /* the game code is still loading: after 15 seconds say so (without blocking the order - a slow phone is not a blocked phone), and keep waiting up to a minute */
+ if(!window.checkConnection){n++;if(n===60)out.innerHTML='<p class="warn">⚠️ המשחק עוד לא נטען במכשיר הזה — כנראה אינטרנט איטי או סינון. רעננו את הדף, ואם זה חוזר — בקשו מחברת הסינון לפתוח את האתר getfamgame.com, או הזמינו ממכשיר אחר.</p>';if(n<240)setTimeout(go,250);return;}
+ const r=await window.checkConnection(out,true);window.buyCheckFatal=!!(r&&r.fatal);};go();}
 function closeBuyPage(){if(history.state&&history.state.screen==='buy'){history.back();return;}leaveBuyPage();}
 function leaveBuyPage(){document.body.classList.remove('buy-mode');window.scrollTo({top:0,behavior:'instant'});}
 window.addEventListener('popstate',()=>{if(document.body.classList.contains('buy-mode')&&!(history.state&&history.state.screen==='buy'))leaveBuyPage();});
@@ -825,6 +832,7 @@ async function submitOrder(){
  if(n<10){people.setCustomValidity('אפשר לרכוש משחק החל מ־10 משתתפים');people.reportValidity();return;}
  people.setCustomValidity('');
  if(n>MAX_PARTICIPANTS){people.setCustomValidity('אפשר להזמין עד 100 משתתפים לאירוע');people.reportValidity();return;}
+ if(window.buyCheckFatal){msg.innerHTML='⚠️ המכשיר הזה חסום למשחק (כנראה סינון אינטרנט), ולכן אי־אפשר לשלוח ממנו את ההזמנה. בקשו מחברת הסינון לפתוח את הכתובות שמופיעות בתיבה הכחולה למעלה, או הזמינו ממכשיר / רשת אחרת. רוצים עזרה? כתבו לנו 😊';document.getElementById('buyCheck').scrollIntoView({block:'center'});return;}
  if(!dateEl.value||dateEl.value<israelToday()){dateEl.setCustomValidity('בחרו תאריך מהיום והלאה');dateEl.reportValidity();return;}
  const phone=normalizePhone(phoneEl.value);
  if(!/^0\d{8,9}$/.test(phone)){phoneEl.setCustomValidity('מספר הטלפון לא תקין. לדוגמה: 050-1234567');phoneEl.reportValidity();return;}
@@ -2182,7 +2190,7 @@ function nowBox(title, steps, current, note) {
 // ---------- בדיקה שהאינטרנט (גם מסונן) לא חוסם את המשחק ----------
 const CONN_CHECK_HTML = '<div class="info"><button class="game-btn" type="button" onclick="window.checkConnection(this.nextElementSibling)">🔌 בדיקה שהאינטרנט לא חוסם את המשחק</button><div class="smallnote" style="margin-top:8px"></div></div>';
 function withTimeout(promise, ms) { return Promise.race([promise, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]); }
-window.checkConnection = async function (out) {
+window.checkConnection = async function (out, compact) {
   const tests = [
     ['המערכת של המשחק (Firebase)', 'firestore.googleapis.com, identitytoolkit.googleapis.com, securetoken.googleapis.com', () => getDoc(doc(db, 'settings', 'payment'))],
     ['זיהוי הפנים', 'cdn.jsdelivr.net', async () => { const r = await fetch(MP_URL + '/vision_bundle.mjs', { method: 'HEAD', cache: 'no-store' }); if (!r.ok) throw new Error(r.status); }],
@@ -2195,12 +2203,18 @@ window.checkConnection = async function (out) {
     try { await withTimeout(test(), 12000); rows.push(`✅ ${label}`); }
     catch (e) { console.warn(label, e); rows.push(`❌ ${label}`); blocked.push(hosts); }
   }
-  out.innerHTML = rows.join('<br>') + (blocked.length
-    ? `<p class="warn">משהו חסום במכשיר הזה — כנראה סינון אינטרנט. בקשו מחברת הסינון לפתוח את הכתובות:<br><span dir="ltr">${esc(location.hostname)}, ${esc(blocked.join(', '))}</span></p>`
+  /* (16.11.26) a ready message for the filter company + copy */
+  const fatal = blocked.some(h => h.includes('firestore'));
+  const ask = 'שלום, אבקש לפתוח באינטרנט המסונן שלי את האתר getfamgame.com (משחק משפחתי לחנוכה) ואת הכתובות שהוא צריך: ' + [location.hostname, ...blocked].join(', ') + '. תודה!';
+  window.lastFilterAsk = ask;
+  if (compact && !blocked.length) { out.innerHTML = '<p><strong>✅ המכשיר הזה מתאים למשחק — הכול פתוח!</strong></p>'; return { blocked, fatal }; }
+  out.innerHTML = (compact ? '' : rows.join('<br>')) + (blocked.length
+    ? `<p class="warn">⚠️ משהו חסום במכשיר הזה — כנראה סינון אינטרנט. <strong>שלחו לחברת הסינון בקשה לפתוח את הכתובות</strong> (אלה לא קישורים לפתוח בדפדפן — רק להעביר לחברת הסינון):<br><span dir="ltr">${esc(location.hostname)}, ${esc(blocked.join(', '))}</span></p><button class="game-btn" type="button" onclick="navigator.clipboard.writeText(window.lastFilterAsk).then(()=>{this.textContent='✓ הבקשה הועתקה — הדביקו אותה בהודעה לחברת הסינון'})">📋 העתקת בקשה מוכנה לחברת הסינון</button>`
       + (blocked.some(h => h.includes('firestore')) ? '<p class="warn">בלי זה אי־אפשר לשחק מהמכשיר הזה — נסו ממכשיר או מרשת אחרת.</p>'
         : blocked.some(h => h.includes('jsdelivr') || h.includes('storage.')) ? '<p>אפשר לשחק — רק את העיניים יסמנו ידנית.</p>'
         : '<p>אפשר לשחק כרגיל — רק מיילים אוטומטיים לא יישלחו מהמכשיר הזה.</p>')
     : '<p><strong>הכול פתוח — אפשר לשחק! 🎉</strong></p>');
+  return { blocked, fatal };
 };
 /* Ayelet 11.11.26 */
 /* AI host proof (#ai-test): write aiTest/{uid}, the server (Cloud Function aiProof) writes {answer, audio} back.
