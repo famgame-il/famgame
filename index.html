@@ -1218,8 +1218,18 @@ window.firebaseAdminLogout = async function () {
 let adminUid = null; // מי התחברה לניהול — כדי לזהות שבאותו דפדפן נכנסו בינתיים כמנהל משחק
 async function showAdminPanel(user) {
   let isAdmin = false; adminUid = user.uid;
-  try { isAdmin = (await getDoc(doc(db, 'admins', user.uid))).exists(); } catch (e) { console.warn(e); }
+  /* Ayelet 16.11.26 - right after logging in, the first check can fail (the login is not ready yet) and then she saw "not an admin".
+     Now: try again up to 4 times; if the check itself keeps failing - say so, and do not say "not an admin" */
+  let checkFailed = false;
+  for (let t = 0; t < 4; t++) {
+    try { isAdmin = (await getDoc(doc(db, 'admins', user.uid))).exists(); checkFailed = false; break; }
+    catch (e) { console.warn(e); checkFailed = true; await new Promise(r => setTimeout(r, 800 * (t + 1))); }
+  }
   const logout = `<button class="game-btn" type="button" onclick="window.firebaseAdminLogout()">יציאה</button>`;
+  if (checkFailed) {
+    adminBox().innerHTML = `<div class="info"><p><strong>✅ הכניסה הצליחה</strong> (<span dir="ltr">${esc(user.email || '')}</span>), אבל לא הצלחנו לבדוק עכשיו את ההרשאות — כנראה האינטרנט איטי.</p><button class="buy" type="button" onclick="location.reload()">🔄 רענון הדף</button> ${logout}</div>`;
+    return;
+  }
   if (!isAdmin) {
     // הכניסה הצליחה, אבל החשבון עוד לא מסומן כמנהלת — מציגים את ה־UID ואת הצעדים להוספה
     adminBox().innerHTML = `<div class="info"><p><strong>✅ הכניסה הצליחה</strong> (<span dir="ltr">${esc(user.email || '')}</span>), אבל החשבון עוד לא מוגדר כמנהלת.</p>
