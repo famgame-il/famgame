@@ -416,7 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <label for="buyer"><strong>שם הרוכש/ת</strong></label><input id="buyer" placeholder="שם מלא" required maxlength="60" autocomplete="name">
 <label for="phone"><strong>טלפון נייד</strong></label><input id="phone" type="tel" inputmode="tel" placeholder="050-1234567" required autocomplete="tel" oninput="this.setCustomValidity('')">
 <label for="email"><strong>כתובת אימייל לקבלת פרטי הכניסה</strong></label><input id="email" type="email" placeholder="name@example.com" required maxlength="100" autocomplete="email">
-<label for="coupon"><strong>קוד קופון (אם יש)</strong></label><div class="order-actions"><input id="coupon" maxlength="30" autocomplete="off" placeholder="קוד הנחה" style="flex:1;min-width:140px" oninput="couponPercent=0;document.getElementById('couponMsg').textContent='';updateGroups()"><button class="game-btn" type="button" onclick="applyCoupon()">הפעלת הקופון</button></div><p id="couponMsg" class="smallnote" role="status"></p>
+<label for="coupon"><strong>קוד קופון (אם יש)</strong></label><div class="order-actions"><input id="coupon" maxlength="30" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" dir="auto" placeholder="קוד הנחה" style="flex:1;min-width:140px" oninput="couponPercent=0;document.getElementById('couponMsg').textContent='';updateGroups()"><button class="game-btn" type="button" onclick="applyCoupon()">הפעלת הקופון</button></div><p id="couponMsg" class="smallnote" role="status"></p>
 <label class="count-confirm" for="countOk"><input type="checkbox" id="countOk" required oninvalid="this.setCustomValidity('סמנו שספרתם את כל המשתתפים, כולל הילדים')" onchange="this.setCustomValidity('')"> <span>ספרנו את כולם — <strong>כולל הילדים</strong> — ורשמנו את המספר המדויק: <strong id="countOkN">30</strong> משתתפים</span></label>
 <p class="smallnote">בשליחת ההזמנה את/ה מאשר/ת את <a href="#" onclick="famOpenDoc('termsModal');return false">התקנון ומדיניות הביטול</a> ואת <a href="#" onclick="famOpenDoc('privacyModal');return false">מדיניות הפרטיות</a>.</p>
 <button class="buy" type="submit" id="orderButton">שליחת הזמנה ומעבר לתשלום בביט</button><p id="purchaseMsg" aria-live="polite"></p>
@@ -574,6 +574,11 @@ const couponSlot=n=>n===1?'coupon':'coupon'+n;
 const couponCurrent=n=>n===1?'current':'current'+n;
 function finalPrice(n,percent){const base=getTotalPrice(n);return percent?Math.round(base*(100-percent)/100):base}
 function normCoupon(s){return String(s||'').trim().toUpperCase()}
+/* the same code, cleaned (no spaces / invisible marks) and as if typed with the other keyboard language */
+const HEB_KEYS={'ק':'E','ר':'R','א':'T','ט':'Y','ו':'U','ן':'I','ם':'O','פ':'P','ש':'A','ד':'S','ג':'D','כ':'F','ע':'G','י':'H','ח':'J','ל':'K','ך':'L','ף':';','ז':'Z','ס':'X','ב':'C','ה':'V','נ':'B','מ':'N','צ':'M','ת':',','ץ':'.'};
+const ENG_KEYS=Object.fromEntries(Object.entries(HEB_KEYS).map(([h,e])=>[e,h]));
+function couponVariants(s){const raw=normCoupon(s),clean=normCoupon(String(s||'').normalize('NFKC').replace(/[\s\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g,''));
+ const swap=(t,m)=>[...t].map(ch=>m[ch]||ch).join('');return [...new Set([raw,clean,swap(clean,HEB_KEYS),swap(clean,ENG_KEYS)])].filter(Boolean)}
 async function couponHash(code){const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(normCoupon(code)));return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('')}
 async function applyCoupon(){
  const code=document.getElementById('coupon').value,msg=document.getElementById('couponMsg');
@@ -581,10 +586,15 @@ async function applyCoupon(){
  if(!window.firebaseGetCoupon){msg.textContent='המערכת עדיין נטענת — נסו שוב בעוד רגע.';return}
  msg.textContent='בודקים…';
  // יש שישה מקומות לקופון (coupon, coupon2 … coupon6) — הקוד תקף אם הוא מתאים לאחד מהם
- const h=await couponHash(code),list=await Promise.all(COUPON_SLOTS.map(n=>window.firebaseGetCoupon(couponSlot(n))));
- const c=list.find(x=>x&&x.active&&x.hash===h);
+ /* Ayelet 16.11.26 - a customer typed the Hanukkah coupon and got "not valid" (Ayelet, on her own phone - fine). Now:
+    the code is also tried without spaces / invisible direction marks (phones add them in a right-to-left page), and as if it was typed
+    with the wrong keyboard language (Hebrew letters instead of English and back). If the coupons could not be read at all
+    (slow or filtered internet) - say so, instead of "not valid" */
+ const hashes=await Promise.all(couponVariants(code).map(couponHash)),list=await Promise.all(COUPON_SLOTS.map(n=>window.firebaseGetCoupon(couponSlot(n))));
+ const c=list.find(x=>x&&x.active&&hashes.includes(x.hash));
  if(c){couponPercent=c.percent;msg.textContent=`✓ הקופון הופעל — ${c.percent}% הנחה!`}
- else{couponPercent=0;msg.textContent='הקוד לא תקף.'}
+ else if(list.some(x=>x&&x.error)){couponPercent=0;msg.textContent='לא הצלחנו לבדוק את הקופון — כנראה האינטרנט במכשיר הזה איטי או מסונן. נסו שוב בעוד רגע, או כתבו לנו ונעזור 😊'}
+ else{couponPercent=0;msg.textContent='הקוד לא תקף. בדקו שהקוד כתוב בדיוק כמו שקיבלתם (באותיות באנגלית או בעברית, כמו בקוד).'}
  updateGroups();
 }
 // מחירון — נקבע בניהול (”💰 מחירון”) ונשמר ב־Firebase. אלה ברירות המחדל עד שהוא נטען:
@@ -822,7 +832,7 @@ async function submitOrder(){
  if(!window.firebaseSubmitOrder){msg.textContent='המערכת עדיין נטענת — נסו שוב בעוד רגע.';return;}
  /* Ayelet 12.11.26 - a coupon typed but not activated: activate it now; a wrong code stops the order (so nobody pays full price by mistake) */
  const couponEl=document.getElementById('coupon');
- if(normCoupon(couponEl.value)&&!couponPercent){await applyCoupon();if(!couponPercent){msg.textContent='קוד הקופון לא תקף — תקנו אותו או מחקו אותו, ואז שלחו שוב.';couponEl.focus();return;}}
+ if(normCoupon(couponEl.value)&&!couponPercent){await applyCoupon();if(!couponPercent){const cm=document.getElementById('couponMsg').textContent;msg.textContent=/לא הצלחנו לבדוק/.test(cm)?cm+' (אפשר גם למחוק את הקוד ולשלוח — ונעדכן את ההנחה ידנית.)':'קוד הקופון לא תקף — תקנו אותו או מחקו אותו, ואז שלחו שוב.';couponEl.focus();return;}}
  const order={buyerName:name,email,phone,participants:n,gameDate:dateEl.value,total:finalPrice(n,couponPercent)};
  if(couponPercent)order.coupon=normCoupon(document.getElementById('coupon').value);
  if(!pendingOrder){const n=new Uint32Array(1);crypto.getRandomValues(n);pendingOrder={id:'o'+Date.now().toString(36)+Math.random().toString(36).slice(2,8),code:String(100000+n[0]%900000),tried:false};}
@@ -1405,7 +1415,7 @@ window.savePricing = async function () {
 let adminCoupons = {};
 // שישה מקומות לקופון (12.11.26): settings/coupon (קופון 1), settings/coupon2 … settings/coupon6. בציבור — רק טביעת אצבע (hash) של הקוד
 window.firebaseGetCoupon = async function (slot = 'coupon') {
-  try { const s = await getDoc(doc(db, 'settings', slot)); return s.exists() ? s.data() : null; } catch (e) { console.warn(e); return null; }
+  try { const s = await getDoc(doc(db, 'settings', slot)); return s.exists() ? s.data() : null; } catch (e) { console.warn(e); return { error: true }; }
 };
 async function loadAdminCoupons() {
   try {
