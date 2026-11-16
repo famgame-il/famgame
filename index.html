@@ -207,6 +207,7 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
 .char-pic{position:relative;aspect-ratio:372/328;border-radius:16px;overflow:hidden;box-shadow:0 6px 18px #0002;background:#fdf3df}
 .char-pic .char-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .char-pic .char-eyes{position:absolute;object-fit:cover;border-radius:6px;box-shadow:0 0 0 3px #fff9,0 2px 6px #0005;background:#000}
+.char-pic .glasses-on{position:absolute;pointer-events:none}.char-pic .glasses-on svg{display:block;width:100%;height:100%;overflow:visible}.slot.spinning .glasses-on{opacity:0}
 .slot.char-slot{aspect-ratio:auto;background:none;box-shadow:none;overflow:visible;border-radius:0}
 .slot.char-slot img.char-bg{filter:none}.slot.char-slot .slot-count{top:44px}
 .eyes-card .char-card{max-width:300px}.eyes-card .char-name{font-size:19px}.eyes-card .char-pic img{max-width:none;aspect-ratio:auto}
@@ -678,9 +679,15 @@ const EYE_CHARS=[
  {name:'התינוק',src:'./c-baby.jpg',e:[186,155,88]},{name:'סבא',src:'./c-grandpa.jpg',e:[194,131,83]},{name:'השופט',src:'./c-judge.jpg',e:[186,141,78]}];
 // הדמות של זוג מספר i: לכל קבוצה סדר אחר, וקבוע גם אחרי רענון. עד 15 זוגות — כל זוג בדמות אחרת
 function eyeCharFor(uid,i){let h=0;for(const ch of String(uid))h=(h*31+ch.charCodeAt(0))>>>0;return EYE_CHARS[(h+i)%EYE_CHARS.length]}
-function charCard(ch,eyesSrc,eyesId){
- const [cx,cy,d]=ch.e,w=d*(d>100?1.75:2.4),h=w/2.53,pc=(v,of)=>(v/of*100).toFixed(2)+'%';
- return `<div class="char-card"><div class="char-name">${ch.name}</div><div class="char-pic"><img class="char-bg" src="${ch.src}" alt=""><img class="char-eyes"${eyesId?` id="${eyesId}"`:''} src="${String(eyesSrc||'').replace(/[<>"&]/g,'')}" alt="עיניים לזיהוי" style="left:${pc(cx-w/2,372)};top:${pc(cy-h/2,328)};width:${pc(w,372)};height:${pc(h,328)}"></div></div>`;
+/* Ayelet 16.11.26 - black glasses on about a third of the characters (the same ones on the guessing and the results screens),
+   so real glasses do not give anyone away. GLASSES_EVERY = 3 -> one in three; 1 -> everyone */
+const GLASSES_EVERY=3;
+function glassesFor(uid,i){let h=0;for(const ch of String(uid))h=(h*31+ch.charCodeAt(0))>>>0;return ((h>>>3)+i*5)%GLASSES_EVERY===0}
+const GLASSES_SVG='<svg class="glasses" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><rect x="8" y="14" width="33" height="74" rx="14" fill="#9fd3ff1c" stroke="#111" stroke-width="5"/><rect x="59" y="14" width="33" height="74" rx="14" fill="#9fd3ff1c" stroke="#111" stroke-width="5"/><path d="M41 42 Q50 30 59 42" fill="none" stroke="#111" stroke-width="5"/><line x1="8" y1="36" x2="-6" y2="30" stroke="#111" stroke-width="5"/><line x1="92" y1="36" x2="106" y2="30" stroke="#111" stroke-width="5"/></svg>';
+function charCard(ch,eyesSrc,eyesId,glasses){
+ const [cx,cy,d]=ch.e,w=d*(d>100?1.75:2.4),h=w*EYE_H/EYE_W,pc=(v,of)=>(v/of*100).toFixed(2)+'%';
+ const pos=`left:${pc(cx-w/2,372)};top:${pc(cy-h/2,328)};width:${pc(w,372)};height:${pc(h,328)}`;
+ return `<div class="char-card"><div class="char-name">${ch.name}</div><div class="char-pic"><img class="char-bg" src="${ch.src}" alt=""><img class="char-eyes"${eyesId?` id="${eyesId}"`:''} src="${String(eyesSrc||'').replace(/[<>"&]/g,'')}" alt="עיניים לזיהוי" style="${pos}">${glasses?`<span class="glasses-on" style="${pos}">${GLASSES_SVG}</span>`:''}</div></div>`;
 }
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 // כל קבוצה מקבלת אותו מספר תמונות עיניים (עד 15) — רק של משתתפים מקבוצות אחרות. כך הסיכוי לנקודות שווה לכולם.
@@ -730,7 +737,8 @@ function namesMatch(guess,real){
  return G.every((g,i)=>i===firstIdx||R.slice(1).some(r=>tokenMatch(g,r,true))||tokenMatch(g,R[0]));
 }
 // ---------- צילום פנים וחיתוך העיניים ----------
-const EYE_W=480,EYE_H=190,EYE_MAX_CHARS=60000;
+/* Ayelet 16.11.26 - a tight strip: only the eyes (no forehead, no nose) - 3.6:1 instead of 2.53:1 */
+const EYE_W=480,EYE_H=133,EYE_MAX_CHARS=60000;
 const MP_URL='https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
 const MP_MODEL='https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task';
 let landmarkerPromise=null;
@@ -763,8 +771,8 @@ async function autoCropEyes(img){
  const d=Math.hypot(b.x-a.x,b.y-a.y);
  if(d<W*0.12||d<120)return{error:'far'};
  const angle=Math.atan2(b.y-a.y,b.x-a.x),up={x:Math.sin(angle),y:-Math.cos(angle)};
- // רצועה צרה שעולה קצת למעלה (כולל הגבות) — כדי שהאף לא ייכנס והעיניים ”יתלבשו” טוב על הדמות
- const canvas=cropStrip(img,(a.x+b.x)/2+up.x*0.12*d,(a.y+b.y)/2+up.y*0.12*d,1.35*d,angle);
+ // (16.11.26) a tight strip around the eyes only - the forehead and the nose stay out, harder to recognise
+ const canvas=cropStrip(img,(a.x+b.x)/2+up.x*0.03*d,(a.y+b.y)/2+up.y*0.03*d,1.3*d,angle);
  if(brightness(canvas)<45)return{error:'dark',canvas};
  return{canvas};
 }
@@ -2713,7 +2721,7 @@ function renderGroup() {
     add.hidden = true; add.innerHTML = ''; crop.innerHTML = '';
     const mine = c.results && c.results.stage1 && c.results.stage1[c.uid];
     if (!mine) { main.innerHTML = '<p>מחשבים את התוצאות…</p>'; return; }
-    const eyesOf = Object.fromEntries(((c.assignment && c.assignment.items) || []).map((it, i) => [it.pid, charCard(eyeCharFor(c.uid, i), it.eyes)]));
+    const eyesOf = Object.fromEntries(((c.assignment && c.assignment.items) || []).map((it, i) => [it.pid, charCard(eyeCharFor(c.uid, i), it.eyes, null, glassesFor(c.uid, i))]));
     main.innerHTML = `<div class="now-box" style="text-align:center"><p style="font-size:24px;margin:0"><strong>🎉 ${mine.points != null ? `קיבלתם ${mine.points} נקודות — ${mine.score} זיהויים נכונים מתוך ${mine.total}!` : `קיבלתם ${mine.score} ${mine.score === 1 ? 'נקודה' : 'נקודות'} מתוך ${mine.total}!`}</strong></p></div>`
       + mine.details.map((d, i) => `<div class="member eyes-card"><strong>${d.ok ? '✅ נכון!' : '❌ לא נכון'} — תמונה ${i + 1}</strong>${eyesOf[d.pid] || ''}<p style="margin:4px 0">כתבתם: ”${esc(d.guess || '—')}”<br>אלה העיניים של: <strong>${esc(d.real)}</strong></p></div>`).join('')
       + scoreboard(c.results.stage1, '🏆 טבלת הניקוד — שלב 1') + nextStepHtml(c);
@@ -2757,7 +2765,7 @@ function eyesStage() { return document.getElementById('eyesStage'); }
 function showSlot(i, spin) {
   const c = groupCtx, items = c.assignment.items, n = items.length;
   c.cur = i;
-  eyesStage().innerHTML = `<div class="slot char-slot" id="slot">${charCard(eyeCharFor(c.uid, i), '', 'slotImg')}<span class="slot-count">זוג ${i + 1} מתוך ${n}</span></div>
+  eyesStage().innerHTML = `<div class="slot char-slot" id="slot">${charCard(eyeCharFor(c.uid, i), '', 'slotImg', glassesFor(c.uid, i))}<span class="slot-count">זוג ${i + 1} מתוך ${n}</span></div>
     <label style="display:block;margin-top:10px"><strong>של מי העיניים שבתוך הדמות? 👀</strong><input id="slotGuess" class="guess" maxlength="40" autocomplete="off" placeholder="מקלידים תחילת שם ובוחרים…" value="${esc(c.guesses[i].guess)}" oninput="window.setGuess(-1,this.value)"></label>
     <div class="order-actions" style="margin-top:10px">${i > 0 ? '<button class="game-btn" type="button" onclick="window.slotStep(-1)">◀ הקודם</button>' : ''}<button class="buy" type="button" id="slotNext" onclick="window.slotStep(1)">${i < n - 1 ? 'הבא ▶' : 'סיום — בדיקה ואישור'}</button></div>`;
   const img = document.getElementById('slotImg'), slot = document.getElementById('slot'), input = document.getElementById('slotGuess'), next = document.getElementById('slotNext');
@@ -2793,7 +2801,7 @@ window.slotStep = function (dir) {
 function renderEyesReview() {
   const c = groupCtx, items = c.assignment.items;
   eyesStage().innerHTML = '<h3 style="margin:6px 0">בדיקה אחרונה לפני אישור</h3>'
-    + items.map((it, i) => `<div class="member eyes-card"><strong>זוג ${i + 1}</strong>${charCard(eyeCharFor(c.uid, i), it.eyes)}<input class="guess" data-idx="${i}" maxlength="40" autocomplete="off" placeholder="של מי העיניים? מקלידים תחילת שם…" value="${esc(c.guesses[i].guess)}" oninput="window.setGuess(${i},this.value)"></div>`).join('')
+    + items.map((it, i) => `<div class="member eyes-card"><strong>זוג ${i + 1}</strong>${charCard(eyeCharFor(c.uid, i), it.eyes, null, glassesFor(c.uid, i))}<input class="guess" data-idx="${i}" maxlength="40" autocomplete="off" placeholder="של מי העיניים? מקלידים תחילת שם…" value="${esc(c.guesses[i].guess)}" oninput="window.setGuess(${i},this.value)"></div>`).join('')
     + '<button class="buy start-big" type="button" id="submitGuesses" onclick="window.submitGuesses(false)" disabled>אישור ✓</button><p class="smallnote" id="guessHint" style="text-align:center"></p>';
   window.updateGuessButton();
 }
