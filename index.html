@@ -1415,7 +1415,12 @@ window.savePricing = async function () {
 let adminCoupons = {};
 // שישה מקומות לקופון (12.11.26): settings/coupon (קופון 1), settings/coupon2 … settings/coupon6. בציבור — רק טביעת אצבע (hash) של הקוד
 window.firebaseGetCoupon = async function (slot = 'coupon') {
-  try { const s = await getDoc(doc(db, 'settings', slot)); return s.exists() ? s.data() : null; } catch (e) { console.warn(e); return { error: true }; }
+  /* (16.11.26) a slow line - try 3 times (2s, then 4s between) before saying it could not be checked */
+  for (let t = 0; t < 3; t++) {
+    try { const s = await getDoc(doc(db, 'settings', slot)); return s.exists() ? s.data() : null; }
+    catch (e) { console.warn(e); if (t < 2) await new Promise(r => setTimeout(r, 2000 * (t + 1))); }
+  }
+  return { error: true };
 };
 async function loadAdminCoupons() {
   try {
