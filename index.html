@@ -681,7 +681,7 @@ const EYE_CHARS=[
 function eyeCharFor(uid,i){let h=0;for(const ch of String(uid))h=(h*31+ch.charCodeAt(0))>>>0;return EYE_CHARS[(h+i)%EYE_CHARS.length]}
 /* Ayelet 16.11.26 - black glasses on about a third of the characters (the same ones on the guessing and the results screens),
    so real glasses do not give anyone away. GLASSES_EVERY = 3 -> one in three; 1 -> everyone */
-const GLASSES_EVERY=3;
+const GLASSES_EVERY=1; /* Ayelet 16.11.26: "על כולם" - glasses on every character */
 function glassesFor(uid,i){let h=0;for(const ch of String(uid))h=(h*31+ch.charCodeAt(0))>>>0;return ((h>>>3)+i*5)%GLASSES_EVERY===0}
 const GLASSES_SVG='<svg class="glasses" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><rect x="8" y="14" width="33" height="74" rx="14" fill="#9fd3ff1c" stroke="#111" stroke-width="5"/><rect x="59" y="14" width="33" height="74" rx="14" fill="#9fd3ff1c" stroke="#111" stroke-width="5"/><path d="M41 42 Q50 30 59 42" fill="none" stroke="#111" stroke-width="5"/><line x1="8" y1="36" x2="-6" y2="30" stroke="#111" stroke-width="5"/><line x1="92" y1="36" x2="106" y2="30" stroke="#111" stroke-width="5"/></svg>';
 function charCard(ch,eyesSrc,eyesId,glasses){
