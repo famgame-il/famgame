@@ -176,7 +176,7 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
 /* Ayelet 16.11.26 - "count exactly" box + confirm checkbox in the order form */
 .count-tip{background:linear-gradient(180deg,#fff8fb,#fff);border:2px solid #f0a9c4;border-radius:16px;padding:14px 16px;line-height:1.7;color:#3e4f66}.count-tip strong{color:var(--navy)}.count-tip ul{margin:8px 0;padding-inline-start:20px}.count-tip li{margin:6px 0}.count-tip p{margin:4px 0 0;font-weight:800;color:#a8346a}
 .count-confirm{display:flex;gap:10px;align-items:flex-start;background:#fff0c7;border-radius:12px;padding:12px 14px;line-height:1.6;cursor:pointer}.count-confirm input{width:22px!important;height:22px;flex:none;margin-top:2px;accent-color:#e9558c}
-.date-words{margin:4px 0 0;font-weight:700;color:#14345d}.date-words:empty{display:none}.date-words.bad{color:#b3261e}.date-one{position:relative;display:flex;gap:6px;align-items:stretch}.date-one #gdText{flex:1;text-align:right;margin:0}.date-cal{flex:none;border:2px solid #14345d;background:#fff8e1;border-radius:12px;font-size:22px;padding:0 12px;cursor:pointer}.date-one.touch #gdText,.date-one.touch .date-cal{display:none}.date-one:not(.touch) #gdPicker{position:absolute;left:0;bottom:0;width:1px;height:1px;opacity:0;border:0;padding:0;pointer-events:none}
+input.unsaved{outline:3px solid #ff9800;background:#fff3e0}.date-words{margin:4px 0 0;font-weight:700;color:#14345d}.date-words:empty{display:none}.date-words.bad{color:#b3261e}.date-one{position:relative;display:flex;gap:6px;align-items:stretch}.date-one #gdText{flex:1;text-align:right;margin:0}.date-cal{flex:none;border:2px solid #14345d;background:#fff8e1;border-radius:12px;font-size:22px;padding:0 12px;cursor:pointer}.date-one.touch #gdText,.date-one.touch .date-cal{display:none}.date-one:not(.touch) #gdPicker{position:absolute;left:0;bottom:0;width:1px;height:1px;opacity:0;border:0;padding:0;pointer-events:none}
 .net-tip{background:linear-gradient(180deg,#f5fbff,#fff);border:2px solid #9bcdf3;border-radius:16px;padding:14px 16px;line-height:1.7;color:#3e4f66}.net-tip strong{color:var(--navy)}.net-tip p{margin:6px 0 10px}.check-share{background:#fff;border:1px dashed #9bcdf3;border-radius:12px;padding:10px 12px;margin:4px 0 8px;line-height:1.6}.check-share a[dir]{font-weight:800;color:#1f4fa8}.buy-check{background:#fff;border-radius:12px;padding:10px 12px;margin-top:6px}.buy-check p{margin:4px 0}
 /* Ayelet 16.11.26 - the admin orders report */
 .admin-sum{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;background:#f4f8ff;border:1px solid #d6e2f5;border-radius:12px;padding:10px 14px;margin:0 0 10px}
@@ -1403,7 +1403,7 @@ function orderCard(o) {
   if (o.status === 'pending') actions += `<button class="buy" type="button" onclick="window.adminApprove('${o.id}')">✅ התשלום התקבל — יצירת משתמש</button><button class="game-btn" type="button" onclick="window.adminCancel('${o.id}')">✖ ביטול הזמנה</button>`;
   if (o.status === 'paid') actions += `<button class="game-btn" type="button" onclick="window.adminNewPassword('${o.id}')">🔑 סיסמה חדשה ללקוח</button>`;
   if (o.status !== 'cancelled') actions += `<span><input type="date" id="date-${o.id}" value="${esc(o.gameDate)}"> <button class="game-btn" type="button" onclick="window.adminChangeDate('${o.id}')">שינוי תאריך</button></span>`;
-  if (o.status !== 'cancelled') actions += `<span><input type="number" id="people-${o.id}" min="${MIN_PARTICIPANTS}" max="${MAX_PARTICIPANTS}" value="${esc(o.participants)}" style="width:70px" aria-label="מספר משתתפים"> <button class="game-btn" type="button" onclick="window.adminChangePeople('${o.id}')">שינוי מספר משתתפים</button></span>`;
+  if (o.status !== 'cancelled') actions += `<span><input type="number" id="people-${o.id}" min="${MIN_PARTICIPANTS}" max="${MAX_PARTICIPANTS}" value="${esc(o.participants)}" style="width:70px" aria-label="מספר משתתפים" title="אחרי שינוי — לוחצים ”שינוי מספר משתתפים“" oninput="this.classList.toggle('unsaved',this.value!==this.defaultValue)"> <button class="game-btn" type="button" onclick="window.adminChangePeople('${o.id}')">שינוי מספר משתתפים</button></span>`;
   /* Ayelet 16.11.26 - "one button that deletes the game's data" (window.adminDeleteGame decides what to delete) */
   if (o.status === 'paid' && !isTestOrder(o)) actions += `<button class="game-btn" type="button" onclick="window.adminCancel('${o.id}')">✖ ביטול ההזמנה</button>`;
   actions += `<button class="game-btn danger" type="button" onclick="window.adminDeleteGame('${o.id}')">🗑️ מחיקת נתוני המשחק</button>`;
@@ -1575,6 +1575,13 @@ window.adminApprove = async function (id) {
   const credBox = document.getElementById('credBox');
   const fresh = await getDoc(doc(db, 'gameOrders', id)); const o = fresh.data();
   if (!o || o.status !== 'pending') { alert('ההזמנה הזו כבר טופלה.'); return; }
+  /* Ayelet 17.11.26 - a number typed in the participants box but not saved ("שינוי מספר משתתפים" not pressed): save it now, so the game opens with it */
+  const pInp = document.getElementById('people-' + id), typed = pInp ? parseInt(pInp.value, 10) : NaN;
+  if (typed && typed !== Number(o.participants) && typed >= MIN_PARTICIPANTS && typed <= MAX_PARTICIPANTS) {
+    if (confirm(`בתיבת מספר המשתתפים כתוב ${typed}, אבל בהזמנה שמור ${o.participants} (לא נלחץ ”שינוי מספר משתתפים“).\nאישור = לשמור ${typed} ולפתוח את המשחק ל־${typed} משתתפים.\nביטול = להשאיר ${o.participants}.`)) {
+      try { await updateDoc(doc(db, 'gameOrders', id), { participants: typed }); o.participants = typed; } catch (e) { console.warn(e); alert('שמירת מספר המשתתפים נכשלה. נסי שוב.'); return; }
+    }
+  }
   const { total } = orderPrice(o);
   if (!confirm(`לאשר שהתקבל בביט תשלום של ${total} ₪ מ־${o.buyerName} (הזמנה ${o.code})?\nאחרי האישור ייווצר משתמש ללקוח.`)) return;
   credBox.innerHTML = '<div class="cred">יוצרים משתמש…</div>';
