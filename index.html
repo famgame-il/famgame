@@ -242,7 +242,7 @@ input.unsaved{outline:3px solid #ff9800;background:#fff3e0}.date-words{margin:4p
 .start-screen .start-option.primary::before{animation-delay:-1.3s}
 @keyframes runLight{to{--runA:360deg}}
 .start-screen .start-purchase .buy{display:inline-block;text-decoration:none;background:#fff1b8;color:#14345d;border:2px solid #fff;box-shadow:0 4px 14px #0005}
-.start-elkana{display:block;width:min(100%,460px);height:auto;margin:6px auto -4px;transform-origin:50% 100%;filter:drop-shadow(0 6px 18px #0007);animation:elkanaJab 2.2s ease-in-out infinite}
+.start-elkana{display:block;width:min(100%,460px);height:auto;margin:6px auto -4px;transform-origin:50% 100%;/* Ayelet 17.11.26 - no filter:drop-shadow here: on Android Chrome the moving image with a shadow was drawn as a white square */animation:elkanaJab 2.2s ease-in-out infinite}
 @keyframes elkanaJab{0%,58%,100%{transform:none}68%{transform:translateY(-16px) rotate(-2.5deg)}78%{transform:none}86%{transform:translateY(-9px) rotate(-1.5deg)}94%{transform:none}}
 @media(prefers-reduced-motion:reduce){.start-elkana,.start-screen .start-option::before{animation:none}}
 @media(min-width:900px){.start-elkana{width:380px}
