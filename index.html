@@ -217,7 +217,11 @@ input.unsaved{outline:3px solid #ff9800;background:#fff3e0}.date-words{margin:4p
 @keyframes finIn{0%{opacity:0;transform:scale(.6)}70%{opacity:1;transform:scale(1.08)}100%{opacity:1;transform:none}}@keyframes raceElk{from{transform:rotate(-4deg)}to{transform:rotate(4deg) translateY(-3px)}}
 .fin-place{font-size:20px!important;background:#ffffffb3;border-radius:14px;padding:8px;animation:finIn .6s both}
 .fin-drum{font-size:26px!important;font-weight:900;margin:14px 0!important;animation:finIn .6s both}
-.fin-win{animation:finIn .8s both}.fin-after{animation:raceIn .6s both}.selfie-box{display:flex;gap:10px;align-items:center;background:#fff;border:3px solid #ffc34b;border-radius:20px;padding:10px 12px;margin:12px 0 4px;box-shadow:0 6px 18px #0002;animation:finIn .6s both}.selfie-elk{width:110px;height:auto;flex:none;animation:raceElk 1.2s ease-in-out infinite alternate}
+.fin-win{animation:finIn .8s both}.fin-after{animation:raceIn .6s both}.prize-talk{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#14345d;color:#fff;border-radius:20px;padding:10px 12px;margin:12px 0;animation:finIn .6s both}.prize-elk{width:88px;height:auto;flex:none}
+.prize-bubble{flex:1;min-width:150px;background:#fff;color:#14345d;border-radius:16px;padding:10px 12px;font-size:20px;font-weight:900;line-height:1.35;min-height:56px}
+.prize-talk.talking .prize-elk{animation:talkBob .32s ease-in-out infinite alternate}@keyframes talkBob{from{transform:rotate(-3deg) scale(1)}to{transform:rotate(3deg) scale(1.05)}}
+.prize-box{text-align:center;background:linear-gradient(135deg,#fff3c4,#ffd9e6);border:3px dashed #e0a100;border-radius:20px;padding:12px 14px;margin:12px 0;animation:finIn .7s both}.prize-box p{margin:6px 0;font-size:17px}.prize-h{font-size:26px!important;font-weight:900}.prize-box a.buy{display:inline-block;margin:8px 0 2px;text-decoration:none}
+.selfie-box{display:flex;gap:10px;align-items:center;background:#fff;border:3px solid #ffc34b;border-radius:20px;padding:10px 12px;margin:12px 0 4px;box-shadow:0 6px 18px #0002;animation:finIn .6s both}.selfie-elk{width:110px;height:auto;flex:none;animation:raceElk 1.2s ease-in-out infinite alternate}
 .selfie-q{font-size:21px;font-weight:900;margin:0}.selfie-btn{display:inline-block;cursor:pointer}
 .cert-box{text-align:center;margin:12px 0}.cert-img{display:block;width:100%;max-width:360px;margin:10px auto 4px;border-radius:14px;box-shadow:0 6px 18px #0003}
 @media(prefers-reduced-motion:reduce){.race *,.race-row,.fin-place,.fin-drum,.fin-win,.fin-after{animation:none!important}}@keyframes trophy{from{transform:scale(1) rotate(-7deg)}to{transform:scale(1.14) rotate(7deg)}}@media(prefers-reduced-motion:reduce){.confetti,.finale .trophy{animation:none}}
@@ -438,7 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <label for="buyer"><strong>שם הרוכש/ת</strong></label><input id="buyer" placeholder="שם מלא" required maxlength="60" autocomplete="name">
 <label for="phone"><strong>טלפון נייד</strong></label><input id="phone" type="tel" inputmode="tel" placeholder="050-1234567" required autocomplete="tel" oninput="this.setCustomValidity('')">
 <label for="email"><strong>כתובת אימייל לקבלת פרטי הכניסה</strong></label><input id="email" type="email" placeholder="name@example.com" required maxlength="100" autocomplete="email">
-<label for="coupon"><strong>קוד קופון (אם יש)</strong></label><div class="order-actions"><input id="coupon" maxlength="30" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" dir="auto" placeholder="קוד הנחה" style="flex:1;min-width:140px" oninput="couponPercent=0;document.getElementById('couponMsg').textContent='';updateGroups()"><button class="game-btn" type="button" onclick="applyCoupon()">הפעלת הקופון</button></div><p id="couponMsg" class="smallnote" role="status"></p>
+<label for="coupon"><strong>קוד קופון (אם יש)</strong></label><div class="order-actions"><input id="coupon" maxlength="30" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" dir="auto" placeholder="קוד הנחה" style="flex:1;min-width:140px" oninput="couponPercent=0;couponOnceHash=null;document.getElementById('couponMsg').textContent='';updateGroups()"><button class="game-btn" type="button" onclick="applyCoupon()">הפעלת הקופון</button></div><p id="couponMsg" class="smallnote" role="status"></p>
 <label class="count-confirm" for="countOk"><input type="checkbox" id="countOk" required oninvalid="this.setCustomValidity('סמנו שספרתם את כל המשתתפים, כולל הילדים')" onchange="this.setCustomValidity('')"> <span>ספרנו את כולם — <strong>כולל הילדים</strong> — ורשמנו את המספר המדויק: <strong id="countOkN">30</strong> משתתפים</span></label>
 <p class="smallnote">בשליחת ההזמנה את/ה מאשר/ת את <a href="#" onclick="famOpenDoc('termsModal');return false">התקנון ומדיניות הביטול</a> ואת <a href="#" onclick="famOpenDoc('privacyModal');return false">מדיניות הפרטיות</a>.</p>
 <button class="buy" type="submit" id="orderButton">שליחת הזמנה ומעבר לתשלום בביט</button><p id="purchaseMsg" aria-live="polite"></p>
@@ -596,6 +600,8 @@ document.addEventListener('keydown',e=>{const m=document.getElementById('modal')
 function closeModal(){const m=document.getElementById('modal'),was=m.classList.contains('open');stopClip();clipState='ended';m.classList.remove('open');if(was&&modalBackTo&&modalBackTo.focus){modalBackTo.focus();modalBackTo=null}}
 // קופון הנחה: הקוד עצמו סודי — באתר נשמרת רק ”טביעת אצבע” שלו, כך שאי־אפשר לגלות אותו
 let couponPercent=0;
+/* Ayelet 18.11.26 - one-time coupon (the winners' voucher): the fingerprint of the coupon to mark as used with the order */
+let couponOnceHash=null;
 /* Ayelet 12.11.26 - six coupon slots: 1 -> settings/coupon (+ couponSecret.current), n -> settings/coupon<n> (+ current<n>) */
 /* Ayelet 16.11.26: 8 coupons (were 6) */
 const COUPON_SLOTS=[1,2,3,4,5,6,7,8];
@@ -623,10 +629,12 @@ async function applyCoupon(){
     a code that was never saved there -> the old 8 slots, as before */
  const hashes=[...new Set(await Promise.all(couponVariants(code).map(couponHash)))];
  const fresh=window.firebaseGetCouponByHash?await Promise.all(hashes.map(h=>window.firebaseGetCouponByHash(h))):[],found=fresh.filter(x=>x&&!x.error);
- let c=null,err=fresh.some(x=>x&&x.error);
+ let c=null,err=fresh.some(x=>x&&x.error);couponOnceHash=null;
  if(found.length)c=found.find(x=>x.active)||null;
  else{const list=await Promise.all(COUPON_SLOTS.map(n=>window.firebaseGetCoupon(couponSlot(n))));c=list.find(x=>x&&x.active&&hashes.includes(x.hash))||null;if(list.some(x=>x&&x.error))err=true;}
- if(c){couponPercent=c.percent;msg.textContent=`✓ הקופון הופעל — ${c.percent}% הנחה!`}
+ /* one-time coupon: already used -> say so clearly; not used yet -> remember its fingerprint (marked used together with the order) */
+ if(c&&c.once){if(c.usedAt){couponPercent=0;msg.textContent='הקופון הזה כבר נוצל — הוא היה לשימוש חד־פעמי בלבד.';updateGroups();return}couponOnceHash=hashes[fresh.indexOf(c)];}
+ if(c){couponPercent=c.percent;msg.textContent=`✓ הקופון הופעל — ${c.percent}% הנחה!`+(c.once?' (קופון חד־פעמי — ינוצל בהזמנה הזו)':'')}
  else if(err&&!found.length){couponPercent=0;msg.textContent='לא הצלחנו לבדוק את הקופון — כנראה האינטרנט במכשיר הזה איטי או מסונן. נסו שוב בעוד רגע, או כתבו לנו ונעזור 😊'}
  else{couponPercent=0;msg.textContent='הקוד לא תקף. בדקו שהקוד כתוב בדיוק כמו שקיבלתם (באותיות באנגלית או בעברית, כמו בקוד).'}
  updateGroups();
@@ -874,8 +882,10 @@ async function submitOrder(){
  if(couponPercent)order.coupon=normCoupon(document.getElementById('coupon').value);
  if(!pendingOrder){const n=new Uint32Array(1);crypto.getRandomValues(n);pendingOrder={id:'o'+Date.now().toString(36)+Math.random().toString(36).slice(2,8),code:String(100000+n[0]%900000),tried:false};}
  btn.disabled=true;msg.textContent='שולחים את ההזמנה…';
- try{const result=await window.firebaseSubmitOrder(order,pendingOrder);pendingOrder=null;msg.textContent='';showBitInstructions(order,result);}
- catch(e){console.error(e);msg.innerHTML='לא הצלחנו לוודא שההזמנה נשלחה — ייתכן שהאינטרנט במכשיר הזה איטי או מסונן. לחצו שוב על ”שליחת הזמנה” — <strong>זה לא ייצור הזמנה כפולה</strong>. אם זה חוזר, נסו ממכשיר או מרשת אחרת.';btn.disabled=false;}
+ try{const result=await window.firebaseSubmitOrder(order,pendingOrder,couponPercent?couponOnceHash:null);pendingOrder=null;couponOnceHash=null;msg.textContent='';showBitInstructions(order,result);}
+ catch(e){console.error(e);
+  /* one-time coupon already used by another order (the security rules refused it) */
+  if(e&&e.code==='coupon-used'){couponPercent=0;couponOnceHash=null;pendingOrder=null;document.getElementById('couponMsg').textContent='הקופון הזה כבר נוצל — הוא היה לשימוש חד־פעמי בלבד.';msg.textContent='קוד הקופון כבר נוצל בהזמנה אחרת. מחקו אותו ושלחו שוב (במחיר המלא), או כתבו לנו 😊';updateGroups();btn.disabled=false;couponEl.focus();return;}msg.innerHTML='לא הצלחנו לוודא שההזמנה נשלחה — ייתכן שהאינטרנט במכשיר הזה איטי או מסונן. לחצו שוב על ”שליחת הזמנה” — <strong>זה לא ייצור הזמנה כפולה</strong>. אם זה חוזר, נסו ממכשיר או מרשת אחרת.';btn.disabled=false;}
 }
 let pendingOrder=null;
 function showBitInstructions(order,result){
@@ -890,7 +900,7 @@ function showBitInstructions(order,result){
  document.getElementById('orderForm').hidden=true;box.hidden=false;box.scrollIntoView({behavior:'smooth',block:'start'});
  if(window.fillContact)window.fillContact();
 }
-function newOrder(){const f=document.getElementById('orderForm');f.reset();document.getElementById('gameDate').value='';showGameDateWords();pendingOrder=null;couponPercent=0;document.getElementById('couponMsg').textContent='';f.hidden=false;document.getElementById('bitBox').hidden=true;document.getElementById('orderButton').disabled=false;updateGroups();}
+function newOrder(){const f=document.getElementById('orderForm');f.reset();document.getElementById('gameDate').value='';showGameDateWords();pendingOrder=null;couponPercent=0;couponOnceHash=null;document.getElementById('couponMsg').textContent='';f.hidden=false;document.getElementById('bitBox').hidden=true;document.getElementById('orderButton').disabled=false;updateGroups();}
 /* Ayelet 17.11.26 - the date field: typing adds the slashes (DD/MM/YY), the 📅 button opens the calendar; the hidden #gameDate keeps YYYY-MM-DD */
 document.getElementById('gdPicker').min=israelToday();
 /* phone / tablet: the phone's own date wheel (easy, already in the right order); computer: the typed field */
@@ -954,10 +964,24 @@ const SITE_URL = location.origin + location.pathname;
 
 // ---------- הזמנה חדשה (ללא התחברות) ----------
 // pending = { id, code, tried }: אותו מזהה בכל ניסיון — כך לחיצה חוזרת לא יוצרת הזמנה כפולה
-window.firebaseSubmitOrder = async function (order, pending) {
+window.firebaseSubmitOrder = async function (order, pending, onceHash) {
   const code = pending.code;
-  try { await withTimeout(setDoc(doc(db, 'gameOrders', pending.id), { code, ...order, status: 'pending', createdAt: serverTimestamp() }), 15000); }
+  try {
+    const data = { code, ...order, status: 'pending', createdAt: serverTimestamp() };
+    if (onceHash) {
+      /* Ayelet 18.11.26 - one-time coupon: the order and "the coupon is used" are saved together (the rules allow only one order per coupon) */
+      const batch = writeBatch(db);
+      batch.set(doc(db, 'gameOrders', pending.id), data);
+      batch.update(doc(db, 'coupons', onceHash), { usedAt: serverTimestamp(), usedOrder: pending.id });
+      await withTimeout(batch.commit(), 15000);
+    } else await withTimeout(setDoc(doc(db, 'gameOrders', pending.id), data), 15000);
+  }
   catch (e) {
+    if (onceHash && e.code === 'permission-denied') {
+      /* refused: is it because the coupon was already used by ANOTHER order? (our own earlier try = fine) */
+      const c = await window.firebaseGetCouponByHash(onceHash);
+      if (c && !c.error && c.usedAt && c.usedOrder !== pending.id) { const err = new Error('coupon used'); err.code = 'coupon-used'; throw err; }
+    }
     // ניסיון קודם כבר נשמר (רק התשובה נתקעה) — Firebase לא מאפשר לשמור שוב, וזה סימן שההזמנה כבר אצלנו
     if (!(pending.tried && e.code === 'permission-denied')) { pending.tried = true; throw e; }
   }
@@ -995,7 +1019,8 @@ function contactText() {
 }
 /* Ayelet 13.11.26 - the WhatsApp buttons show at once (not after the number loads): the number is remembered on the device, and a tap before it loads waits for it */
 const WA_TEXT = 'היי איילת, יש לי שאלה על משחק המשפחה 🙂';
-function setWaLinks(wa) { document.querySelectorAll('[data-wa]').forEach(a => { if (wa && wa.length >= 11) { a.href = 'https://wa.me/' + wa + '?text=' + encodeURIComponent(WA_TEXT); a.hidden = false; } else if (wa === '') a.hidden = true; }); }
+/* (18.11.26) a link may carry its own message (data-wa-text) - e.g. the winners sending their photo for the 50% voucher */
+function setWaLinks(wa) { document.querySelectorAll('[data-wa]').forEach(a => { if (wa && wa.length >= 11) { a.href = 'https://wa.me/' + wa + '?text=' + encodeURIComponent(a.dataset.waText || WA_TEXT); a.hidden = false; } else if (wa === '') a.hidden = true; }); }
 try { const w = localStorage.getItem('familyGame.wa'); if (w) setWaLinks(w); } catch (e) {}
 document.addEventListener('click', async e => { const a = e.target.closest && e.target.closest('a[data-wa]'); if (!a || a.getAttribute('href') !== '#') return; e.preventDefault(); const win = window.open('', '_blank'); await window.fillContact(); if (a.getAttribute('href') !== '#') { if (win) win.location = a.href; else location.href = a.href; } else if (win) win.close(); });
 window.fillContact = async function () {
@@ -1337,7 +1362,7 @@ async function showAdminPanel(user) {
   if (adminUnsub) adminUnsub();
   // הרשימה מתעדכנת בזמן אמת — הזמנה חדשה מופיעה מיד בלי לרענן
   adminUnsub = onSnapshot(query(collection(db, 'gameOrders'), orderBy('createdAt', 'desc'), limit(300)),
-    snap => { adminOrders = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderOrders(); },
+    snap => { adminOrders = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderOrders(); refreshOnceUse().catch(e => console.warn(e)); },
     // ”אין הרשאה” כמעט תמיד = באותו דפדפן נכנסו בינתיים כמנהל משחק (ההתחברות התחלפה), לא כללי האבטחה
     err => {
       console.warn(err);
@@ -1407,12 +1432,16 @@ window.adminExportCsv = function () {
 };
 // המחיר הנכון להזמנה — כולל הנחת קופון רק אם הקוד שהלקוח כתב הוא אחד מהקודים שהגדרת
 function orderPrice(o) {
-  const c = o.coupon && adminCoupons[normCoupon(o.coupon)];
-  return { total: finalPrice(o.participants, c || 0), percent: c || 0 };
+  let c = o.coupon && adminCoupons[normCoupon(o.coupon)];
+  /* Ayelet 18.11.26 - a one-time coupon counts only for the ONE order that used it */
+  const row = o.coupon && cpRows.find(r => r.saved && normCoupon(r.saved) === normCoupon(o.coupon)), once = !!(row && row.state && row.state.once);
+  const use = once && adminCouponUse[normCoupon(o.coupon)], usedElsewhere = once && (!use || use.usedOrder !== o.id);
+  if (usedElsewhere) c = 0;
+  return { total: finalPrice(o.participants, c || 0), percent: c || 0, usedElsewhere };
 }
 function orderCard(o) {
-  const { total, percent } = orderPrice(o);
-  const couponInfo = o.coupon ? (percent ? `<span>🎟️ קופון ${esc(o.coupon)} (−${percent}%)</span>` : `<span class="warn">🎟️ קופון ${esc(o.coupon)} — לא תקף</span>`) : '';
+  const { total, percent, usedElsewhere } = orderPrice(o);
+  const couponInfo = o.coupon ? (percent ? `<span>🎟️ קופון ${esc(o.coupon)} (−${percent}%)</span>` : `<span class="warn">🎟️ קופון ${esc(o.coupon)} — ${usedElsewhere ? 'חד־פעמי שכבר נוצל בהזמנה אחרת (לא מגיעה הנחה)' : 'לא תקף'}</span>`) : '';
   const created = o.createdAt ? o.createdAt.toDate().toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem', dateStyle: 'short', timeStyle: 'short' }) : '';
   const mismatch = Number(o.total) !== total ? `<span class="warn">⚠ בטופס הוצג ללקוח ${esc(o.total)} ₪</span>` : '';
   const wiped = o.dataDeletedAt ? `<span>🧹 נתוני המשחק נמחקו (${o.dataDeletedAt.toDate().toLocaleDateString('he-IL', { timeZone: 'Asia/Jerusalem' })})</span>` : '';
@@ -1491,11 +1520,36 @@ function readCouponRows() {
   cpRows.forEach((r, i) => {
     const c = document.getElementById('cpCode' + i); if (!c) return;
     r.code = c.value; r.percent = document.getElementById('cpPercent' + i).value; r.active = document.getElementById('cpActive' + i).checked;
+    const o = document.getElementById('cpOnce' + i); if (o) r.once = o.checked;
   });
+}
+/* Ayelet 18.11.26 - one-time coupons: who used it (from the public coupon doc) - CODE -> { usedAt, usedOrder } */
+let adminCouponUse = {};
+async function refreshOnceUse() {
+  const once = cpRows.filter(r => r.saved && r.state && r.state.once);
+  const got = await Promise.all(once.map(async r => [normCoupon(r.saved), await window.firebaseGetCouponByHash(await couponHash(r.saved))]));
+  const next = {}; got.forEach(([c, d]) => { if (d && !d.error) next[c] = { usedAt: d.usedAt || null, usedOrder: d.usedOrder || '' }; });
+  const changed = JSON.stringify(Object.keys(next).map(k => [k, next[k].usedOrder])) !== JSON.stringify(Object.keys(adminCouponUse).map(k => [k, adminCouponUse[k].usedOrder]));
+  adminCouponUse = next;
+  if (changed) { readCouponRows(); renderCouponRows(); if (typeof renderOrders === 'function') renderOrders(); }
+}
+/* a code that is hard to guess, for a winners' voucher: WIN-XXXXX (no 0/O/1/I, so it is easy to copy) */
+window.randomCouponCode = function (i) {
+  readCouponRows();
+  const abc = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', n = new Uint32Array(5); crypto.getRandomValues(n);
+  cpRows[i].code = 'WIN-' + [...n].map(x => abc[x % abc.length]).join(''); cpRows[i].once = true; cpRows[i].percent = 50;
+  renderCouponRows();
+};
+function couponUseLine(r) {
+  if (!r.saved || !r.state || !r.state.once) return '';
+  const u = adminCouponUse[normCoupon(r.saved)];
+  if (!u || !u.usedAt) return '<p class="smallnote">🎟️ חד־פעמי — עוד לא נוצל.</p>';
+  const o = adminOrders.find(x => x.id === u.usedOrder), when = u.usedAt.toDate ? u.usedAt.toDate().toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem', dateStyle: 'short', timeStyle: 'short' }) : '';
+  return `<p class="smallnote"><strong>✅ נוצל</strong> ${esc(when)}${o ? ` — הזמנה ${esc(o.code)} של ${esc(o.buyerName)}` : ''}. מי שינסה אותו שוב יקבל ”הקופון כבר נוצל“.</p>`;
 }
 function renderCouponRows() {
   const box = document.getElementById('cpList'); if (!box) return;
-  box.innerHTML = cpRows.map((r, i) => `<p style="margin:10px 0 4px"><strong>קופון ${i + 1}</strong></p><div class="order-actions"><label>קוד<input id="cpCode${i}" dir="ltr" maxlength="30" value="${esc(r.code || '')}" placeholder="למשל: CHANUKA10" style="text-transform:uppercase"></label><label>אחוז הנחה<input id="cpPercent${i}" type="number" min="1" max="50" value="${esc(r.percent || 10)}" style="width:80px"></label><label><input id="cpActive${i}" type="checkbox" ${r.active ? 'checked' : ''}> פעיל</label><button class="game-btn" type="button" onclick="window.saveCoupon(${i})">שמירה</button>${r.saved ? `<button class="game-btn" type="button" onclick="window.removeCoupon(${i})">🗑️ הסרה</button>` : ''}</div><p id="cpMsg${i}" class="smallnote" role="status"></p>`).join('')
+  box.innerHTML = cpRows.map((r, i) => `<p style="margin:10px 0 4px"><strong>קופון ${i + 1}</strong></p><div class="order-actions"><label>קוד<input id="cpCode${i}" dir="ltr" maxlength="30" value="${esc(r.code || '')}" placeholder="למשל: CHANUKA10" style="text-transform:uppercase"></label><label>אחוז הנחה<input id="cpPercent${i}" type="number" min="1" max="50" value="${esc(r.percent || 10)}" style="width:80px"></label><label><input id="cpActive${i}" type="checkbox" ${r.active ? 'checked' : ''}> פעיל</label><label><input id="cpOnce${i}" type="checkbox" ${r.once ? 'checked' : ''}> חד־פעמי (הזמנה אחת בלבד)</label>${r.saved ? '' : `<button class="game-btn" type="button" onclick="window.randomCouponCode(${i})">🎲 קוד אקראי לזוכים</button>`}<button class="game-btn" type="button" onclick="window.saveCoupon(${i})">שמירה</button>${r.saved ? `<button class="game-btn" type="button" onclick="window.removeCoupon(${i})">🗑️ הסרה</button>` : ''}</div>${couponUseLine(r)}<p id="cpMsg${i}" class="smallnote" role="status"></p>`).join('')
     || '<p class="smallnote">אין עדיין קופונים. לחצי ➕ קופון חדש.</p>';
 }
 async function loadAdminCoupons() {
@@ -1516,6 +1570,7 @@ async function loadAdminCoupons() {
     }
   } catch (e) { console.warn(e); }
   renderCouponRows();
+  refreshOnceUse().catch(e => console.warn(e));
 }
 window.addCouponRow = function () {
   readCouponRows();
@@ -1526,24 +1581,25 @@ window.addCouponRow = function () {
 window.saveCoupon = async function (i) {
   readCouponRows();
   const r = cpRows[i], msg = document.getElementById('cpMsg' + i), code = normCoupon(r.code);
-  const percent = parseInt(r.percent, 10), active = !!r.active;
+  const percent = parseInt(r.percent, 10), active = !!r.active, once = !!r.once;
   const twin = cpRows.findIndex((x, j) => j !== i && normCoupon(x.code) === code);
   if (!code) { msg.textContent = 'כתבי קוד קופון.'; return; }
   if (!(percent >= 1 && percent <= 50)) { msg.textContent = 'אחוז ההנחה צריך להיות בין 1 ל־50.'; return; }
   if (twin >= 0) { msg.textContent = `הקוד הזה כבר משמש לקופון ${twin + 1}. בחרי קוד אחר.`; return; }
   msg.textContent = 'שומרים…';
   try {
-    const st = { code, percent, active }, codes = { ...adminCoupons, [code]: percent };
+    const st = { code, percent, active, once }, codes = { ...adminCoupons, [code]: percent };
     const list = cpRows.filter(x => x === r || x.saved).map(x => x === r ? st : x.state);
     const batch = writeBatch(db);
-    batch.set(doc(db, 'coupons', await couponHash(code)), { active, percent, updatedAt: serverTimestamp() });
+    /* merge: saving again keeps "used" (usedAt / usedOrder) of a one-time coupon */
+    batch.set(doc(db, 'coupons', await couponHash(code)), { active, percent, once, updatedAt: serverTimestamp() }, { merge: true });
     /* the code was changed: the old code stops working */
     if (r.saved && normCoupon(r.saved) !== code) batch.set(doc(db, 'coupons', await couponHash(r.saved)), { active: false, percent, updatedAt: serverTimestamp() });
     batch.set(doc(db, 'settings', 'couponSecret'), { codes, list, updatedAt: serverTimestamp() }, { merge: true });
     await batch.commit();
     Object.assign(r, st, { saved: code, state: { ...st } }); adminCoupons = codes; renderOrders();
-    renderCouponRows();
-    document.getElementById('cpMsg' + i).textContent = active ? `נשמר ✓ — הקוד ${code} נותן עכשיו ${percent}% הנחה.` : `נשמר ✓ — הקופון ${code} כבוי כרגע.`;
+    renderCouponRows(); await refreshOnceUse().catch(e => console.warn(e));
+    document.getElementById('cpMsg' + i).textContent = active ? `נשמר ✓ — הקוד ${code} נותן עכשיו ${percent}% הנחה${once ? ' — להזמנה אחת בלבד' : ''}.` : `נשמר ✓ — הקופון ${code} כבוי כרגע.`;
   } catch (e) { console.warn(e); msg.textContent = 'השמירה נכשלה. ודאי שכללי האבטחה פורסמו.'; }
 };
 window.removeCoupon = async function (i) {
@@ -1555,7 +1611,7 @@ window.removeCoupon = async function (i) {
   try {
     const list = cpRows.filter(x => x !== r && x.saved).map(x => x.state);
     const batch = writeBatch(db);
-    batch.set(doc(db, 'coupons', await couponHash(r.saved)), { active: false, percent: parseInt(r.state.percent, 10) || 10, updatedAt: serverTimestamp() });
+    batch.set(doc(db, 'coupons', await couponHash(r.saved)), { active: false, percent: parseInt(r.state.percent, 10) || 10, updatedAt: serverTimestamp() }, { merge: true });
     batch.set(doc(db, 'settings', 'couponSecret'), { list, updatedAt: serverTimestamp() }, { merge: true });
     await batch.commit();
     cpRows.splice(i, 1); renderCouponRows();
@@ -2084,6 +2140,7 @@ const SOUND_DRUM = Array.from({ length: 26 }, (_, i) => [i % 2 ? 92 : 104, i * 0
 document.addEventListener('animationstart', e => {
   const el = e.target, cue = el && el.dataset && el.dataset.cue; if (!cue || e.animationName !== 'finIn') return;
   const k = cue + '|' + el.dataset.k; if (fxPlayed.has(k)) return; fxPlayed.add(k);
+  if (cue === 'prize') return window.prizePlay();
   try { playNotes(cue === 'drum' ? SOUND_DRUM : SOUND_FINALE); } catch (er) { }
 });
 /* Race board after stages 1 and 2: total points so far, bars that grow, arrows for who went up, and a headline from Elkana.
@@ -2132,17 +2189,45 @@ function finaleHtml(results, myId, key) {
   const drumAt = t, winAt = t + 2.6;
   return `<div class="finale">${places}<p class="fin-drum" style="animation-delay:${fxD(key, drumAt)}"${fxCue(key, drumAt, 'drum')}>🥁 ובמקום הראשון…</p>`
     + `<div class="fin-win" style="animation-delay:${fxD(key, winAt)}"${fxCue(key, winAt, 'win')}>${conf}<div class="trophy">🏆</div><h3>${winners.length > 1 ? 'תיקו! המנצחות' : 'המנצחים'}: ${winners.map(w => 'קבוצת ' + esc(w.name)).join(' ו')}!</h3><p>עם ${tops[0]} נקודות</p>${mine}</div></div>`
-    + `<div class="fin-after" style="animation-delay:${fxD(key, winAt + 1.2)}">${certBtnHtml(rows, tops, myId)}${totalsTable(results, myId, '📊 טבלת הניקוד הסופית')}<p style="text-align:center;font-size:18px"><strong>תודה ששיחקתם! 💛</strong></p></div>`;
+    + `<div class="fin-after" style="animation-delay:${fxD(key, winAt + 1.2)}">${certBtnHtml(rows, tops, myId, winAt)}${totalsTable(results, myId, '📊 טבלת הניקוד הסופית')}<p style="text-align:center;font-size:18px"><strong>תודה ששיחקתם! 💛</strong></p></div>`;
 }
 /* Certificate to share: a picture with Elkana, the group name, the place and the points - made in the phone itself (nothing is uploaded) */
 let certData = null;
-function certBtnHtml(rows, tops, myId) {
+function certBtnHtml(rows, tops, myId, winAt) {
   const r = myId ? rows.find(x => x.id === myId) : rows[0]; if (!r) return '';
   const place = tops.indexOf(r.total); certData = { name: String(r.name || ''), total: r.total, place };
   /* Ayelet 18.11.26 - "at the end Elkana says: friends, want a picture? - and the picture goes in together with Elkana", with the group's place on top */
   const selfie = myId ? `<div class="selfie-box"><img src="./how-elkana-heart.webp" class="selfie-elk" alt="" width="120" height="119"><div><p class="selfie-q">חברים, רוצים תמונה איתי? 📸</p><p class="smallnote" style="margin:2px 0 8px">כולם נכנסים לתמונה, ואני מצטרף! התמונה נשארת רק בטלפון שלכם.</p><label class="buy selfie-btn">📸 מצטלמים עם אלקנה<input type="file" accept="image/*" capture="user" hidden onchange="window.selfieTaken(this)"></label></div></div><div id="selfieOut"></div>` : '';
-  return `${selfie}<div class="cert-box"><button class="${myId ? 'game-btn' : 'buy'}" type="button" onclick="window.shareCert(this)">🏅 ${place === 0 ? 'תעודת ניצחון' : 'תעודה'} לשיתוף בוואטסאפ</button>${myId ? '' : `<p class="smallnote">התעודה של הקבוצה המנצחת — אפשר לשלוח לה.</p>`}<div id="certOut"></div></div>`;
+  /* Ayelet 18.11.26 - first place wins a (joking) family vacation + a real 50% voucher: they send the photo on WhatsApp and get a personal one-time code */
+  /* (18.11.26, Ayelet: "do not show the text of what he says - only while he says it") - Elkana says it in his voice (elkana-prize.mp3)
+     a moment after the winners are revealed, the words appear one line at a time as he speaks, and the prize box opens only after he finishes */
+  const talk = myId && place === 0 ? `<div class="prize-talk" id="prizeTalk" style="animation-delay:${(winAt || 0) + 3}s" data-cue="prize" data-k="g"><img src="./how-elkana-cheer.webp" class="prize-elk" alt="" width="96" height="94"><div class="prize-bubble" id="prizeCap">🎁 רגע… אלקנה רוצה להגיד לכם משהו!</div><button class="game-btn" id="prizePlay" type="button" onclick="window.prizePlay()" hidden>▶ לשמוע את אלקנה</button></div>` : '';
+  const prize = myId && place === 0 ? talk + `<div class="prize-box" id="prizeBox"${window.__prizeDone ? '' : ' hidden'}><p class="prize-h">🎁 הפרס שלכם!</p><p>🏖️ <strong>זכיתם בחופשה משפחתית!</strong> עכשיו רק תגידו לאבא שייקח אתכם, בארץ או בחו״ל 😄</p><p>🎟️ <strong>ושובר 50% הנחה למשחק הבא, עלינו!</strong><br>מצטלמים עם אלקנה (כאן למטה), שולחים לנו את התמונה בוואטסאפ, ומקבלים קוד הנחה אישי.</p><a class="buy" href="#" data-wa data-wa-text="${esc(`היי איילת! 🏆 ניצחנו במשחק המשפחה (קבוצת ${r.name}) — מצרפים את התמונה שלנו עם אלקנה, ונשמח לשובר ה־50% למשחק הבא 🎁`)}" target="_blank" rel="noopener">📤 שליחת התמונה בוואטסאפ</a><p class="smallnote" style="margin-top:6px">קודם מצטלמים ושומרים את התמונה, ואז מצרפים אותה להודעה.</p></div>` : '';
+  return `${prize}${selfie}<div class="cert-box"><button class="${myId ? 'game-btn' : 'buy'}" type="button" onclick="window.shareCert(this)">🏅 ${place === 0 ? 'תעודת ניצחון' : 'תעודה'} לשיתוף בוואטסאפ</button>${myId ? '' : `<p class="smallnote">התעודה של הקבוצה המנצחת — אפשר לשלוח לה.</p>`}<div id="certOut"></div></div>`;
 }
+/* the words Elkana says, by the second in elkana-prize.mp3 (23 s) - shown only when he gets to them */
+/* (18.11.26, Ayelet: "the text comes a little before he says it") - each line starts exactly when he starts saying it (measured from the pauses in the file) */
+const PRIZE_CAPS = [[0.4, 'וואו! זכיתם!!! 🎉'], [2.4, 'והפרס הגדול הוא…'], [4.1, '🏖️ חופשה משפחתית!'], [6.5, 'אה…'], [7.3, 'רגע. עכשיו רק צריך לשכנע את אבא לשלם 😅'], [9.6, 'בארץ או בחוץ לארץ — אני לא מתערב.'], [12.7, 'אני חשמונאי, לא סוכן נסיעות! 😄'], [14.95, 'אבל שובר של 50% למשחק הבא? זה כבר עלינו! 🎟️'], [18.05, 'תצטלמו איתי, תשלחו את התמונה בוואטסאפ…'], [21, '…ותקבלו קוד הנחה אישי! 📸']];
+/* phones (mainly iPhone) block sound that was not started by a touch: the first touch in the game "opens" the sound for the drums,
+   the fanfare and Elkana's prize voice, so they can play later by themselves */
+document.addEventListener('pointerdown', function unlockGameSound() {
+  if (!groupCtx && !managerCtx) return;
+  try { audioCtx(); } catch (e) { }
+  if (groupCtx && !window.__prizeAudio) { const a = window.__prizeAudio = new Audio('./elkana-prize.mp3'); a.preload = 'auto'; a.muted = true; a.play().then(() => { a.pause(); a.currentTime = 0; a.muted = false; }).catch(() => { a.muted = false; }); }
+}, { passive: true });
+window.prizePlay = function () {
+  const cap = document.getElementById('prizeCap'), btn = document.getElementById('prizePlay'), talk = document.getElementById('prizeTalk'); if (!cap) return;
+  const showBox = () => { window.__prizeDone = true; const b = document.getElementById('prizeBox'); if (b) b.hidden = false; };
+  const a = window.__prizeAudio || (window.__prizeAudio = new Audio('./elkana-prize.mp3'));
+  try { hostAudio().pause(); } catch (e) { } /* never two of Elkana's voices together */
+  a.ontimeupdate = () => { const c = document.getElementById('prizeCap'); let t = ''; PRIZE_CAPS.forEach(([s, x]) => { if (a.currentTime >= s) t = x; }); if (c && t && c.textContent !== t) c.textContent = t; };
+  a.onended = () => { const c = document.getElementById('prizeCap'), b2 = document.getElementById('prizePlay'), t2 = document.getElementById('prizeTalk'); if (c) c.textContent = '🎁 הפרס שלכם — כאן למטה 👇'; if (b2) { b2.hidden = false; b2.textContent = '🔁 לשמוע שוב'; } if (t2) t2.classList.remove('talking'); showBox(); };
+  btn.hidden = true; talk.classList.add('talking');
+  try { a.currentTime = 0; } catch (e) { }
+  a.muted = false;
+  a.play().catch(() => { talk.classList.remove('talking'); btn.hidden = false; btn.textContent = '▶ לשמוע את אלקנה'; });
+  setTimeout(() => { if (!window.__prizeDone && a.paused) showBox(); }, 60000); /* never stuck: the prize shows anyway */
+};
 function certImage(src) {
   return new Promise(resolve => { const im = new Image(); im.onload = () => resolve(im); im.onerror = () => resolve(null); im.src = src || './how-elkana-cheer.webp'; });
 }
