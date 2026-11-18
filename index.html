@@ -220,6 +220,7 @@ input.unsaved{outline:3px solid #ff9800;background:#fff3e0}.date-words{margin:4p
 .fin-win{animation:finIn .8s both}.fin-after{animation:raceIn .6s both}.prize-talk{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#14345d;color:#fff;border-radius:20px;padding:10px 12px;margin:12px 0;animation:finIn .6s both}.prize-elk{width:88px;height:auto;flex:none}
 .prize-bubble{flex:1;min-width:150px;background:#fff;color:#14345d;border-radius:16px;padding:10px 12px;font-size:20px;font-weight:900;line-height:1.35;min-height:56px}
 .prize-talk.talking .prize-elk{animation:talkBob .32s ease-in-out infinite alternate}@keyframes talkBob{from{transform:rotate(-3deg) scale(1)}to{transform:rotate(3deg) scale(1.05)}}
+.prize-code-label{margin:8px 0 2px;font-weight:bold}.prize-code{font:900 30px/1.2 monospace;letter-spacing:3px;color:#14345d;background:#fff;border:3px dashed #ffb627;border-radius:14px;padding:8px 14px;margin:0 auto 8px;display:inline-block}.prize-code-wait{font-weight:bold;color:#7a5a00}
 .prize-box{text-align:center;background:linear-gradient(135deg,#fff3c4,#ffd9e6);border:3px dashed #e0a100;border-radius:20px;padding:12px 14px;margin:12px 0;animation:finIn .7s both}.prize-box p{margin:6px 0;font-size:17px}.prize-h{font-size:26px!important;font-weight:900}.prize-box a.buy{display:inline-block;margin:8px 0 2px;text-decoration:none}
 .selfie-box{display:flex;gap:10px;align-items:center;background:#fff;border:3px solid #ffc34b;border-radius:20px;padding:10px 12px;margin:12px 0 4px;box-shadow:0 6px 18px #0002;animation:finIn .6s both}.selfie-elk{width:110px;height:auto;flex:none;animation:raceElk 1.2s ease-in-out infinite alternate}
 .selfie-q{font-size:21px;font-weight:900;margin:0}.selfie-btn{display:inline-block;cursor:pointer}
@@ -1196,7 +1197,7 @@ async function createOrderLogin(email) {
 // ---------- ניקוי אוטומטי: יום אחרי המשחק נמחק כל תוכן המשחק (תמונות, שמות, קבוצות, תשובות) ----------
 // ההזמנות עצמן נשארות (רישום תשלומים). הניקוי רץ לבד, ברקע, בכל פעם שהאתר נפתח במכשיר שמחובר כמנהלת — ועוד פעם בשעה כל עוד הוא פתוח.
 // (עד הניקוי התוכן ממילא נעול: אחרי יום המשחק כללי האבטחה לא מאפשרים לאף אחד חוץ מהמנהלת לקרוא אותו)
-const GAME_SUBCOLLECTIONS = ['players', 'groups', 'assignments', 'answers', 'assoc', 'recordings', 'whoAssign', 'whoAnswers', 'live', 'host'];
+const GAME_SUBCOLLECTIONS = ['players', 'groups', 'assignments', 'answers', 'assoc', 'recordings', 'whoAssign', 'whoAnswers', 'live', 'host', 'prize'];
 async function autoCleanupIfAdmin() {
   const u = auth.currentUser; if (!u || u.isAnonymous) return;
   try { if ((await getDoc(doc(db, 'admins', u.uid))).exists()) await cleanupOldGames(); } catch (e) { console.warn(e); }
@@ -1549,7 +1550,7 @@ function couponUseLine(r) {
 }
 function renderCouponRows() {
   const box = document.getElementById('cpList'); if (!box) return;
-  box.innerHTML = cpRows.map((r, i) => `<p style="margin:10px 0 4px"><strong>קופון ${i + 1}</strong></p><div class="order-actions"><label>קוד<input id="cpCode${i}" dir="ltr" maxlength="30" value="${esc(r.code || '')}" placeholder="למשל: CHANUKA10" style="text-transform:uppercase"></label><label>אחוז הנחה<input id="cpPercent${i}" type="number" min="1" max="50" value="${esc(r.percent || 10)}" style="width:80px"></label><label><input id="cpActive${i}" type="checkbox" ${r.active ? 'checked' : ''}> פעיל</label><label><input id="cpOnce${i}" type="checkbox" ${r.once ? 'checked' : ''}> חד־פעמי (הזמנה אחת בלבד)</label>${r.saved ? '' : `<button class="game-btn" type="button" onclick="window.randomCouponCode(${i})">🎲 קוד אקראי לזוכים</button>`}<button class="game-btn" type="button" onclick="window.saveCoupon(${i})">שמירה</button>${r.saved ? `<button class="game-btn" type="button" onclick="window.removeCoupon(${i})">🗑️ הסרה</button>` : ''}</div>${couponUseLine(r)}<p id="cpMsg${i}" class="smallnote" role="status"></p>`).join('')
+  box.innerHTML = cpRows.map((r, i) => `<p style="margin:10px 0 4px"><strong>קופון ${i + 1}</strong></p><div class="order-actions"><label>קוד<input id="cpCode${i}" dir="ltr" maxlength="30" value="${esc(r.code || '')}" placeholder="למשל: CHANUKA10" style="text-transform:uppercase"></label><label>אחוז הנחה<input id="cpPercent${i}" type="number" min="1" max="50" value="${esc(r.percent || 10)}" style="width:80px"></label><label><input id="cpActive${i}" type="checkbox" ${r.active ? 'checked' : ''}> פעיל</label><label><input id="cpOnce${i}" type="checkbox" ${r.once ? 'checked' : ''}> חד־פעמי (הזמנה אחת בלבד)</label>${r.saved ? '' : `<button class="game-btn" type="button" onclick="window.randomCouponCode(${i})">🎲 קוד אקראי לזוכים</button>`}<button class="game-btn" type="button" onclick="window.saveCoupon(${i})">שמירה</button>${r.saved ? `<button class="game-btn" type="button" onclick="window.removeCoupon(${i})">🗑️ הסרה</button>` : ''}</div>${r.note ? `<p class="smallnote">🏆 ${esc(r.note)} — נוצר לבד בסוף המשחק</p>` : ''}${couponUseLine(r)}<p id="cpMsg${i}" class="smallnote" role="status"></p>`).join('')
     || '<p class="smallnote">אין עדיין קופונים. לחצי ➕ קופון חדש.</p>';
 }
 async function loadAdminCoupons() {
@@ -1588,7 +1589,7 @@ window.saveCoupon = async function (i) {
   if (twin >= 0) { msg.textContent = `הקוד הזה כבר משמש לקופון ${twin + 1}. בחרי קוד אחר.`; return; }
   msg.textContent = 'שומרים…';
   try {
-    const st = { code, percent, active, once }, codes = { ...adminCoupons, [code]: percent };
+    const st = { ...(r.state || {}), code, percent, active, once }, codes = { ...adminCoupons, [code]: percent };
     const list = cpRows.filter(x => x === r || x.saved).map(x => x === r ? st : x.state);
     const batch = writeBatch(db);
     /* merge: saving again keeps "used" (usedAt / usedOrder) of a one-time coupon */
@@ -2202,23 +2203,45 @@ function certBtnHtml(rows, tops, myId, winAt) {
   /* (18.11.26, Ayelet: "do not show the text of what he says - only while he says it") - Elkana says it in his voice (elkana-prize.mp3)
      a moment after the winners are revealed, the words appear one line at a time as he speaks, and the prize box opens only after he finishes */
   const talk = myId && place === 0 ? `<div class="prize-talk" id="prizeTalk" style="animation-delay:${(winAt || 0) + 3}s" data-cue="prize" data-k="g"><img src="./how-elkana-cheer.webp" class="prize-elk" alt="" width="96" height="94"><div class="prize-bubble" id="prizeCap">🎁 רגע… אלקנה רוצה להגיד לכם משהו!</div><button class="game-btn" id="prizePlay" type="button" onclick="window.prizePlay()" hidden>▶ לשמוע את אלקנה</button></div>` : '';
-  const prize = myId && place === 0 ? talk + `<div class="prize-box" id="prizeBox"${window.__prizeDone ? '' : ' hidden'}><p class="prize-h">🎁 הפרס שלכם!</p><p>🏖️ <strong>זכיתם בחופשה משפחתית!</strong> עכשיו רק תגידו לאבא שייקח אתכם, בארץ או בחו״ל 😄</p><p>🎟️ <strong>ושובר 50% הנחה למשחק הבא, עלינו!</strong><br>מצטלמים עם אלקנה (כאן למטה), שולחים לנו את התמונה בוואטסאפ, ומקבלים קוד הנחה אישי.</p><a class="buy" href="#" data-wa data-wa-text="${esc(`היי איילת! 🏆 ניצחנו במשחק המשפחה (קבוצת ${r.name}) — מצרפים את התמונה שלנו עם אלקנה, ונשמח לשובר ה־50% למשחק הבא 🎁`)}" target="_blank" rel="noopener">📤 שליחת התמונה בוואטסאפ</a><p class="smallnote" style="margin-top:6px">קודם מצטלמים ושומרים את התמונה, ואז מצרפים אותה להודעה.</p></div>` : '';
+  const prize = myId && place === 0 ? talk + `<div class="prize-box" id="prizeBox"${window.__prizeDone ? '' : ' hidden'}><p class="prize-h">🎁 הפרס שלכם!</p><p>🏖️ <strong>זכיתם בחופשה משפחתית!</strong> עכשיו רק תגידו לאבא שייקח אתכם, בארץ או בחו״ל 😄</p><p>🎟️ <strong>ושובר 50% הנחה למשחק הבא — בחנוכה או בכל משחק אחר, עלינו!</strong></p><div id="prizeCodeBox">${prizeCodeHtml(r.name)}</div></div>` : '';
+  if (myId && place === 0) setTimeout(() => window.loadPrizeCode(r.name), 0);
   return `${prize}${selfie}<div class="cert-box"><button class="${myId ? 'game-btn' : 'buy'}" type="button" onclick="window.shareCert(this)">🏅 ${place === 0 ? 'תעודת ניצחון' : 'תעודה'} לשיתוף בוואטסאפ</button>${myId ? '' : `<p class="smallnote">התעודה של הקבוצה המנצחת — אפשר לשלוח לה.</p>`}<div id="certOut"></div></div>`;
 }
-/* the words Elkana says, by the second in elkana-prize.mp3 (23 s) - shown only when he gets to them */
+/* Ayelet 18.11.26 - the winners' code is made by the server by itself (prize.js): familyGames/{gid}/prize/{uid} = { code }.
+   Only this group can read it. Until it arrives - "מכינים לכם קוד"; if it never comes (a test game / no connection) - WhatsApp to us. */
+function prizeCodeHtml(name) {
+  const code = window.__prizeCode;
+  if (code) return `<p class="prize-code-label">הקוד האישי שלכם:</p><p class="prize-code" dir="ltr">${esc(code)}</p><button class="game-btn" type="button" onclick="navigator.clipboard&&navigator.clipboard.writeText('${esc(code)}');this.textContent='הועתק ✓'">📋 העתקת הקוד</button><p class="smallnote" style="margin-top:6px">50% הנחה על משחק אחד. כותבים את הקוד בטופס הרכישה, בשדה ”קוד קופון”. כדאי לצלם את המסך עכשיו — אחרי המשחק הקוד לא יופיע כאן שוב.</p>`;
+  if (window.__prizeCode === '') return `<p class="smallnote">הקוד שלכם יגיע אלינו — שלחו לנו הודעה, ונשלח לכם אותו:</p><a class="buy" href="#" data-wa data-wa-text="${esc(`היי! 🏆 ניצחנו במשחק המשפחה (קבוצת ${name}) — נשמח לקוד ה־50% למשחק הבא 🎁`)}" target="_blank" rel="noopener">📤 שליחת הודעה בוואטסאפ</a>`;
+  return '<p class="prize-code-wait">⏳ מכינים לכם קוד הנחה אישי…</p>';
+}
+window.loadPrizeCode = async function (name) {
+  const c = groupCtx; if (!c || window.__prizeCode || window.__prizeLoading) return;
+  window.__prizeLoading = true;
+  const draw = () => { const b = document.getElementById('prizeCodeBox'); if (b) { b.innerHTML = prizeCodeHtml(name); if (typeof setWaLinks === 'function') setWaLinks(); } };
+  /* the server makes it a few seconds after the finale - try for up to 2 minutes */
+  for (let t = 0; t < 40 && groupCtx === c; t++) {
+    try { const s = await getDoc(doc(db, 'familyGames', c.gameId, 'prize', c.uid)); if (s.exists() && s.data().code) { window.__prizeCode = s.data().code; break; } } catch (e) { }
+    await new Promise(r => setTimeout(r, 3000));
+  }
+  if (!window.__prizeCode) window.__prizeCode = '';
+  window.__prizeLoading = false; draw();
+};
+/* the words Elkana says, by the second in elkana-prize.mp3 (17.75 s since 18.11.26) - shown only when he gets to them */
 /* (18.11.26, Ayelet: "the text comes a little before he says it") - each line starts exactly when he starts saying it (measured from the pauses in the file) */
-const PRIZE_CAPS = [[0.4, 'וואו! זכיתם!!! 🎉'], [2.4, 'והפרס הגדול הוא…'], [4.1, '🏖️ חופשה משפחתית!'], [6.5, 'אה…'], [7.3, 'רגע. עכשיו רק צריך לשכנע את אבא לשלם 😅'], [9.6, 'בארץ או בחוץ לארץ — אני לא מתערב.'], [12.7, 'אני חשמונאי, לא סוכן נסיעות! 😄'], [14.95, 'אבל שובר של 50% למשחק הבא? זה כבר עלינו! 🎟️'], [18.05, 'תצטלמו איתי, תשלחו את התמונה בוואטסאפ…'], [21, '…ותקבלו קוד הנחה אישי! 📸']];
+const PRIZE_CAPS = [[0.4, 'וואו! זכיתם!!! 🎉'], [2.4, 'והפרס הגדול הוא…'], [4.1, '🏖️ חופשה משפחתית!'], [6.5, 'אה…'], [7.3, 'רגע. עכשיו רק צריך לשכנע את אבא לשלם 😅'], [9.6, 'בארץ או בחוץ לארץ — אני לא מתערב.'], [12.7, 'אני חשמונאי, לא סוכן נסיעות! 😄'], [14.95, 'אבל שובר של 50% למשחק הבא? זה כבר עלינו! 🎟️']];
+/* (18.11.26, Ayelet) the end "send the photo on WhatsApp and get a code" was cut from the file (17.75 s) - the code now shows on the screen by itself */
 /* phones (mainly iPhone) block sound that was not started by a touch: the first touch in the game "opens" the sound for the drums,
    the fanfare and Elkana's prize voice, so they can play later by themselves */
 document.addEventListener('pointerdown', function unlockGameSound() {
   if (!groupCtx && !managerCtx) return;
   try { audioCtx(); } catch (e) { }
-  if (groupCtx && !window.__prizeAudio) { const a = window.__prizeAudio = new Audio('./elkana-prize.mp3'); a.preload = 'auto'; a.muted = true; a.play().then(() => { a.pause(); a.currentTime = 0; a.muted = false; }).catch(() => { a.muted = false; }); }
+  if (groupCtx && !window.__prizeAudio) { const a = window.__prizeAudio = new Audio('./elkana-prize.mp3?v=2'); a.preload = 'auto'; a.muted = true; a.play().then(() => { a.pause(); a.currentTime = 0; a.muted = false; }).catch(() => { a.muted = false; }); }
 }, { passive: true });
 window.prizePlay = function () {
   const cap = document.getElementById('prizeCap'), btn = document.getElementById('prizePlay'), talk = document.getElementById('prizeTalk'); if (!cap) return;
   const showBox = () => { window.__prizeDone = true; const b = document.getElementById('prizeBox'); if (b) b.hidden = false; };
-  const a = window.__prizeAudio || (window.__prizeAudio = new Audio('./elkana-prize.mp3'));
+  const a = window.__prizeAudio || (window.__prizeAudio = new Audio('./elkana-prize.mp3?v=2'));
   try { hostAudio().pause(); } catch (e) { } /* never two of Elkana's voices together */
   a.ontimeupdate = () => { const c = document.getElementById('prizeCap'); let t = ''; PRIZE_CAPS.forEach(([s, x]) => { if (a.currentTime >= s) t = x; }); if (c && t && c.textContent !== t) c.textContent = t; };
   a.onended = () => { const c = document.getElementById('prizeCap'), b2 = document.getElementById('prizePlay'), t2 = document.getElementById('prizeTalk'); if (c) c.textContent = '🎁 הפרס שלכם — כאן למטה 👇'; if (b2) { b2.hidden = false; b2.textContent = '🔁 לשמוע שוב'; } if (t2) t2.classList.remove('talking'); showBox(); };
@@ -2674,6 +2697,7 @@ function startGroup(gameId) {
   stopPlay();
   const uid = auth.currentUser.uid;
   let started = false; try { started = localStorage.getItem('familyGame.started.' + gameId) === '1'; } catch (e) { }
+  window.__prizeCode = undefined; window.__prizeLoading = false; /* a new game on this phone - no code from an old game */
   whoStopAll();
   groupCtx = { gameId, uid, state: null, group: null, players: [], assignment: null, started, submitted: false, results: null, eyesBuilt: false,
     who: { pick: {}, rec: null, pend: null, saving: false, msg: '' }, whoAssign: null, whoUrl: {}, whoLoads: {} };
