@@ -3689,8 +3689,11 @@ window.assocRemove = function (i) {
    Where the group is (question number + picks) is kept on the phone (localStorage), so a refresh continues from the same place */
 const SEE_SECS = 360;
 const SEE_PICS = [
-  { src: 's2-entrance.jpg', alt: 'כניסה לבניין בחנוכה: אבא ושני ילדים מדליקים נרות ליד השולחן', qs: [
-    ['איזה יום של חנוכה היום?', ['השני', 'הראשון', 'השלישי', 'השמיני']],
+  /* Ayelet 19.11.26 - picture made with promo\entrance_clues.py med18,poster4: the party poster says "נר רביעי, 17:00";
+     the medicine label says "תרופה / מגיל 18+" -> Abba is the sick one
+     (the trap: the tissue in Yonatan's bag). ?v=2 = the new picture */
+  { src: 's2-entrance.jpg?v=2', alt: 'כניסה לבניין בחנוכה: אבא ושני ילדים מדליקים נרות ליד השולחן', qs: [
+    ['בעוד כמה ימים מסיבת החנוכה של הבניין?', ['4', '3', 'היום', '5']], // 19.11.26 the poster: "נר רביעי"; one candle burns = the 1st night -> in 3 days (the trap: 4)
     ['מה מספר הבניין?', ['16', '3', '14', '12']],
     ['של מי האופניים?', ['יונתן', 'אורי', 'אבא', 'השכן']],
     ['מה שם המשפחה שלהם?', ['כהן', 'לוי', 'אברמון', 'בראון']],
@@ -3699,7 +3702,8 @@ const SEE_PICS = [
     ['מי לא מרגיש טוב?', ['יונתן', 'אורי', 'אבא', 'אף אחד']],
     ['ברשימת המשימות, איזו משימה לא תסומן היום?', ['להדליק נרות', 'לקנות סופגניות', 'כולן יסומנו', 'להשקות את הפרחים']],
   ] },
-  { src: 's2-sabba.jpg', alt: 'סבא, אבא והנכדים סביב שולחן חנוכה', qs: [
+  /* Ayelet 19.11.26 - promo\sabba_fix.py scarf,tag: one stain less on Uri's scarf, a smaller new-clothes tag on Daniel (the kippot as they were); ?v=2 = the new picture */
+  { src: 's2-sabba.jpg?v=2', alt: 'סבא, אבא והנכדים סביב שולחן חנוכה', qs: [
     ['באיזו עיר האירוע?', ['ירושלים', 'צפת', 'חברון', 'בני ברק']],
     ['מי הבן של דניאל?', ['אהרן', 'רפאל', 'משה', 'אורי']],
     ['מי היה באירוע וכבר הלך?', ['דוד', 'אורי', 'יונתן', 'אליהו']],
