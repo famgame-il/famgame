@@ -2592,7 +2592,8 @@ function nowBox(title, steps, current, note) {
 // ---------- בדיקה שהאינטרנט (גם מסונן) לא חוסם את המשחק ----------
 const CONN_CHECK_HTML = '<div class="info"><button class="game-btn" type="button" onclick="window.checkConnection(this.nextElementSibling)">🔌 בדיקה שהאינטרנט לא חוסם את המשחק</button><div class="smallnote" style="margin-top:8px"></div></div>';
 function withTimeout(promise, ms) { return Promise.race([promise, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]); }
-/* Ayelet 19.11.26 - the voice button on the check page: plays Elkana's real voice, and says what to do if nothing is heard */
+/* Ayelet 19.11.26 - the voice button on the check page: plays Elkana's real voice (elkana-hello.mp3 = the first 4 seconds of
+   elkana-intro.mp4, cut with ffmpeg), and says what to do if nothing is heard */
 window.checkVoice = function (btn) {
   const box = btn.parentElement.nextElementSibling;
   const tips = '<p><strong>לא שומעים?</strong></p><ol style="margin:4px 0;padding-inline-start:22px;line-height:1.8">'
@@ -2601,7 +2602,7 @@ window.checkVoice = function (btn) {
     + '<li>בודקים שאין אוזניות או רמקול בלוטות׳ מחוברים.</li>'
     + '<li>לוחצים שוב על הכפתור.</li></ol>'
     + '<p class="smallnote">💡 גם בלי קול אפשר לשחק — כל מה שאלקנה אומר כתוב גם על המסך.</p>';
-  const a = new Audio('elkana-prize.mp3');
+  const a = new Audio('elkana-hello.mp3');   // the first sentence of Elkana's opening video (not the prize announcement)
   a.play().then(() => { btn.textContent = '🔊 אלקנה מדבר עכשיו — שומעים? אם כן, גם הקול מוכן 👍'; box.innerHTML = tips; box.hidden = false; })
     .catch(() => { btn.textContent = '🔇 הקול לא התנגן — נסו שוב'; box.innerHTML = tips; box.hidden = false; });
 };
@@ -2610,7 +2611,7 @@ function mediaGroups() {
   const poses = [...new Set([...HOST_POSES, 'thinking'])];
   return [
     ['סרטוני אלקנה', ['elkana-intro.mp4', 'elkana-stage1.mp4', 'elkana-stage2.mp4', 'elkana-stage3.mp4', 'elkana-winners.mp4'], 'video'],
-    ['הקול של אלקנה בהכרזת הפרס', ['elkana-prize.mp3'], 'audio'],
+    ['הקולות של אלקנה', ['elkana-prize.mp3', 'elkana-hello.mp3'], 'audio'],
     ['התמונות של אלקנה', [...poses.map(p => 'h-' + p + '.jpg'), 'e-welcome.jpg', 'e-instructions.jpg', 'e-trophy.jpg'], 'img'],
     ['התמונות של שלב 1', EYE_CHARS.map(c => c.src), 'img'],
     ['התמונות של שלב 2', SEE_PICS.map(p => p.src), 'img'],
@@ -2645,6 +2646,17 @@ async function mediaLoadAll(files, kind) {
 window.checkConnection = async function (out, compact) {
   const tests = [
     ['המערכת של המשחק (Firebase)', 'firestore.googleapis.com, identitytoolkit.googleapis.com, securetoken.googleapis.com', () => getDoc(doc(db, 'settings', 'payment'))],
+    /* Ayelet 19.11.26 ("שלא יהיה שום דבר חסום שיכולנו לבדוק ולא בדקנו") - everything the game does with Firebase, not only one read:
+       the anonymous sign-in every group phone does, the live updates (a filter can break the live channel while a single read works),
+       and sending (a write that reaches the server: "permission-denied" means the server answered = the way is open) */
+    ['הכניסה למשחק', 'identitytoolkit.googleapis.com, securetoken.googleapis.com, firestore.googleapis.com', async () => { if (!auth.currentUser) await signInAnonymously(auth); await auth.currentUser.getIdToken(); }],
+    ['העדכונים החיים במשחק', 'firestore.googleapis.com', () => new Promise((res, rej) => {
+      const stop = onSnapshot(doc(db, 'settings', 'payment'), { includeMetadataChanges: true }, s => { if (!s.metadata.fromCache) { stop(); res(); } }, e => { stop(); rej(e); });
+    })],
+    ['שליחת תשובות מהטלפון', 'firestore.googleapis.com', async () => {
+      try { await setDoc(doc(db, 'connCheck', (auth.currentUser && auth.currentUser.uid) || 'x'), { t: Date.now() }); }
+      catch (e) { if (e && e.code === 'permission-denied') return; throw e; }
+    }],
     ['זיהוי הפנים', 'cdn.jsdelivr.net', async () => { const r = await fetch(MP_URL + '/vision_bundle.mjs', { method: 'HEAD', cache: 'no-store' }); if (!r.ok) throw new Error(r.status); }],
     ['מודל זיהוי הפנים', 'storage.googleapis.com', async () => { const r = await fetch(MP_MODEL, { method: 'HEAD', cache: 'no-store' }); if (!r.ok) throw new Error(r.status); }],
     ['שליחת מיילים', 'api.emailjs.com', () => fetch('https://api.emailjs.com/', { mode: 'no-cors', cache: 'no-store' })]
