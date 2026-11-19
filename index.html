@@ -226,8 +226,7 @@ footer{background:#14325b;color:white;padding:24px 5%;display:flex;justify-conte
 .count-tip{background:linear-gradient(180deg,#fff8fb,#fff);border:2px solid #f0a9c4;border-radius:16px;padding:14px 16px;line-height:1.7;color:#3e4f66}.count-tip strong{color:var(--navy)}.count-tip ul{margin:8px 0;padding-inline-start:20px}.count-tip li{margin:6px 0}.count-tip p{margin:4px 0 0;font-weight:800;color:#a8346a}
 .count-confirm{display:flex;gap:10px;align-items:flex-start;background:#fff0c7;border-radius:12px;padding:12px 14px;line-height:1.6;cursor:pointer}.count-confirm input{width:22px!important;height:22px;flex:none;margin-top:2px;accent-color:#e9558c}
 input.unsaved{outline:3px solid #ff9800;background:#fff3e0}.date-words{margin:4px 0 0;font-weight:700;color:#14345d}.date-words:empty{display:none}.date-words.bad{color:#b3261e}.date-one{position:relative;display:flex;gap:6px;align-items:stretch}.date-one #gdText{flex:1;text-align:right;margin:0}.date-cal{flex:none;border:2px solid #14345d;background:#fff8e1;border-radius:12px;font-size:22px;padding:0 12px;cursor:pointer}.date-one.touch #gdText,.date-one.touch .date-cal{display:none}.date-one:not(.touch) #gdPicker{position:absolute;left:0;bottom:0;width:1px;height:1px;opacity:0;border:0;padding:0;pointer-events:none}
-.net-tip{background:linear-gradient(180deg,#f5fbff,#fff);border:2px solid #9bcdf3;border-radius:16px;padding:14px 16px;line-height:1.7;color:#3e4f66}.net-tip strong{color:var(--navy)}.net-tip p{margin:6px 0 10px}.check-share{background:#fff;border:1px dashed #9bcdf3;border-radius:12px;padding:10px 12px;margin:4px 0 8px;line-height:1.6}.check-share a[dir]{font-weight:800;color:#1f4fa8}.buy-check{background:#fff;border-radius:12px;padding:10px 12px;margin-top:6px}.buy-check p{margin:4px 0}
-/* Ayelet 16.11.26 - the admin orders report */
+.net-tip{background:linear-gradient(180deg,#f5fbff,#fff);border:2px solid #9bcdf3;border-radius:16px;padding:14px 16px;line-height:1.7;color:#3e4f66}.net-tip strong{color:var(--navy)}.net-tip p{margin:6px 0 10px}.check-share{background:#fff;border:1px dashed #9bcdf3;border-radius:12px;padding:10px 12px;margin:4px 0 8px;line-height:1.6}.check-share a[dir]{font-weight:800;color:#1f4fa8}.buy-check{background:#fff;border-radius:12px;padding:10px 12px;margin-top:6px}.buy-check p{margin:4px 0}/* Ayelet 16.11.26 - the admin orders report */
 .admin-sum{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;background:#f4f8ff;border:1px solid #d6e2f5;border-radius:12px;padding:10px 14px;margin:0 0 10px}
 .orders-wrap{overflow-x:auto}.orders-table{width:100%;border-collapse:collapse;font-size:15px;min-width:640px}
 .orders-table th{text-align:start;background:#14345d;color:#fff;padding:8px;font-weight:800;position:sticky;top:0}.orders-table td{padding:8px;border-bottom:1px solid #e8dfd2;vertical-align:top}
@@ -2593,6 +2592,56 @@ function nowBox(title, steps, current, note) {
 // ---------- בדיקה שהאינטרנט (גם מסונן) לא חוסם את המשחק ----------
 const CONN_CHECK_HTML = '<div class="info"><button class="game-btn" type="button" onclick="window.checkConnection(this.nextElementSibling)">🔌 בדיקה שהאינטרנט לא חוסם את המשחק</button><div class="smallnote" style="margin-top:8px"></div></div>';
 function withTimeout(promise, ms) { return Promise.race([promise, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]); }
+/* Ayelet 19.11.26 - the voice button on the check page: plays Elkana's real voice, and says what to do if nothing is heard */
+window.checkVoice = function (btn) {
+  const box = btn.parentElement.nextElementSibling;
+  const tips = '<p><strong>לא שומעים?</strong></p><ol style="margin:4px 0;padding-inline-start:22px;line-height:1.8">'
+    + '<li>מגבירים את הווליום (הכפתור בצד הטלפון — בזמן שהקול מתנגן).</li>'
+    + '<li>מכבים מצב שקט / רטט (באייפון — המתג הקטן בצד).</li>'
+    + '<li>בודקים שאין אוזניות או רמקול בלוטות׳ מחוברים.</li>'
+    + '<li>לוחצים שוב על הכפתור.</li></ol>'
+    + '<p class="smallnote">💡 גם בלי קול אפשר לשחק — כל מה שאלקנה אומר כתוב גם על המסך.</p>';
+  const a = new Audio('elkana-prize.mp3');
+  a.play().then(() => { btn.textContent = '🔊 אלקנה מדבר עכשיו — שומעים? אם כן, גם הקול מוכן 👍'; box.innerHTML = tips; box.hidden = false; })
+    .catch(() => { btn.textContent = '🔇 הקול לא התנגן — נסו שוב'; box.innerHTML = tips; box.hidden = false; });
+};
+/* Ayelet 19.11.26 - every media file the game uses, by group (for the full phone check) */
+function mediaGroups() {
+  const poses = [...new Set([...HOST_POSES, 'thinking'])];
+  return [
+    ['סרטוני אלקנה', ['elkana-intro.mp4', 'elkana-stage1.mp4', 'elkana-stage2.mp4', 'elkana-stage3.mp4', 'elkana-winners.mp4'], 'video'],
+    ['הקול של אלקנה בהכרזת הפרס', ['elkana-prize.mp3'], 'audio'],
+    ['התמונות של אלקנה', [...poses.map(p => 'h-' + p + '.jpg'), 'e-welcome.jpg', 'e-instructions.jpg', 'e-trophy.jpg'], 'img'],
+    ['התמונות של שלב 1', EYE_CHARS.map(c => c.src), 'img'],
+    ['התמונות של שלב 2', SEE_PICS.map(p => p.src), 'img'],
+  ];
+}
+/* loads one file the way the game does; a filter that swaps a picture for a tiny "blocked" one also counts as blocked */
+function mediaLoad(src, kind) {
+  return new Promise(resolve => {
+    let done = false;
+    const end = ok => { if (done) return; done = true; clearTimeout(t); resolve(ok); };
+    const t = setTimeout(() => end(false), 25000);
+    if (kind === 'img') {
+      const im = new Image();
+      im.onload = () => end(im.naturalWidth >= 100 && im.naturalHeight >= 100);
+      im.onerror = () => end(false);
+      im.src = src;
+    } else {
+      const m = document.createElement(kind);
+      m.preload = 'metadata'; m.muted = true;
+      if (kind === 'video') m.playsInline = true;
+      m.onloadedmetadata = () => end(m.duration > 0.5 && (kind !== 'video' || m.videoWidth > 0));
+      m.onerror = () => end(false);
+      m.src = src;
+    }
+  });
+}
+async function mediaLoadAll(files, kind) {
+  const res = [];
+  for (let i = 0; i < files.length; i += 4) res.push(...await Promise.all(files.slice(i, i + 4).map(f => mediaLoad(f, kind))));
+  return res;
+}
 window.checkConnection = async function (out, compact) {
   const tests = [
     ['המערכת של המשחק (Firebase)', 'firestore.googleapis.com, identitytoolkit.googleapis.com, securetoken.googleapis.com', () => getDoc(doc(db, 'settings', 'payment'))],
@@ -2600,23 +2649,43 @@ window.checkConnection = async function (out, compact) {
     ['מודל זיהוי הפנים', 'storage.googleapis.com', async () => { const r = await fetch(MP_MODEL, { method: 'HEAD', cache: 'no-store' }); if (!r.ok) throw new Error(r.status); }],
     ['שליחת מיילים', 'api.emailjs.com', () => fetch('https://api.emailjs.com/', { mode: 'no-cors', cache: 'no-store' })]
   ];
-  out.innerHTML = 'בודקים…';
-  const rows = [], blocked = [];
+  out.innerHTML = 'בודקים… ⏳';
+  const rows = [], blocked = [];   // rows = only what is NOT ok (Ayelet 19.11.26: all ok -> one line; not ok -> only what's wrong)
   for (const [label, hosts, test] of tests) {
-    try { await withTimeout(test(), 12000); rows.push(`✅ ${label}`); }
+    try { await withTimeout(test(), 12000); }
     catch (e) { console.warn(label, e); rows.push(`❌ ${label}`); blocked.push(hosts); }
+  }
+  /* Ayelet 19.11.26 - the full check page (#check) also loads EVERY picture, video and sound of the game:
+     a filter can block one file even when the site is open (e.g. an image filter / videos that need approval).
+     Nothing is shown (the stage-2 pictures and the characters are secret) - only what failed */
+  const badFiles = [];
+  if (!compact) {
+    out.innerHTML = 'בודקים את כל התמונות והסרטונים של המשחק… ⏳';
+    const groups = mediaGroups();
+    for (const [label, files, kind] of groups) {
+      const res = await mediaLoadAll(files, kind);
+      const bad = files.filter((f, i) => !res[i]);
+      badFiles.push(...bad);
+      if (bad.length) rows.push(`❌ ${label} — ${bad.length} מתוך ${files.length} לא נטענו`);
+    }
+    if (badFiles.length) blocked.push(badFiles.map(f => location.hostname + '/' + f.replace(/^\.\//, '').replace(/\?.*$/, '')).join(', '));
   }
   /* (16.11.26) a ready message for the filter company + copy */
   const fatal = blocked.some(h => h.includes('firestore'));
-  const ask = 'שלום, אבקש לפתוח באינטרנט המסונן שלי את האתר getfamgame.com (משחק משפחתי לחנוכה) ואת הכתובות שהוא צריך: ' + [location.hostname, ...blocked].join(', ') + '. תודה!';
+  const ask = 'שלום, אבקש לפתוח באינטרנט המסונן שלי את האתר getfamgame.com (משחק משפחתי לחנוכה) ואת הכתובות שהוא צריך'
+    + (badFiles.length ? ' — כולל כל התמונות, הסרטונים והקולות של האתר' : '') + ': ' + [location.hostname, ...blocked].join(', ') + '. תודה!';
   window.lastFilterAsk = ask;
   if (compact && !blocked.length) { out.innerHTML = '<p><strong>✅ המכשיר הזה מתאים למשחק — הכול פתוח!</strong></p>'; return { blocked, fatal }; }
   out.innerHTML = (compact ? '' : rows.join('<br>')) + (blocked.length
     ? `<p class="warn">⚠️ משהו חסום במכשיר הזה — כנראה סינון אינטרנט. <strong>שלחו לחברת הסינון בקשה לפתוח את הכתובות</strong> (אלה לא קישורים לפתוח בדפדפן — רק להעביר לחברת הסינון):<br><span dir="ltr">${esc(location.hostname)}, ${esc(blocked.join(', '))}</span></p><button class="game-btn" type="button" onclick="navigator.clipboard.writeText(window.lastFilterAsk).then(()=>{this.textContent='✓ הבקשה הועתקה — הדביקו אותה בהודעה לחברת הסינון'})">📋 העתקת בקשה מוכנה לחברת הסינון</button>`
       + (blocked.some(h => h.includes('firestore')) ? '<p class="warn">בלי זה אי־אפשר לשחק מהמכשיר הזה — נסו ממכשיר או מרשת אחרת.</p>'
+        : badFiles.length ? '<p class="warn">אפשר לשחק, אבל חלק מהתמונות / הסרטונים / הקולות לא יופיעו במכשיר הזה — כדאי לבקש מחברת הסינון לפתוח אותם, ואז לבדוק שוב.</p>'
         : blocked.some(h => h.includes('jsdelivr') || h.includes('storage.')) ? '<p>אפשר לשחק — רק את העיניים יסמנו ידנית.</p>'
         : '<p>אפשר לשחק כרגיל — רק מיילים אוטומטיים לא יישלחו מהמכשיר הזה.</p>')
-    : '<p><strong>הכול פתוח — אפשר לשחק! 🎉</strong></p>');
+    : '<p style="font-size:20px"><strong>✅ הכול תקין — הטלפון הזה מוכן למשחק!</strong></p>');
+  /* (19.11.26) Elkana's voice in the game comes inside the game data (Firebase) - covered above. This button checks that the phone
+     really plays sound (volume / silent mode), with Elkana's real voice */
+  if (!compact && !fatal) out.insertAdjacentHTML('beforeend', '<p><button class="game-btn" type="button" onclick="window.checkVoice(this)">🔊 לשמוע את אלקנה (בדיקת קול)</button></p><div class="check-voice" hidden></div>');
   return { blocked, fatal };
 };
 /* Ayelet 11.11.26 */
