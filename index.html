@@ -326,7 +326,13 @@ input.unsaved{outline:3px solid #ff9800;background:#fff3e0}.date-words{margin:4p
 .start-screen .start-option small{font-size:clamp(15px,2vh,18px);max-width:360px}
 .start-screen .start-purchase{margin-top:26px}
 .start-screen .start-purchase .buy{font-size:19px;padding:14px 28px;padding-inline-start:58px!important}
-.start-screen .start-purchase .wa-ico{width:38px;height:38px;inset-inline-start:10px}}</style></head><body>
+.start-screen .start-purchase .wa-ico{width:38px;height:38px;inset-inline-start:10px}}
+/* Ayelet 22.11.26 - start screen: the same yellow button as before, now "לרכישה לחצו כאן" (opens the purchase page);
+   the small WhatsApp icon in its corner is a link of its own that opens WhatsApp */
+.start-purchase .buy-wrap{position:relative;display:inline-block}
+.start-purchase .buy.buy-now{cursor:pointer;font-family:inherit;font-weight:800}
+.start-purchase .wa-in{position:absolute;top:0;bottom:0;inset-inline-start:0;width:52px;border-radius:999px}
+.start-purchase .wa-in:focus-visible{outline:3px solid #14345d;outline-offset:2px}</style></head><body>
 <section class="start-screen" id="startScreen">
   <div class="start-card">
     <h1>ברוכים הבאים! 👋</h1>
@@ -344,8 +350,8 @@ input.unsaved{outline:3px solid #ff9800;background:#fff3e0}.date-words{margin:4p
         <small>לאחר הרכישה — כל קבוצה נכנסת עם הקוד שלה</small>
       </button>
     </div>
-    <!-- Ayelet 13.11.26: instead of the purchase button - "for questions and details" opens Ayelet's WhatsApp (number = the contact phone in admin) -->
-    <div class="start-purchase"><a class="buy" data-wa target="_blank" rel="noopener" href="#"><svg class="wa-ico" viewBox="0 0 32 32" aria-hidden="true"><path fill="#25D366" d="M16 2.5A13.4 13.4 0 0 0 4.4 22.6L2.6 29.4l7-1.8A13.4 13.4 0 1 0 16 2.5z"/><path fill="#fff" d="M23.3 19.5c-.4-.2-2.3-1.1-2.6-1.2-.4-.1-.6-.2-.9.2l-1.2 1.5c-.2.3-.4.3-.8.1a10.6 10.6 0 0 1-5.3-4.6c-.4-.7.4-.6 1.1-2 .1-.3 0-.5 0-.6l-1.2-2.8c-.3-.7-.6-.6-.9-.6h-.7c-.3 0-.7.1-1 .5-.4.4-1.4 1.3-1.4 3.2s1.4 3.7 1.6 4c.2.3 2.7 4.2 6.6 5.8 2.5 1 3.4 1.1 4.7.9.8-.1 2.3-.9 2.6-1.9.3-.9.3-1.7.2-1.9-.1-.2-.4-.3-.8-.5z"/></svg>שאלות? לחצו כאן</a></div>
+    <!-- Ayelet 19.11.26: the purchase button is back + a WhatsApp icon next to it for questions (number = the contact phone in admin) -->
+    <div class="start-purchase"><span class="buy-wrap"><button class="buy buy-now" type="button" onclick="openBuyPage()">לרכישה לחצו כאן</button><a class="wa-in" data-wa target="_blank" rel="noopener" href="#" aria-label="שאלות? כתבו לנו בוואטסאפ" title="שאלות? כתבו לנו בוואטסאפ"><svg class="wa-ico" viewBox="0 0 32 32" aria-hidden="true"><path fill="#25D366" d="M16 2.5A13.4 13.4 0 0 0 4.4 22.6L2.6 29.4l7-1.8A13.4 13.4 0 1 0 16 2.5z"/><path fill="#fff" d="M23.3 19.5c-.4-.2-2.3-1.1-2.6-1.2-.4-.1-.6-.2-.9.2l-1.2 1.5c-.2.3-.4.3-.8.1a10.6 10.6 0 0 1-5.3-4.6c-.4-.7.4-.6 1.1-2 .1-.3 0-.5 0-.6l-1.2-2.8c-.3-.7-.6-.6-.9-.6h-.7c-.3 0-.7.1-1 .5-.4.4-1.4 1.3-1.4 3.2s1.4 3.7 1.6 4c.2.3 2.7 4.2 6.6 5.8 2.5 1 3.4 1.1 4.7.9.8-.1 2.3-.9 2.6-1.9.3-.9.3-1.7.2-1.9-.1-.2-.4-.3-.8-.5z"/></svg></a></span></div>
     <!-- Ayelet 16.11.26: no accessibility button on the start screen (only at the bottom of the game and in the site footer) -->
   </div>
   <!-- Ayelet 13.11.26: Elkana (cut out of his background) points up at "איך המשחק עובד?" -->
@@ -1096,7 +1102,9 @@ async function sendEmail(to, subject, text) {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ service_id: cfg.serviceId, template_id: cfg.templateId, user_id: cfg.publicKey, template_params: { to_email: to, subject, /* Ayelet 17.11.26 - Hebrew mail: right to left, aligned right */ message: '<div dir="rtl" lang="he" style="direction:rtl;text-align:right;unicode-bidi:embed">' + esc(text).replace(/\n/g, '<br>') + '</div>', reply_to: cfg.adminEmail || '' } })
   });
-  if (!r.ok) console.warn('email', r.status, await r.text());
+  /* Ayelet 22.11.26 - keep why it failed, so the admin sees the real reason (e.g. the Gmail link in EmailJS expired) */
+  window.lastEmailError = r.ok ? '' : r.status + ' ' + (await r.text()).slice(0, 200);
+  if (!r.ok) console.warn('email', window.lastEmailError);
   return r.ok;
 }
 
@@ -1432,6 +1440,13 @@ function couponCell(o) {
   const pct = orderPrice(o).percent;
   return pct ? `<b dir="ltr">${esc(o.coupon)}</b><br><span class="smallnote">−${pct}%</span>` : `<span dir="ltr">${esc(o.coupon)}</span><br><span class="warn" style="font-size:12px">לא תקף</span>`;
 }
+/* Ayelet 19.11.26 - when the order was made: "19.11 14:32" (Israel time) */
+const orderedMs = o => o.createdAt && o.createdAt.toMillis ? o.createdAt.toMillis() : Date.now();
+function orderedAt(o) {
+  if (!(o.createdAt && o.createdAt.toDate)) return '<span class="smallnote">עכשיו</span>';
+  const d = o.createdAt.toDate(), z = { timeZone: 'Asia/Jerusalem' };
+  return `${d.toLocaleDateString('he-IL', { ...z, day: 'numeric', month: 'numeric' })}<br><span class="smallnote" dir="ltr">${d.toLocaleTimeString('he-IL', { ...z, hour: '2-digit', minute: '2-digit' })}</span>`;
+}
 function orderAmount(o) { return o.status === 'paid' && o.amountPaid != null ? Number(o.amountPaid) || 0 : orderPrice(o).total; }
 /* how many orders used each coupon (orders that were not cancelled) */
 function couponUse(orders) {
@@ -1452,16 +1467,16 @@ function renderOrders() {
   const tabs = [['pending', `⏳ ממתינות (${counts.pending})`], ['paid', `✅ שולמו (${counts.paid})`], ['cancelled', `✖ בוטלו (${counts.cancelled})`], ['all', `הכול (${real.length})`], ['test', `🧪 משחקי בדיקה (${tests.length})`]];
   document.getElementById('adminFilter').innerHTML = tabs.map(([k, label]) => `<button type="button" class="game-btn ${adminFilter === k ? 'on' : ''}" aria-pressed="${adminFilter === k}" onclick="window.setAdminFilter('${k}')">${label}</button>`).join('');
   const list = (adminFilter === 'test' ? tests : real.filter(o => adminFilter === 'all' || o.status === adminFilter))
-    /* upcoming games first (nearest first), then past games (latest first) */
-    .sort((a, b) => { const fa = a.gameDate >= today, fb = b.gameDate >= today; return fa !== fb ? (fa ? -1 : 1) : fa ? String(a.gameDate).localeCompare(String(b.gameDate)) : String(b.gameDate).localeCompare(String(a.gameDate)); });
+    /* Ayelet 19.11.26 - newest order first (by when it was ordered); an order still being saved counts as "now" */
+    .sort((a, b) => orderedMs(b) - orderedMs(a));
   const bulk = adminFilter === 'test' && tests.length ? `<p><button class="game-btn danger" type="button" onclick="window.adminDeleteAllTests()">🗑️ מחיקת כל משחקי הבדיקה (${tests.length})</button></p>` : '';
-  document.getElementById('ordersList').innerHTML = bulk + (list.length ? `<div class="orders-wrap"><table class="orders-table"><thead><tr><th>תאריך המשחק</th><th>לקוח</th><th>טלפון</th><th>משתתפים</th><th>קופון</th><th>סכום</th><th>מצב</th><th><span class="sr-only">פרטים</span></th></tr></thead><tbody>${list.map(o => {
+  document.getElementById('ordersList').innerHTML = bulk + (list.length ? `<div class="orders-wrap"><table class="orders-table"><thead><tr><th>הוזמן</th><th>תאריך המשחק</th><th>לקוח</th><th>טלפון</th><th>משתתפים</th><th>קופון</th><th>סכום</th><th>מצב</th><th><span class="sr-only">פרטים</span></th></tr></thead><tbody>${list.map(o => {
     const past = o.gameDate < today, open = adminOpenRows.has(o.id);
-    return `<tr class="${esc(o.status)}${past ? ' past' : ''}"><td>${formatDateHe(o.gameDate)}${!past && o.status === 'paid' ? ' <span class="soon">קרוב</span>' : ''}</td><td><b>${esc(o.buyerName)}</b><br><span class="smallnote">הזמנה ${esc(o.code)}${o.dataDeletedAt ? ' · 🧹 הנתונים נמחקו' : ''}</span></td>
+    return `<tr class="${esc(o.status)}${past ? ' past' : ''}"><td class="ordered-at">${orderedAt(o)}</td><td>${formatDateHe(o.gameDate)}${!past && o.status === 'paid' ? ' <span class="soon">קרוב</span>' : ''}</td><td><b>${esc(o.buyerName)}</b><br><span class="smallnote">הזמנה ${esc(o.code)}${o.dataDeletedAt ? ' · 🧹 הנתונים נמחקו' : ''}</span></td>
       <td><a href="tel:${esc(o.phone)}" dir="ltr">${esc(formatPhone(o.phone))}</a></td><td>${esc(o.participants)}</td><td>${couponCell(o)}</td><td>${orderAmount(o).toLocaleString('he-IL')} ₪</td>
       <td><span class="badge ${esc(o.status)}">${STATUS_LABEL[o.status] || esc(o.status)}</span></td>
       <td><button class="game-btn" type="button" aria-expanded="${open}" aria-controls="od-${esc(o.id)}" onclick="window.toggleOrderRow('${esc(o.id)}', this)">${open ? 'סגירה ▴' : 'פרטים ▾'}</button></td></tr>
-      <tr class="order-detail" id="od-${esc(o.id)}" ${open ? '' : 'hidden'}><td colspan="8">${orderCard(o)}</td></tr>`;
+      <tr class="order-detail" id="od-${esc(o.id)}" ${open ? '' : 'hidden'}><td colspan="9">${orderCard(o)}</td></tr>`;
   }).join('')}</tbody></table></div>` : '<p class="smallnote">אין הזמנות ברשימה הזו.</p>');
   fillOrderCodes();
 }
@@ -1495,8 +1510,8 @@ function orderCard(o) {
   const mismatch = Number(o.total) !== total ? `<span class="warn">⚠ בטופס הוצג ללקוח ${esc(o.total)} ₪</span>` : '';
   const wiped = o.dataDeletedAt ? `<span>🧹 נתוני המשחק נמחקו (${o.dataDeletedAt.toDate().toLocaleDateString('he-IL', { timeZone: 'Asia/Jerusalem' })})</span>` : '';
   let actions = '';
-  if (o.status === 'pending') actions += `<button class="buy" type="button" onclick="window.adminApprove('${o.id}')">✅ התשלום התקבל — יצירת משתמש</button><button class="game-btn" type="button" onclick="window.adminCancel('${o.id}')">✖ ביטול הזמנה</button>`;
-  if (o.status === 'paid') actions += `<button class="game-btn" type="button" onclick="window.adminNewPassword('${o.id}')">🔑 סיסמה חדשה ללקוח</button>`;
+  if (o.status === 'pending') actions += `<button class="buy" type="button" onclick="window.adminApprove('${o.id}')">✅ התשלום התקבל — אישור ושליחת מייל ללקוח</button><button class="game-btn" type="button" onclick="window.adminCancel('${o.id}')">✖ ביטול הזמנה</button>`;
+  if (o.status === 'paid') actions += `<button class="game-btn" type="button" onclick="window.adminResendEmail('${o.id}')">📧 שליחת המייל שוב</button><button class="game-btn" type="button" onclick="window.adminNewPassword('${o.id}')">🔑 סיסמה חדשה ללקוח</button>`;
   if (o.status !== 'cancelled') actions += `<span><input type="date" id="date-${o.id}" value="${esc(o.gameDate)}"> <button class="game-btn" type="button" onclick="window.adminChangeDate('${o.id}')">שינוי תאריך</button></span>`;
   if (o.status !== 'cancelled') actions += `<span><input type="number" id="people-${o.id}" min="${MIN_PARTICIPANTS}" max="${MAX_PARTICIPANTS}" value="${esc(o.participants)}" style="width:70px" aria-label="מספר משתתפים" title="אחרי שינוי — לוחצים ”שינוי מספר משתתפים“" oninput="this.classList.toggle('unsaved',this.value!==this.defaultValue)"> <button class="game-btn" type="button" onclick="window.adminChangePeople('${o.id}')">שינוי מספר משתתפים</button></span>`;
   /* Ayelet 16.11.26 - "one button that deletes the game's data" (window.adminDeleteGame decides what to delete) */
@@ -1669,8 +1684,30 @@ window.removeCoupon = async function (i) {
 window.autoSendCred = async function (btn) {
   const c = window.lastCred; if (!c) return;
   btn.disabled = true; btn.textContent = 'שולחים…';
-  try { btn.textContent = await sendEmail(c.to, c.subject, c.text) ? '✓ נשלח ללקוח במייל' : 'השליחה נכשלה — השתמשי בכפתור Gmail'; }
-  catch (e) { console.warn(e); btn.textContent = 'השליחה נכשלה — השתמשי בכפתור Gmail'; }
+  let ok = false; window.lastEmailError = '';
+  try { ok = await sendEmail(c.to, c.subject, c.text); } catch (e) { console.warn(e); window.lastEmailError = String(e.message || e); }
+  btn.textContent = ok ? '✓ נשלח ללקוח במייל' : '❌ המייל לא נשלח';
+  if (!ok) btn.insertAdjacentHTML('afterend', emailFailHtml());
+  return ok;
+};
+/* Ayelet 22.11.26 - why the email failed, in plain words */
+function emailFailHtml() {
+  const why = window.lastEmailError || '';
+  const tip = /Gmail_API|grant|reconnect/i.test(why)
+    ? '<strong>החיבור של Gmail ב־EmailJS פג.</strong> נכנסים ל־emailjs.com ← Email Services ← שירות ה־Gmail ← Reconnect ← בוחרים את חשבון ה־Gmail של העסק ומאשרים. אחר כך לוחצים בהזמנה ”📧 שליחת המייל שוב”.'
+    : /limit|quota|426|429/i.test(why) ? '<strong>נגמרה מכסת המיילים החודשית ב־EmailJS.</strong> אפשר לשלוח בינתיים בכפתור Gmail.'
+    : 'אפשר לשלוח בינתיים בכפתור Gmail או בהעתקה.';
+  return `<p class="warn" style="flex-basis:100%">${tip}${why ? ` <span class="smallnote" dir="ltr">(${esc(why)})</span>` : ''}</p>`;
+}
+/* Ayelet 22.11.26 - send the customer's email again (the join link + code), e.g. after the email account was reconnected */
+window.adminResendEmail = async function (id) {
+  const o = adminOrders.find(x => x.id === id); if (!o) return;
+  let jc = '';
+  try { const g = await getDoc(doc(db, 'familyGames', o.gameId || id)); jc = (g.exists() && g.data().joinCode) || ''; } catch (e) { console.warn(e); }
+  if (!confirm(`לשלוח שוב ל־${o.email} את המייל עם הקישור למשחק${jc ? ` וקוד ההצטרפות ${jc}` : ''}?`)) return;
+  await showCred(o, '', `📧 המייל של ${esc(o.buyerName)}`, 'התשלום התקבל — תודה! המשחק שלכם הוקם ✅', jc);
+  const b = document.getElementById('credBox').querySelector('button[onclick^="window.autoSendCred"]');
+  if (b) await window.autoSendCred(b);
 };
 window.saveEmailCfg = async function () {
   const msg = document.getElementById('emMsg'), v = id => document.getElementById(id).value.trim();
@@ -1705,7 +1742,7 @@ window.adminApprove = async function (id) {
     }
   }
   const { total } = orderPrice(o);
-  if (!confirm(`לאשר שהתקבל בביט תשלום של ${total} ₪ מ־${o.buyerName} (הזמנה ${o.code})?\nאחרי האישור ייווצר משתמש ללקוח.`)) return;
+  if (!confirm(`לאשר שהתקבל בביט תשלום של ${total} ₪ מ־${o.buyerName} (הזמנה ${o.code})?\nאחרי האישור המשחק יוקם, ומייל עם הקישור, קוד ההצטרפות והפרטים יישלח ל־${o.email} מיד.`)) return;
   credBox.innerHTML = '<div class="cred">יוצרים משתמש…</div>';
   let ownerUid, password;
   try { ({ uid: ownerUid, password } = await createOrderLogin(o.email)); }
@@ -1729,6 +1766,9 @@ window.adminApprove = async function (id) {
     return;
   }
   await showCred(o, password, `✅ התשלום אושר ונוצרה סיסמה עבור ${esc(o.buyerName)}`, 'התשלום התקבל — תודה! המשחק שלכם הוקם ✅', joinCode);
+  /* Ayelet 19.11.26 - one press: approving the payment also sends the customer the email at once (if it fails - the Gmail / copy buttons stay) */
+  const sendBtn = credBox.querySelector('button[onclick^="window.autoSendCred"]');
+  if (sendBtn) await window.autoSendCred(sendBtn);
 };
 /* Ayelet 11.11.26 */
 /* Elkana's AI money: the server adds the cost of every AI call to settings/aiUsage. Here: how much of the credit was used,
