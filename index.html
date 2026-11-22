@@ -329,9 +329,11 @@ input.unsaved{outline:3px solid #ff9800;background:#fff3e0}.date-words{margin:4p
 .start-screen .start-purchase .wa-ico{width:38px;height:38px;inset-inline-start:10px}}
 /* Ayelet 22.11.26 - start screen: the same yellow button as before, now "לרכישה לחצו כאן" (opens the purchase page);
    the small WhatsApp icon in its corner is a link of its own that opens WhatsApp */
-.start-purchase .buy-wrap{position:relative;display:inline-block}
-.start-purchase .buy.buy-now{cursor:pointer;font-family:inherit;font-weight:800}
-.start-purchase .wa-in{position:absolute;top:0;bottom:0;inset-inline-start:0;width:52px;border-radius:999px}
+/* (22.11.26, Ayelet: people pressed "רכישה" and got WhatsApp) - two separate buttons side by side: the round WhatsApp icon on the right, a small gap, the yellow purchase button */
+.start-purchase .buy-wrap{display:inline-flex;align-items:center;gap:10px;vertical-align:middle}
+.start-purchase .buy.buy-now{cursor:pointer;font-family:inherit;font-weight:800;padding-inline:26px!important}
+.start-purchase .wa-in{order:-1;flex:none;display:inline-flex;align-items:center;justify-content:center;width:50px;height:50px;border-radius:50%;background:#fff;border:2px solid #fff;box-shadow:0 4px 14px #0005;text-decoration:none}
+.start-screen .start-purchase .wa-in .wa-ico,.start-purchase .wa-in .wa-ico{position:static;transform:none;width:36px;height:36px;filter:none}
 .start-purchase .wa-in:focus-visible{outline:3px solid #14345d;outline-offset:2px}</style></head><body>
 <section class="start-screen" id="startScreen">
   <div class="start-card">
@@ -1043,19 +1045,9 @@ window.firebaseSubmitOrder = async function (order, pending, onceHash) {
   let bitPhone = '', bitLink = '';
   try { const s = await getDoc(doc(db, 'settings', 'payment')); if (s.exists()) { bitPhone = s.data().bitPhone || ''; bitLink = s.data().bitLink || ''; } } catch (e) { console.warn(e); }
   if (!/^https:\/\//.test(bitLink)) bitLink = '';
-  // מייל ”ההזמנה נקלטה” ללקוח, ומייל ”הזמנה חדשה” למנהלת האתר
-  const date = formatDateHe(order.gameDate), total = order.total.toLocaleString('he-IL');
-  const payLine = [bitLink ? `בקישור (פייבוקס): ${bitLink}` : '', bitPhone ? `${bitLink ? 'או ' : ''}בביט — מעבירים ${total} ₪ למספר ${formatPhone(bitPhone)}` : ''].filter(Boolean).join('\n') || 'פרטי התשלום יישלחו אליכם בהקדם.';
-  let emailed = false;
-  try {
-    await loadContact();
-    emailed = await sendEmail(order.email, `ההזמנה שלך למשחק המשפחה נקלטה (הזמנה ${code})`,
-      `שלום ${order.buyerName},\n\nההזמנה שלך נקלטה — תודה! 🎉\n\nמספר הזמנה: ${code}\nמספר משתתפים: ${order.participants}\nתאריך המשחק: ${date}\nלתשלום: ${total} ₪\n\nאיך משלמים:\n${payLine}\nבהערה לתשלום כותבים: הזמנה ${code}\n\nאחרי שנקבל את התשלום, נשלח לך למייל הזה שם משתמש וסיסמה — עד 24 שעות מהתשלום (בדרך כלל הרבה יותר מהר).\nיש שאלה? אני כאן בשבילכם 😊${contactText()}\nהמשחק יהיה פתוח ביום ${date} בלבד, מ־6:00 בבוקר עד 1:00 בלילה.\n\n📶 בדיקת טלפונים: המשחק עובד דרך האינטרנט ונבדק גם במכשירים מסוננים, אבל כדאי לבדוק מראש כל טלפון שישמש קבוצה. שלחו לכל המשפחה את הקישור הזה — כל אחד פותח אותו בטלפון שלו, ותוך כמה שניות רואים אם הכול תקין:\n${SITE_URL}?check\n\nמשחק המשפחה`);
-    const cfg = await getEmailCfg();
-    if (cfg.adminEmail) await sendEmail(cfg.adminEmail, `הזמנה חדשה ${code} — ${order.buyerName}`,
-      `התקבלה הזמנה חדשה באתר:\n\nמספר הזמנה: ${code}\nשם: ${order.buyerName}\nטלפון: ${formatPhone(order.phone)}\nאימייל: ${order.email}\nמשתתפים: ${order.participants}\nתאריך המשחק: ${date}\nלתשלום: ${total} ₪\n${order.coupon ? `קופון: ${order.coupon}\n` : 'קופון: בלי\n'}\nכשהתשלום מגיע לביט — נכנסים לאזור הניהול ולוחצים ”התשלום התקבל”:\n${SITE_URL}#admin`);
-  } catch (e) { console.warn(e); }
-  return { code, bitPhone, bitLink, emailed };
+  /* Ayelet 22.11.26 - the "ההזמנה נקלטה" email to the customer and the "הזמנה חדשה" email to the business are sent by the SERVER
+     (server/functions/orderEmail.js, wakes on the new order) - a filtered phone can no longer block them */
+  return { code, bitPhone, bitLink, emailed: true };
 };
 // ---------- פרטי קשר גלויים (טלפון ואימייל מההגדרות באזור הניהול — לא כתובים בקוד) ----------
 let contactCache = null;
