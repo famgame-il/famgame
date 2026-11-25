@@ -123,7 +123,17 @@ footer .nagish-bottom{margin:6px 0 0;display:block}
 /* Ayelet 16.11.26 - stage 2 "מה ראיתם?" */
 .see-pic{display:block;width:100%;max-width:720px;margin:0 auto;padding:0;border:0;background:none;cursor:zoom-in;border-radius:14px;overflow:hidden;box-shadow:0 3px 12px #0002}.see-pic img{display:block;width:100%;height:auto}
 .see-pic-title{text-align:center;margin:6px 0}.see-zoom-hint{text-align:center;margin:4px 0 8px}
-.see-q{max-width:560px;margin:0 auto;text-align:center}.see-q h3{margin:4px 0 10px;font-size:20px;color:var(--navy)}.see-num{margin:6px 0 0;font-weight:bold;color:#2e7d32}
+.see-q{max-width:560px;margin:0 auto;text-align:center}
+/* Ayelet 25.11.26 ("after the photo it is not clear you must press save") - the save button glows and pulses */
+.buy.save-pulse{animation:savePulse 1.2s ease-in-out infinite;font-size:20px}
+@keyframes savePulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,193,7,.9)}50%{transform:scale(1.08);box-shadow:0 0 0 12px rgba(255,193,7,0),0 0 22px 6px rgba(255,213,79,.9)}}
+@media (prefers-reduced-motion:reduce){.buy.save-pulse{animation:none;outline:4px solid #ffc107}}
+/* Ayelet 25.11.26 - a new question slides in from the side, and "שאלה X מתוך Y" flashes yellow */
+.see-q.see-new{animation:seeSlide .45s cubic-bezier(.2,.9,.3,1.2)}.see-q.see-new .see-num{animation:seeNum 1.1s ease-out}
+@keyframes seeSlide{from{transform:translateX(-110%);opacity:0}to{transform:none;opacity:1}}
+@keyframes seeNum{0%,35%{background:#ffd54f;box-shadow:0 0 0 6px #ffd54f;transform:scale(1.25)}100%{background:transparent;box-shadow:0 0 0 0 transparent;transform:none}}
+.see-num{display:inline-block;border-radius:12px;padding:2px 10px}
+@media (prefers-reduced-motion:reduce){.see-q.see-new,.see-q.see-new .see-num{animation:none}}.see-q h3{margin:4px 0 10px;font-size:20px;color:var(--navy)}.see-num{margin:6px 0 0;font-weight:bold;color:#2e7d32}
 .see-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}.see-opts.one{grid-template-columns:1fr}
 .see-opt{font:inherit;font-size:16px;font-weight:bold;padding:12px 8px;border-radius:14px;border:2px solid #c9d6e6;background:#fff;color:var(--navy);cursor:pointer;min-height:52px}.see-opt.on{background:#ffe0ef;border-color:#d81b72;box-shadow:0 0 0 3px #d81b7233}
 .see-worth{margin:10px 0 6px;font-weight:bold;color:#a8400a}.see-next{margin:4px auto 0;display:block}.see-next:disabled{opacity:.5;cursor:not-allowed}
@@ -790,7 +800,7 @@ const EYE_CHARS=[
 function eyeCharFor(uid,i){let h=0;for(const ch of String(uid))h=(h*31+ch.charCodeAt(0))>>>0;return EYE_CHARS[(h+i)%EYE_CHARS.length]}
 /* Ayelet 16.11.26 - black glasses on about a third of the characters (the same ones on the guessing and the results screens),
    so real glasses do not give anyone away. GLASSES_EVERY = 3 -> one in three; 1 -> everyone */
-const GLASSES_EVERY=1; /* Ayelet 16.11.26: "על כולם" - glasses on every character */
+const GLASSES_EVERY=2; /* Ayelet 25.11.26 ("too hard because of the glasses - glasses on half of the characters only"; was 1 = everyone) */
 function glassesFor(uid,i){let h=0;for(const ch of String(uid))h=(h*31+ch.charCodeAt(0))>>>0;return ((h>>>3)+i*5)%GLASSES_EVERY===0}
 const GLASSES_SVG='<svg class="glasses" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><rect x="8" y="14" width="33" height="74" rx="14" fill="#9fd3ff1c" stroke="#111" stroke-width="5"/><rect x="59" y="14" width="33" height="74" rx="14" fill="#9fd3ff1c" stroke="#111" stroke-width="5"/><path d="M41 42 Q50 30 59 42" fill="none" stroke="#111" stroke-width="5"/><line x1="8" y1="36" x2="-6" y2="30" stroke="#111" stroke-width="5"/><line x1="92" y1="36" x2="106" y2="30" stroke="#111" stroke-width="5"/></svg>';
 function charCard(ch,eyesSrc,eyesId,glasses){
@@ -2556,7 +2566,7 @@ window.managerRevealResults = async function () {
 // --- טלפון של קבוצה ---
 window.openJoin = function (code) {
   const c = /^\d{6}$/.test(code || '') ? code : '';
-  showPlay(`<div class="play-wrap"><h2>הצטרפות למשחק</h2>${nowBox('מה עושים עכשיו?', [c ? 'הקוד כבר ממולא (הגעתם מהקישור).' : 'מקלידים את הקוד בן 6 הספרות שמנהל המשחק נתן.', 'כותבים שם לקבוצה (למשל: הנמרים).', 'כותבים כמה משתתפים יש בקבוצה — עד 5. אתם יותר? מתחלקים לשתי קבוצות.', 'לוחצים ”הצטרפות”.'], c ? 1 : 0, 'טלפון אחד לכל קבוצה — כל הקבוצה משחקת ממנו. את הקוד מקבלים ממנהל המשחק.')}<form class="game-form" onsubmit="event.preventDefault();window.joinGame()"><label>קוד משחק<input id="joinCode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="קוד בן 6 ספרות" value="${c}"></label><label>שם הקבוצה<input id="joinGroupName" maxlength="30" required placeholder="למשל: הנמרים"></label><label>כמה משתתפים בקבוצה?<input id="joinGroupSize" type="number" inputmode="numeric" min="${MIN_GROUP_SIZE}" max="${MAX_GROUP_SIZE}" required placeholder="למשל: 4"></label><p class="smallnote" style="margin:-4px 0 0">כל משתתף בקבוצה יצטלם — המשחק ימשיך רק אחרי שכולם הצטלמו.</p><button class="buy" type="submit" id="joinBtn">הצטרפות</button><p id="joinMsg" class="smallnote" role="status"></p><button class="game-btn" type="button" onclick="leavePlay()">← חזרה</button></form>${CONN_CHECK_HTML}</div>`);
+  showPlay(`<div class="play-wrap"><h2>הצטרפות למשחק</h2>${nowBox('מה עושים עכשיו?', [c ? 'הקוד כבר ממולא (הגעתם מהקישור).' : 'מקלידים את הקוד בן 6 הספרות שמנהל המשחק נתן.', 'כותבים שם לקבוצה (למשל: הנמרים).', 'כותבים כמה משתתפים יש בקבוצה — עד 5. אתם יותר? מתחלקים לשתי קבוצות.', 'לוחצים ”הצטרפות”.'], c ? 1 : 0, 'טלפון אחד לכל קבוצה — כל הקבוצה משחקת ממנו. את הקוד מקבלים ממנהל המשחק.')}<form class="game-form" onsubmit="event.preventDefault();window.joinGame()"><label>קוד משחק<input id="joinCode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="קוד בן 6 ספרות" value="${c}"></label><label>שם הקבוצה<input id="joinGroupName" maxlength="30" required placeholder="למשל: הנמרים"></label><label>כמה משתתפים בקבוצה?<input id="joinGroupSize" type="number" inputmode="numeric" min="1" max="${MAX_GROUP_SIZE}" required placeholder="למשל: 4"></label><p class="smallnote" style="margin:-4px 0 0">כל משתתף בקבוצה יצטלם — המשחק ימשיך רק אחרי שכולם הצטלמו.</p><button class="buy" type="submit" id="joinBtn">הצטרפות</button><p id="joinMsg" class="smallnote" role="status"></p><button class="game-btn" type="button" onclick="leavePlay()">← חזרה</button></form>${CONN_CHECK_HTML}</div>`);
 };
 // תיבת ”מה עושים עכשיו?” — צעדים ממוספרים: מה שבוצע מסומן ✓, והצעד הנוכחי מודגש
 // כותרת חגיגית לפני כל שלב: ”בואו נראה כמה אתם מכירים... בעיניים / בידע / בשמיעה”
@@ -2693,11 +2703,22 @@ window.checkConnection = async function (out, compact) {
     ['מודל זיהוי הפנים', 'storage.googleapis.com', async () => { const r = await fetch(MP_MODEL, { method: 'HEAD', cache: 'no-store' }); if (!r.ok) throw new Error(r.status); }],
     ['שליחת מיילים', 'api.emailjs.com', () => fetch('https://api.emailjs.com/', { mode: 'no-cors', cache: 'no-store' })]
   ];
+  /* Ayelet 24.11.26 ("הראה לי בעיה ואחרי רענון הכול תקין") - one check at a time: the page starts it by itself,
+     and pressing the button meanwhile ran two checks together, slowing each other into false errors */
+  if (window.__checkBusy) return window.__checkBusy;
+  const btn = document.getElementById('checkBtn');
+  if (btn && !compact) btn.disabled = true;
+  window.__checkBusy = (async () => {
   out.innerHTML = 'בודקים… ⏳';
   const rows = [], blocked = [];   // rows = only what is NOT ok (Ayelet 19.11.26: all ok -> one line; not ok -> only what's wrong)
   for (const [label, hosts, test] of tests) {
+    /* Ayelet 24.11.26 - a moment of weak network is not a block: a failed test gets a second try before it is shown */
     try { await withTimeout(test(), 12000); }
-    catch (e) { console.warn(label, e); rows.push(`❌ ${label}`); blocked.push(hosts); }
+    catch (e1) {
+      await new Promise(r => setTimeout(r, 1500));
+      try { await withTimeout(test(), 15000); }
+      catch (e) { console.warn(label, e); rows.push(`❌ ${label}`); blocked.push(hosts); }
+    }
   }
   /* Ayelet 19.11.26 - the full check page (#check) also loads EVERY picture, video and sound of the game:
      a filter can block one file even when the site is open (e.g. an image filter / videos that need approval).
@@ -2708,7 +2729,9 @@ window.checkConnection = async function (out, compact) {
     const groups = mediaGroups();
     for (const [label, files, kind] of groups) {
       const res = await mediaLoadAll(files, kind);
-      const bad = files.filter((f, i) => !res[i]);
+      /* Ayelet 24.11.26 - files that did not load get one more try, one by one (no crowding), before they count as blocked */
+      const bad = [];
+      for (const f of files.filter((f, i) => !res[i])) if (!(await mediaLoad(f + (f.includes('?') ? '&' : '?') + 'r=' + Date.now(), kind))) bad.push(f);
       badFiles.push(...bad);
       if (bad.length) rows.push(`❌ ${label} — ${bad.length} מתוך ${files.length} לא נטענו`);
     }
@@ -2731,6 +2754,9 @@ window.checkConnection = async function (out, compact) {
      really plays sound (volume / silent mode), with Elkana's real voice */
   if (!compact && !fatal) out.insertAdjacentHTML('beforeend', '<p><button class="game-btn" type="button" onclick="window.checkVoice(this)">🔊 לשמוע את אלקנה (בדיקת קול)</button></p><div class="check-voice" hidden></div>');
   return { blocked, fatal };
+  })();
+  try { return await window.__checkBusy; }
+  finally { window.__checkBusy = null; if (btn) btn.disabled = false; }
 };
 /* Ayelet 11.11.26 */
 /* AI host proof (#ai-test): write aiTest/{uid}, the server (Cloud Function aiProof) writes {answer, audio} back.
@@ -2803,7 +2829,9 @@ window.joinGame = async function () {
   const code = document.getElementById('joinCode').value.trim(), name = document.getElementById('joinGroupName').value.trim();
   const size = parseInt(document.getElementById('joinGroupSize').value, 10);
   const msg = document.getElementById('joinMsg'), btn = document.getElementById('joinBtn');
-  if (!(size >= MIN_GROUP_SIZE && size <= MAX_GROUP_SIZE)) { msg.textContent = size > MAX_GROUP_SIZE ? `בכל קבוצה עד ${MAX_GROUP_SIZE} משתתפים. אתם יותר? התחלקו לשתי קבוצות — לכל קבוצה טלפון משלה.` : `בכל קבוצה צריכים להיות ${MIN_GROUP_SIZE} עד ${MAX_GROUP_SIZE} משתתפים (אפשר לצרף גם ילדים מגיל 3). אתם פחות? הצטרפו לקבוצה אחרת.`; return; }
+  /* Ayelet 25.11.26 - a test game (id "test…") may have groups of 1 participant, so she can check the game alone; checked below */
+  const sizeBad = () => { msg.textContent = `בכל קבוצה צריכים להיות ${MIN_GROUP_SIZE} עד ${MAX_GROUP_SIZE} משתתפים (אפשר לצרף גם ילדים מגיל 3). אתם פחות? הצטרפו לקבוצה אחרת.`; btn.disabled = false; };
+  if (!(size >= 1 && size <= MAX_GROUP_SIZE)) { msg.textContent = size > MAX_GROUP_SIZE ? `בכל קבוצה עד ${MAX_GROUP_SIZE} משתתפים. אתם יותר? התחלקו לשתי קבוצות — לכל קבוצה טלפון משלה.` : `בכל קבוצה צריכים להיות ${MIN_GROUP_SIZE} עד ${MAX_GROUP_SIZE} משתתפים (אפשר לצרף גם ילדים מגיל 3). אתם פחות? הצטרפו לקבוצה אחרת.`; return; }
   if (auth.currentUser && !auth.currentUser.isAnonymous) {
     if (!confirm('המכשיר הזה מחובר כמנהל המשחק. כדי להצטרף כקבוצה צריך לצאת מחשבון המנהל. להמשיך?')) return;
     await signOut(auth);
@@ -2815,6 +2843,7 @@ window.joinGame = async function () {
     const codeDoc = await getDoc(doc(db, 'gameCodes', code));
     if (!codeDoc.exists()) { msg.textContent = 'לא נמצא משחק עם הקוד הזה. בדקו שהקלדתם 6 ספרות נכון, או בקשו את הקישור שוב ממי שרכש את המשחק.'; btn.disabled = false; return; }
     const gameId = codeDoc.data().gameId, gameDate = codeDoc.data().gameDate;
+    if (size < MIN_GROUP_SIZE && !String(gameId).startsWith('test')) return sizeBad();
     // הקוד נכון, אבל המשחק פתוח רק ביום המשחק
     if (gameDate && gameDate !== israelGameDay()) {
       msg.textContent = gameDate > israelGameDay()
@@ -2870,9 +2899,14 @@ function startGroup(gameId) {
   playUnsubs.push(onSnapshot(liveDoc(gameId, 'state'), s => {
     // המשחק נמחק (יום אחרי המשחק) — מודיעים במקום להיתקע
     if (!s.exists()) { stopPlay(); const el = document.getElementById('grpMain'); if (el) el.innerHTML = '<div class="now-box"><strong>המשחק הסתיים 👋</strong><p>תודה ששיחקתם!</p></div>'; return; }
-    const prev = c.state && c.state.stage, prevStep = c.state && (c.state.assocRound + ':' + c.state.whoRound + ':' + !!c.state.photosOpen); c.state = s.data({ serverTimestamps: 'estimate' }); if (prev !== c.state.stage) c.eyesBuilt = false;
+    const prev = c.state && c.state.stage, prevStep = c.state && (c.state.assocRound + ':' + c.state.whoRound + ':' + !!c.state.photosOpen);
+    /* Ayelet 25.11.26 ("most important: never back - in stage 3 never return to stage 2") - a second guard on the phone (the server fix is in
+       engine.js): a state with an EARLIER stage than the one on the screen is ignored */
+    const nd = s.data({ serverTimestamps: 'estimate' });
+    if (prev && STAGE_ORDER.indexOf(nd.stage) >= 0 && STAGE_ORDER.indexOf(nd.stage) < STAGE_ORDER.indexOf(prev)) { console.warn('stage went back - ignored', prev, nd.stage); return; }
+    c.state = nd; if (prev !== c.state.stage) c.eyesBuilt = false;
     /* every move forward (a stage, a picture, a question) starts at the top of the page (11.11.26, Ayelet) */
-    if (prev && (prev !== c.state.stage || prevStep !== (c.state.assocRound + ':' + c.state.whoRound + ':' + !!c.state.photosOpen))) { setTimeout(scrollTop, 50); showTransition(c); }
+    if (prev && (prev !== c.state.stage || prevStep !== (c.state.assocRound + ':' + c.state.whoRound + ':' + !!c.state.photosOpen))) { setTimeout(scrollTop, 50); setTimeout(scrollTop, 1000); showTransition(c); } /* (25.11.26, Ayelet: "after הבנתי the next stage opened in the middle") once more after pictures loaded */
     stageSound(prev, c.state.stage); r();
   }, playError));
   playUnsubs.push(onSnapshot(doc(db, 'familyGames', gameId, 'answers', uid), s => { const was = c.submitted; c.submitted = s.exists(); c.savedGuesses = s.exists() ? s.data().guesses : null; if (was !== c.submitted) c.eyesBuilt = false; r(); }, playError));
@@ -2983,6 +3017,7 @@ function videoGate(main, c, key, srcs, poster, label, inner, gateHtml, done) {
 }
 /* (11.11.26, Ayelet: "it must be clear that we move on - maybe a page that changes with an effect")
    every move forward shows a big card for a moment (not on screens that open with one of Elkana's videos) */
+const STAGE_ORDER = ['photos', 'eyes', 'eyesDone', 'assocIntro', 'assoc', 'assocCheck', 'assocDone', 'whoIntro', 'whoRecord', 'whoGuess', 'whoDone', 'final'];
 function transitionText(st) {
   const s = st.stage;
   if (s === 'photos' && st.photosOpen) return ['📸', 'מצטלמים!', 'כל משתתף בתורו'];
@@ -3467,7 +3502,7 @@ function showCropPreview(canvas) {
   // כל תמונת עיניים עד EYE_MAX_CHARS — כך 15 תמונות תמיד נכנסות ברשומה אחת, וכל הקבוצות מקבלות אותו מספר
   let q = 0.82; pendingFace.dataUrl = canvas.toDataURL('image/jpeg', q);
   while (pendingFace.dataUrl.length > EYE_MAX_CHARS && q > 0.3) { q -= 0.08; pendingFace.dataUrl = canvas.toDataURL('image/jpeg', q); }
-  document.getElementById('cropBox').innerHTML = `<div class="info"><p><strong>ככה ייראו העיניים של ${esc(pendingFace.name)} — ברור?</strong></p><img class="eyes-preview" src="${pendingFace.dataUrl}" alt="העיניים שנחתכו"><div class="order-actions"><button class="buy" type="button" id="saveMemberBtn" onclick="window.saveMember()">✓ שמירה</button><button class="game-btn" type="button" onclick="document.getElementById('faceInput').click()">📸 צילום מחדש</button><button class="game-btn" type="button" onclick="window.manualCrop()">✋ כוונון ידני</button></div></div>`;
+  document.getElementById('cropBox').innerHTML = `<div class="info"><p><strong>ככה ייראו העיניים של ${esc(pendingFace.name)} — ברור?</strong></p><img class="eyes-preview" src="${pendingFace.dataUrl}" alt="העיניים שנחתכו"><div class="order-actions"><button class="buy save-pulse" type="button" id="saveMemberBtn" onclick="window.saveMember()">✓ שמירה</button><button class="game-btn" type="button" onclick="document.getElementById('faceInput').click()">📸 צילום מחדש</button><button class="game-btn" type="button" onclick="window.manualCrop()">✋ כוונון ידני</button></div></div>`;
 }
 window.manualCrop = function () {
   if (!pendingFace) return;
@@ -3800,7 +3835,11 @@ window.assocRemove = function (i) {
    Answers: assoc/{uid}_{picture}_{question} = { a } (the server counts the time of the last pick). The correct answers are only on the server
    (engine-core SEE_KEY - the same order as here!). After the last "הבא": groups/{uid}.seeDone - when all groups did, the stage ends.
    Where the group is (question number + picks) is kept on the phone (localStorage), so a refresh continues from the same place */
-const SEE_SECS = 360;
+/* Ayelet 25.11.26 ("2 minutes a picture is very little - 3.5 minutes a picture at most, and whoever finishes earlier moves on"):
+   every picture has its own clock of SEE_PIC_SECS (from when the group reached it, kept on the phone); when it ends the group moves to the
+   next picture. The stage clock (server) = 3 pictures + 30 s for the dreidel, and still ends early when all groups pressed "סיימנו" */
+const SEE_PIC_SECS = 210;
+const SEE_SECS = 660;
 const SEE_PICS = [
   /* Ayelet 19.11.26 - picture made with promo\entrance_clues.py med18,poster4: the party poster says "נר רביעי, 17:00";
      the medicine label says "תרופה / מגיל 18+" -> Abba is the sick one
@@ -3820,24 +3859,31 @@ const SEE_PICS = [
     ['באיזו עיר האירוע?', ['ירושלים', 'צפת', 'חברון', 'בני ברק']],
     ['מי הבן של דניאל?', ['אהרן', 'רפאל', 'משה', 'אורי']],
     ['מי היה באירוע וכבר הלך?', ['דוד', 'אורי', 'יונתן', 'אליהו']],
-    ['מתי יצא העיתון שסבא קורא?', ['היום', 'אתמול', 'לפני חודש', 'לפני שבוע']],
+    ['מתי יצא העיתון שסבא קורא?', ['היום', 'אתמול', 'לפני חודש', 'לפני 8 ימים']],
     ['למי יש פריט חדש?', ['דניאל', 'סבא', 'אהרן', 'רפאל']],
     ['מה התאריך והשעה של האירוע?', ['ב׳ בטבת תשפ״ה, 4:10', 'כ״ה בכסלו תשפ״ה, 10:00 בלילה', 'ב׳ בטבת תשפ״ה, 10:00 בלילה', 'ט״ז בכסלו תשפ״ה, 4:10']],
     ['מי כבר אכל סופגנייה?', ['משה ואהרן', 'אורי ורפאל', 'משה, אהרן, רפאל ואורי', 'רק רפאל']],
   ] },
   { src: 's2-salon.jpg', alt: 'שני אבות וילדים בסלון מצטלמים עם הטלפונים', qs: [
-    ['לכמה מהמשתתפים יש משקפיים?', ['1', '2', '3', '4']],
+    ['של מי המשקפיים שעל המדף?', ['יהודה', 'חיים', 'הילד עם המשקפיים', 'הילד עם הטלפון הכחול']],
     ['במה עוסקים יהודה וחיים?', ['יהודה רופא, חיים צייר', 'יהודה צלם, חיים רופא', 'יהודה רופא, חיים צלם', 'שניהם רופאים']],
     ['מה הייתה הפעילות שעסקו בה קודם?', ['נגינה', 'כדורגל', 'אפיית עוגיות', 'ציור']],
     ['מי קיבל את התה שלו ראשון?', ['חיים', 'יהודה', 'הילד עם הטלפון הכחול', 'הילד עם המשקפיים']],
     ['מה הקשר בין יהודה לחיים?', ['אחים', 'גיסים', 'בני דודים', 'שכנים']],
-    ['איזו ארוחה הם אכלו לפני כן?', ['חלבית', 'פרווה', 'בשרית', 'לא אכלו']],
+    ['איזו ארוחה הם אכלו לפני כן?', ['חלבית', 'פרווה', 'בשרית']],
     ['מי כבר אכל סופגנייה?', ['הילד עם הטלפון הכחול', 'הילד שבקצה השמאלי', 'הילד עם המשקפיים', 'הילד שבקצה הימני']],
     ['מי היה לאחרונה אצל רופא?', ['חיים', 'יהודה', 'הילד עם הטלפון הכחול', 'הילד עם המשקפיים']],
   ] },
 ];
 const SEE_LIST = SEE_PICS.flatMap((p, pi) => p.qs.map(([q, a], qi) => ({ pi, qi, q, a })));
 function seeEndMs(st) { return st && st.assocStartedAt ? st.assocStartedAt.toMillis() + (st.assocSeconds || SEE_SECS) * 1000 : 0; }
+/* (25.11.26) the clock of the picture the group is on: from when it reached it (c.see.picAt[pi]), never after the stage clock */
+function seePicEndMs(c) {
+  const s = c && c.see, st = c && c.state; if (!s || s.pos >= SEE_LIST.length) return seeEndMs(st);
+  const pi = SEE_LIST[s.pos].pi; s.picAt = s.picAt || {};
+  if (!s.picAt[pi]) { s.picAt[pi] = Date.now(); seeSaveLocal(c); }
+  return Math.min(seeEndMs(st), s.picAt[pi] + SEE_PIC_SECS * 1000);
+}
 // כמה שווה עכשיו תשובה נכונה: 100 בהתחלה ← 50 בסוף השעון (כמו בשרת)
 function seeWorth(st) {
   const start = st && st.assocStartedAt ? st.assocStartedAt.toMillis() : Date.now();
@@ -3992,7 +4038,7 @@ function renderGroupSee(main) {
       '3 תמונות מלאות בפרטים — כל הקבוצות מקבלות את אותן תמונות.',
       'התמונה נשארת למעלה. 👆 לחיצה עליה מגדילה אותה — ככה רואים כל פרט קטן.',
       'מתחת לתמונה: שאלה אחת עם 4 תשובות. בוחרים תשובה ולוחצים ”הבא” — ומגיעה השאלה הבאה.',
-      `⏱️ ${secsText(SEE_SECS)} לכל השלב. ⚡ המהירות קובעת: תשובה נכונה שווה 100 נקודות בהתחלה, ופחות ופחות ככל שהזמן עובר (עד 50). תשובה לא נכונה = 0.`,
+      `⏱️ עד ${secsText(SEE_PIC_SECS)} לכל תמונה. סיימתם קודם? עוברים מיד לתמונה הבאה. ⚡ המהירות קובעת: תשובה נכונה שווה 100 נקודות בהתחלה, ופחות ופחות ככל שהזמן עובר (עד 50). תשובה לא נכונה = 0.`,
       '🎁 לפני התמונה האחרונה — בונוס חנוכה: מסובבים סביבון, ומה שיוצא מוסיף נקודות!',
       'כל קבוצה מתקדמת בקצב שלה. כשכולן סיימו (או כשהשעון נגמר) — רואים מי ראה הכי טוב 🏆'], 0)
       , gotItHtml(c, 's2'), !!(c.group.gotIt && c.group.gotIt.s2));
@@ -4006,9 +4052,9 @@ function renderGroupSee(main) {
   if (c.seeBuilt === key && document.getElementById('seeQ')) return;
   c.seeBuilt = key; c.seeOver = false;
   /* no "מה עושים?" box here (explained before the stage) - so the picture, the question and "הבא" fit on one phone screen */
-  main.innerHTML = `${timerBar(fmtClock(seeEndMs(st) - Date.now()), `עד ${secsText(SEE_SECS)} לכל השלב`)}
+  main.innerHTML = `${timerBar(fmtClock(seePicEndMs(c) - Date.now()), `עד ${secsText(SEE_PIC_SECS)} לכל תמונה`)}
     <div id="seePic"></div><div id="seeQ"></div>`;
-  renderSeeStep();
+  renderSeeStep(); scrollTop();
 }
 function renderSeeStep(scroll) {
   const c = groupCtx, st = c && c.state, s = c && c.see, box = document.getElementById('seeQ'), picBox = document.getElementById('seePic');
@@ -4033,7 +4079,9 @@ function renderSeeStep(scroll) {
     if (scroll !== false && s.pos) scrollTop();
   }
   const long = it.a.some(t => t.length > 16);
-  box.innerHTML = `<div class="see-q"><p class="see-num">שאלה ${it.qi + 1} מתוך ${pic.qs.length}</p><h3>${esc(it.q)}</h3>
+  /* Ayelet 25.11.26 ("after 'הבא' it was not clear there is a new question") - a new question slides in, its number lights up */
+  const fresh = box.dataset.pos !== String(s.pos); box.dataset.pos = String(s.pos);
+  box.innerHTML = `<div class="see-q${fresh && s.pos ? ' see-new' : ''}"><p class="see-num">שאלה ${it.qi + 1} מתוך ${pic.qs.length}</p><h3>${esc(it.q)}</h3>
     <div class="see-opts${long ? ' one' : ''}">${it.a.map((t, i) => `<button type="button" class="see-opt${pick === i ? ' on' : ''}" aria-pressed="${pick === i}" onclick="window.seePick(${i})">${esc(t)}</button>`).join('')}</div>
     <p class="see-worth">${isBonusQ(it) ? '🎁 עם הבונוס: ' : '⚡ '}תשובה נכונה שווה עכשיו <strong data-worth${isBonusQ(it) ? ` data-dreidel="${dr}"` : ''}>${isBonusQ(it) ? dreidelPoints(seeWorth(st), dr) : seeWorth(st)}</strong> נקודות</p>
     <button class="buy see-next" type="button" id="seeNextBtn" onclick="window.seeNext()" ${pick == null ? 'disabled' : ''}>${last ? 'סיימנו ✓' : lastOfPic ? 'לתמונה הבאה ◀' : 'הבא ◀'}</button>
@@ -4060,11 +4108,20 @@ window.seeNext = async function () {
   renderSeeStep();
 };
 function seeTick(st) {
-  const left = seeEndMs(st) - Date.now();
+  const c = groupCtx, stageLeft = seeEndMs(st) - Date.now();
+  /* (25.11.26) the group's clock = the clock of its picture */
+  const left = c && c.see && document.getElementById('seeQ') ? seePicEndMs(c) - Date.now() : stageLeft;
   document.querySelectorAll('[data-countdown]').forEach(el => { el.textContent = fmtClock(left); el.closest('.timer-bar')?.classList.toggle('urgent', left < 30000); });
   const w = seeWorth(st); document.querySelectorAll('[data-worth]').forEach(el => { const v = String(el.dataset.dreidel ? dreidelPoints(w, Number(el.dataset.dreidel)) : w); if (el.textContent !== v) el.textContent = v; });
-  const c = groupCtx;
-  if (c && left <= 0 && !c.seeOver && document.getElementById('seeQ')) { c.seeOver = true; seeZoomClose(); closeDreidel(c); renderSeeStep(); }
+  if (c && stageLeft <= 0 && !c.seeOver && document.getElementById('seeQ')) { c.seeOver = true; seeZoomClose(); closeDreidel(c); renderSeeStep(); return; }
+  /* the picture's time ended (the stage goes on): to the first question of the next picture; after the last picture = finished */
+  const s = c && c.see;
+  if (c && s && !c.seeOver && left <= 0 && s.pos < SEE_LIST.length && document.getElementById('seeQ') && !document.getElementById('dreidelOv')) {
+    const pi = SEE_LIST[s.pos].pi; let n = s.pos; while (n < SEE_LIST.length && SEE_LIST[n].pi === pi) n++;
+    s.pos = n; c.seeSave = null; seeSaveLocal(c); seeZoomClose();
+    if (n < SEE_LIST.length) flashCard(['⏰', 'הזמן לתמונה נגמר!', `ממשיכים לתמונה ${SEE_LIST[n].pi + 1} מתוך ${SEE_PICS.length}`], 'pink');
+    renderSeeStep();
+  }
 }
 // התמונה בגדול: על כל המסך, עם הגדלה (כפתורים, או לחיצה כפולה) וגלילה בתוך התמונה
 window.seeZoom = function () {
