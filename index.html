@@ -125,9 +125,23 @@ footer .nagish-bottom{margin:6px 0 0;display:block}
 .see-pic-title{text-align:center;margin:6px 0}.see-zoom-hint{text-align:center;margin:4px 0 8px}
 .see-q{max-width:560px;margin:0 auto;text-align:center}
 /* Ayelet 25.11.26 ("after the photo it is not clear you must press save") - the save button glows and pulses */
-.buy.save-pulse{animation:savePulse 1.2s ease-in-out infinite;font-size:20px}
-@keyframes savePulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,193,7,.9)}50%{transform:scale(1.08);box-shadow:0 0 0 12px rgba(255,193,7,0),0 0 22px 6px rgba(255,213,79,.9)}}
-@media (prefers-reduced-motion:reduce){.buy.save-pulse{animation:none;outline:4px solid #ffc107}}
+.buy.save-pulse{font-size:20px}
+/* (25.11.26, Ayelet: "when it blinks the whole page dances - instead a gold frame that looks like it is flowing"): the buttons do not
+   grow or move; a gold border runs around them (a moving gradient ring) with a soft glow */
+@keyframes goldFlow{to{background-position:300% 0}}
+@keyframes goldGlow{0%,100%{box-shadow:0 0 10px 2px rgba(255,190,20,.6)}50%{box-shadow:0 0 20px 6px rgba(255,190,20,.95)}}
+.save-pulse,.go-pulse:not(:disabled),.gotit-btn,#vidNext,.lobby-box .buy,.see-next:not(:disabled){position:relative;isolation:isolate;animation:goldGlow 3s ease-in-out infinite}
+.save-pulse::before,.go-pulse:not(:disabled)::before,.gotit-btn::before,#vidNext::before,.lobby-box .buy::before,.see-next:not(:disabled)::before{content:'';position:absolute;inset:-5px;border-radius:inherit;padding:5px;pointer-events:none;
+  background:linear-gradient(90deg,#b07800 0%,#e0a800 38%,#ffffff 50%,#e0a800 62%,#b07800 100%);background-size:300% 100%;animation:goldFlow 5s linear infinite; /* one bright shine that travels around: noticeable but calm (3s too fast, 10s not noticed) */ /* (25.11.26, Ayelet: "too fast - slower" (was 3s), "gentle but still clear you must press") */
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+@media (prefers-reduced-motion:reduce){.save-pulse,.go-pulse,.gotit-btn,#vidNext,.lobby-box .buy,.see-next{animation:none!important}.save-pulse::before,.go-pulse::before,.gotit-btn::before,#vidNext::before,.lobby-box .buy::before,.see-next::before{animation:none!important}}
+/* Ayelet 25.11.26 - "מה באמת היה?" opens as a page of its own over the announcement, with "חזרה" */
+.truth-ov{position:fixed;inset:0;z-index:9000;overflow-y:auto;background:var(--bg,#fff8ec);-webkit-overflow-scrolling:touch}.truth-in{max-width:640px;margin:0 auto;padding:14px 12px}
+/* Ayelet 25.11.26 - the names list: always open, scrolls inside a frame, the chosen name green */
+.name-chips.all{max-height:240px;overflow-y:auto;padding:8px;border:2px solid #d6e6fb;border-radius:14px;background:#fafcff}
+.name-chip.on{background:#2e7d32;border-color:#2e7d32;color:#fff}
+/* Ayelet 25.11.26 ("every button that moves on must pulse and blink, so it is clear") - הבנתי, העלינו ואנחנו מוכנים, כולנו כאן, המשך, הבא, סיימנו */
+/* (the gold flowing frame - defined above, with .save-pulse) */
 /* Ayelet 25.11.26 - a new question slides in from the side, and "שאלה X מתוך Y" flashes yellow */
 .see-q.see-new{animation:seeSlide .45s cubic-bezier(.2,.9,.3,1.2)}.see-q.see-new .see-num{animation:seeNum 1.1s ease-out}
 @keyframes seeSlide{from{transform:translateX(-110%);opacity:0}to{transform:none;opacity:1}}
@@ -2232,6 +2246,9 @@ document.addEventListener('animationstart', e => {
   const el = e.target, cue = el && el.dataset && el.dataset.cue; if (!cue || e.animationName !== 'finIn') return;
   const k = cue + '|' + el.dataset.k; if (fxPlayed.has(k)) return; fxPlayed.add(k);
   if (cue === 'prize') return window.prizePlay();
+  /* Ayelet 25.11.26 ("Elkana's roast started while the prize recording played - wait until it ends"): from the winners on, little
+     Elkana is quiet on EVERY phone (same room) for the prize recording: 3 s + 23.4 s + a breath. Meanwhile he prepares his words */
+  if (cue === 'win') window.__finHoldUntil = Date.now() + (3 + 23.4 + 1.5) * 1000;
   try { playNotes(cue === 'drum' ? SOUND_DRUM : SOUND_FINALE); } catch (er) { }
 });
 /* Race board after stages 1 and 2: total points so far, bars that grow, arrows for who went up, and a headline from Elkana.
@@ -2265,7 +2282,7 @@ function raceHtml(results, myId, key) {
 }
 // ההכרזה החגיגית בסוף המשחק — לכולם באותו רגע
 /* (18.11.26) the announcement with suspense: 3rd place, then 2nd, then a drumroll "...and in first place" - and only then the winners */
-function finaleHtml(results, myId, key) {
+function finaleHtml(results, myId, key, extra /* (25.11.26) "what really was" - after the table, appears with it */) {
   const rows = totalRows(results); if (!rows.length) return '<p>מחשבים את הניקוד…</p>';
   const tops = [...new Set(rows.map(r => r.total))], winners = rows.filter(r => r.total === tops[0]);
   const conf = Array.from({ length: 28 }, (_, i) => `<span class="confetti" style="left:${(i * 37) % 100}%;animation-duration:${2.6 + (i % 5) * 0.5}s;animation-delay:${-(i % 7) * 0.45}s">${['🎉', '✨', '🎊', '⭐', '💛', '🎈'][i % 6]}</span>`).join('');
@@ -2280,11 +2297,11 @@ function finaleHtml(results, myId, key) {
   const drumAt = t, winAt = t + 2.6;
   return `<div class="finale">${places}<p class="fin-drum" style="animation-delay:${fxD(key, drumAt)}"${fxCue(key, drumAt, 'drum')}>🥁 ובמקום הראשון…</p>`
     + `<div class="fin-win" style="animation-delay:${fxD(key, winAt)}"${fxCue(key, winAt, 'win')}>${conf}<div class="trophy">🏆</div><h3>${winners.length > 1 ? 'תיקו! המנצחות' : 'המנצחים'}: ${winners.map(w => 'קבוצת ' + esc(w.name)).join(' ו')}!</h3><p>עם ${tops[0]} נקודות</p>${mine}</div></div>`
-    + `<div class="fin-after" style="animation-delay:${fxD(key, winAt + 1.2)}">${certBtnHtml(rows, tops, myId, winAt)}${totalsTable(results, myId, '📊 טבלת הניקוד הסופית')}<p style="text-align:center;font-size:18px"><strong>תודה ששיחקתם! 💛</strong></p></div>`;
+    + `<div class="fin-after" style="animation-delay:${fxD(key, winAt + 1.2)}">${certBtnHtml(rows, tops, myId, winAt, extra)}${totalsTable(results, myId, '📊 טבלת הניקוד הסופית')}<p style="text-align:center;font-size:18px"><strong>תודה ששיחקתם! 💛</strong></p></div>`;
 }
 /* Certificate to share: a picture with Elkana, the group name, the place and the points - made in the phone itself (nothing is uploaded) */
 let certData = null;
-function certBtnHtml(rows, tops, myId, winAt) {
+function certBtnHtml(rows, tops, myId, winAt, after /* (25.11.26) the "מה באמת היה?" button - right under the selfie box */) {
   const r = myId ? rows.find(x => x.id === myId) : rows[0]; if (!r) return '';
   const place = tops.indexOf(r.total); certData = { name: String(r.name || ''), total: r.total, place };
   /* Ayelet 18.11.26 - "at the end Elkana says: friends, want a picture? - and the picture goes in together with Elkana", with the group's place on top */
@@ -2295,7 +2312,7 @@ function certBtnHtml(rows, tops, myId, winAt) {
   const talk = myId && place === 0 ? `<div class="prize-talk" id="prizeTalk" style="animation-delay:${(winAt || 0) + 3}s" data-cue="prize" data-k="g"><img src="./how-elkana-cheer.webp" class="prize-elk" alt="" width="96" height="94"><div class="prize-bubble" id="prizeCap">🎁 רגע… אלקנה רוצה להגיד לכם משהו!</div><button class="game-btn" id="prizePlay" type="button" onclick="window.prizePlay()" hidden>▶ לשמוע את אלקנה</button></div>` : '';
   const prize = myId && place === 0 ? talk + `<div class="prize-box" id="prizeBox"${window.__prizeDone ? '' : ' hidden'}><p class="prize-h">🎁 הפרס שלכם!</p><p>🏖️ <strong>זכיתם בחופשה משפחתית!</strong> עכשיו רק תגידו לאבא שייקח אתכם, בארץ או בחו״ל 😄</p><p>🎟️ <strong>ושובר 50% הנחה למשחק הבא — בחנוכה או בכל משחק אחר, עלינו!</strong></p><div id="prizeCodeBox">${prizeCodeHtml(r.name)}</div></div>` : '';
   if (myId && place === 0) setTimeout(() => window.loadPrizeCode(r.name), 0);
-  return `${prize}${selfie}<div class="cert-box"><button class="${myId ? 'game-btn' : 'buy'}" type="button" onclick="window.shareCert(this)">🏅 ${place === 0 ? 'תעודת ניצחון' : 'תעודה'} לשיתוף בוואטסאפ</button>${myId ? '' : `<p class="smallnote">התעודה של הקבוצה המנצחת — אפשר לשלוח לה.</p>`}<div id="certOut"></div></div>`;
+  return `${prize}${selfie}${after || ''}<div class="cert-box"><button class="${myId ? 'game-btn' : 'buy'}" type="button" onclick="window.shareCert(this)">🏅 ${place === 0 ? 'תעודת ניצחון' : 'תעודה'} לשיתוף בוואטסאפ</button>${myId ? '' : `<p class="smallnote">התעודה של הקבוצה המנצחת — אפשר לשלוח לה.</p>`}<div id="certOut"></div></div>`;
 }
 /* Ayelet 18.11.26 - the winners' code is made by the server by itself (prize.js): familyGames/{gid}/prize/{uid} = { code }.
    Only this group can read it. Until it arrives - "מכינים לכם קוד"; if it never comes (a test game / no connection) - WhatsApp to us. */
@@ -2319,7 +2336,7 @@ window.loadPrizeCode = async function (name) {
 };
 /* the words Elkana says, by the second in elkana-prize.mp3 (17.75 s since 18.11.26) - shown only when he gets to them */
 /* (18.11.26, Ayelet: "the text comes a little before he says it") - each line starts exactly when he starts saying it (measured from the pauses in the file) */
-const PRIZE_CAPS = [[0.4, 'וואו! זכיתם!!! 🎉'], [2.4, 'והפרס הגדול הוא…'], [4.1, '🏖️ חופשה משפחתית!'], [6.5, 'אה…'], [7.3, 'רגע. עכשיו רק צריך לשכנע את אבא לשלם 😅'], [9.6, 'בארץ או בחוץ לארץ — אני לא מתערב.'], [12.7, 'אני חשמונאי, לא סוכן נסיעות! 😄'], [14.95, 'אבל שובר של 50% למשחק הבא? זה כבר עלינו! 🎟️']];
+const PRIZE_CAPS = [[0.4, 'וואו! זכיתם!!! 🎉'], [2.4, 'והפרס הגדול הוא…'], [4.1, '🏖️ חופשה משפחתית!'], [6.5, 'אה…'], [7.3, 'רגע. עכשיו רק צריך לשכנע את אבא לשלם 😅'], [9.6, 'בארץ או בחוץ לארץ — אני לא מתערב.'], [12.7, 'אני חשמונאי, לא סוכן נסיעות! 😄'], [14.95, 'אבל שובר של 50% למשחק הבא? 🎟️' /* 25.11.26 Ayelet: he does not say "זה כבר עלינו" */]];
 /* (18.11.26, Ayelet) the end "send the photo on WhatsApp and get a code" was cut from the file (17.75 s) - the code now shows on the screen by itself */
 /* phones (mainly iPhone) block sound that was not started by a touch: the first touch in the game "opens" the sound for the drums,
    the fanfare and Elkana's prize voice, so they can play later by themselves */
@@ -2571,10 +2588,12 @@ window.openJoin = function (code) {
 // תיבת ”מה עושים עכשיו?” — צעדים ממוספרים: מה שבוצע מסומן ✓, והצעד הנוכחי מודגש
 // כותרת חגיגית לפני כל שלב: ”בואו נראה כמה אתם מכירים... בעיניים / בידע / בשמיעה”
 /* Ayelet 13.11.26 - stage 1 without "בעיניים": the eyes come as a surprise with the character */
-const STAGE_HEADLINES = { 1: ['', '', 'c1'], 2: ['בעין חדה!', '🔍', 'c2'], 3: ['בשמיעה!', '🎙️', 'c3'] };
+const STAGE_HEADLINES = { 1: ['', '', 'c1'], 2: ['בתמונות!', '🔍', 'c2'], 3: ['בשמיעה!', '🎙️', 'c3'] };
 function stageHeadline(n) {
   const [word, icon, cls] = STAGE_HEADLINES[n];
-  return `<div class="stage-headline ${cls}"><span class="sh-num">שלב ${n}</span><span class="sh-top">בואו נראה כמה אתם מכירים…</span>${word ? `<span class="sh-word">${word} ${icon}</span>` : ''}</div>`;
+  /* Ayelet 25.11.26 - stage 2 is about pictures, not about knowing each other: "בואו נראה כמה אתם חדים… בעין חדה!" */
+  const top = n === 2 ? 'בואו נראה כמה אתם חדים…' : 'בואו נראה כמה אתם מכירים…';
+  return `<div class="stage-headline ${cls}"><span class="sh-num">שלב ${n}</span><span class="sh-top">${top}</span>${word ? `<span class="sh-word">${word} ${icon}</span>` : ''}</div>`;
 }
 // ---------- בחירת שם מרשימה (שלב 1 ושלב 3): בזמן ההקלדה מופיעים כפתורים עם השמות שמתאימים, ואפשר לפתוח את כל הרשימה ----------
 // הרשימה = כל המשתתפים של הקבוצות האחרות (c.nameList, מגיע ממנהל המשחק). אפשר תמיד גם להקליד חופשי.
@@ -2587,16 +2606,16 @@ function nameChipsBox(input) {
 function showNameChips(input) {
   const names = (groupCtx && groupCtx.nameList) || [];
   if (!names.length || input.disabled) { const b = input.nextElementSibling; if (b && b.classList.contains('name-chips')) b.innerHTML = ''; return; }
-  const q = assocNorm(input.value), all = input.dataset.all === '1', box = nameChipsBox(input);
-  // מתאים לפי תחילת מילה: ”י” ← יוסף, יצחק; ”מ כ” ← משה כהן (לא שמות שיש בהם י באמצע)
-  let list = q ? names.filter(n => { const t = assocNorm(n).split(' '); return q.split(' ').every(w => t.some(x => x.startsWith(w))); }) : (all ? names : []);
+  /* Ayelet 25.11.26 ("the list of names is not nice, it does not open well"): the whole list is always open under the box, as big
+     buttons - tap a name and it is chosen (it stays marked). Typing only narrows the list */
+  const q = assocNorm(input.value), box = nameChipsBox(input);
   const exact = q && names.some(n => assocNorm(n) === q);
-  if (exact && list.length === 1) list = [];
-  if (!all) list = list.slice(0, 6);
+  // מתאים לפי תחילת מילה: ”י” ← יוסף, יצחק; ”מ כ” ← משה כהן (לא שמות שיש בהם י באמצע)
+  const list = q && !exact ? names.filter(n => { const t = assocNorm(n).split(' '); return q.split(' ').every(w => t.some(x => x.startsWith(w))); }) : names;
   input.classList.toggle('bad', !!q && !exact);
-  box.innerHTML = list.map(n => `<button type="button" class="name-chip" data-name="${esc(n)}">${esc(n)}</button>`).join('')
-    + (q && !exact ? `<span class="name-warn">${list.length ? '👆 בחרו שם מהרשימה' : '⚠️ אין שם כזה ברשימה — מחקו ונסו תחילת שם אחרת'}</span>` : '')
-    + (q ? '' : `<button type="button" class="name-chip more" data-more="1">${all ? '▲ סגירת הרשימה' : `📋 בחירה מרשימת השמות (${names.length})`}</button>`);
+  box.classList.add('all');
+  box.innerHTML = (q && !exact ? `<span class="name-warn">${list.length ? '👆 בחרו שם מהרשימה' : '⚠️ אין שם כזה ברשימה — מחקו ונסו תחילת שם אחרת'}</span>` : '')
+    + list.map(n => `<button type="button" class="name-chip${exact && assocNorm(n) === q ? ' on' : ''}" data-name="${esc(n)}">${exact && assocNorm(n) === q ? '✓ ' : ''}${esc(n)}</button>`).join('');
 }
 // אפשר לבחור רק שם מהרשימה: מחזיר את השם כפי שהוא ברשימה, '' לתיבה ריקה, או null כשהשם לא ברשימה (בלי רשימה — כל טקסט תקין)
 function nameFromList(v) {
@@ -2618,8 +2637,7 @@ document.addEventListener('click', e => {
   const box = b.parentElement, input = box && box.previousElementSibling; if (!input || input.disabled) return;
   if (b.dataset.more) { input.dataset.all = input.dataset.all === '1' ? '0' : '1'; showNameChips(input); return; }
   input.value = b.dataset.name; input.dataset.all = '0';
-  input.dispatchEvent(new Event('input', { bubbles: true }));
-  box.innerHTML = '';
+  input.dispatchEvent(new Event('input', { bubbles: true }));   /* (25.11.26) the list stays open, the chosen name marked */
 });
 function nowBox(title, steps, current, note) {
   // תיבות ”מה עושים?” בזמן המשחק — תמיד למעלה, ובקצרה (כבר הסבירו באריכות ב”בואו נבין”).
@@ -3207,7 +3225,15 @@ function hostPlayNext(c) {
   if (c.hostPlaying || !c.hostQueue.length) return;
   /* never talk over one of Elkana's videos - wait until it is closed */
   const openingDue = c.state && c.state.stage === 'photos' && !c.state.photosOpen && !(c.group && c.group.gotIt && c.group.gotIt.s1) && !((c.vidDone || {}).s1 || hostVideoSeen(c, 's1'));
-  if (document.getElementById('vidOverlay') || c.vidPending || openingDue || document.querySelector('#grpMain .vg-body[hidden]')) { clearTimeout(c.hostWait); c.hostWait = setTimeout(() => hostPlayNext(c), 1000); return; }
+  /* (25.11.26) the finale: quiet until the winners appeared + the prize recording ended (window.__finHoldUntil, set by the 'win' cue).
+     Never stuck: at most 70 s after the finale screen opened */
+  const videoUp = document.getElementById('vidOverlay') || c.vidPending || openingDue || document.querySelector('#grpMain .vg-body[hidden]');
+  let finHold = false;
+  if (!videoUp && c.state && c.state.stage === 'final') {
+    if (!c.finalSeenAt) { c.finalSeenAt = Date.now(); setTimeout(() => revealTruth(c), 150000); } /* counted from when the announcement itself is on the screen (after the video); the results button at the latest 2.5 min later */
+    finHold = Date.now() - c.finalSeenAt < 70000 && (!window.__finHoldUntil || Date.now() < window.__finHoldUntil);
+  }
+  if (finHold || videoUp) { clearTimeout(c.hostWait); c.hostWait = setTimeout(() => hostPlayNext(c), 1000); return; }
   /* (11.11.26, Ayelet: "after the stage-3 video Elkana says 'time is up, I am checking the answers' - what does it have to do with it?")
      a line written for a moment that is already over is skipped (the AI + voice can take a few seconds, the game does not wait) */
   while (c.hostQueue.length && hostStale(c, c.hostQueue[0])) { const old = c.hostQueue.shift(); hostMark(c, old.seq); }
@@ -3221,7 +3247,7 @@ function hostPlayNext(c) {
     const el = document.querySelector('#hostBox .host-text'); if (el) el.textContent = full.slice(0, c.hostTyped);
     if (c.hostTyped >= full.length) clearInterval(c.hostTypeTimer);
   }, 45);
-  const done = () => { c.hostPlaying = false; hostRender(c); setTimeout(() => hostPlayNext(c), 600); };
+  const done = () => { c.hostPlaying = false; hostRender(c); if (m.moment === 'thanks') revealTruth(c); /* (25.11.26) after his last word - "מה באמת היה?" */ setTimeout(() => hostPlayNext(c), 600); };
   if (!m.audio) { c.hostDoneTimer = setTimeout(done, Math.min(9000, 2500 + String(m.text || '').length * 60)); return; }
   const a = hostAudio(); a.onended = done; a.onerror = done; a.src = m.audio;
   /* (11.11.26, Ayelet: "he talks a bit slowly") - 12% faster, same pitch */
@@ -3290,15 +3316,16 @@ function renderGroup() {
       add.hidden = true; return;
     }
     if (c.group.ready) {
-      main.innerHTML = lobbyHtml(c) + nowBox('מה עושים עכשיו?', ['כל המשתתפים הצטלמו.', 'לחצתם ”העלינו ואנחנו מוכנים”.', 'מחכים לשאר הקבוצות. כשכולן מוכנות — אלקנה מתחיל את המשחק לבד, עם שעון עצר.'], 2, `⏱️ כשיתחיל: יהיו לכם כ־${secsText(c.state.eyesPerPair || 15)} לכל תמונה, והשעון רץ למעלה במסך. לא צריך לרענן ולא לסגור את המסך.`) + `<p><strong>✅ העליתם ${c.players.length === 1 ? 'משתתף אחד' : c.players.length + ' משתתפים'}:</strong></p>${members}<button class="game-btn" type="button" onclick="window.setGroupReady(false)">רגע, עוד לא — חזרה לצילום (או לתיקון שם)</button>`;
+      main.innerHTML = lobbyHtml(c) + nowBox('מה עושים עכשיו?', ['כל המשתתפים הצטלמו.', 'לחצתם ”העלינו ואנחנו מוכנים”.', 'מחכים לשאר הקבוצות. כשכולן מוכנות — אלקנה מתחיל את המשחק לבד, עם שעון עצר.'], 2, `⏱️ כשיתחיל: יהיו לכם כ־${secsText(c.state.eyesPerPair || 15)} לכל תמונה, והשעון רץ למעלה במסך.<br><strong>⚡ מי שעונה מהר — מקבל יותר נקודות!</strong> (תשובה נכונה מיד = 100, בסוף הזמן = 50)`) + `<p><strong>✅ העליתם ${c.players.length === 1 ? 'משתתף אחד' : c.players.length + ' משתתפים'}:</strong></p>${members}<button class="game-btn" type="button" onclick="window.setGroupReady(false)">רגע, עוד לא — חזרה לצילום (או לתיקון שם)</button>`;
       add.hidden = true; crop.innerHTML = ''; pendingFace = null;
     } else {
       // ”העלינו ואנחנו מוכנים” נפתח רק כשהקבוצה העלתה בדיוק את מספר המשתתפים שלה
       const readyBtn = missing <= 0
-        ? '<button class="buy" type="button" onclick="window.setGroupReady(true)">העלינו ואנחנו מוכנים ✓</button>'
+        ? '<button class="buy go-pulse" type="button" onclick="window.setGroupReady(true)">העלינו ואנחנו מוכנים ✓</button>'
         : `<button class="buy" type="button" disabled>העלינו ואנחנו מוכנים ✓</button><p class="warn" style="margin:4px 0">צריך עוד ${missing === 1 ? 'משתתף אחד' : missing + ' משתתפים'} כדי להמשיך — הקבוצה שלכם צריכה ${need}.</p>`
           /* without a manager: a group whose member did not come may continue with fewer */
-          + (c.players.length ? `<button class="game-btn" type="button" onclick="window.groupShort(${c.players.length})">מישהו לא הגיע? אנחנו רק ${c.players.length} — ממשיכים</button>` : '');
+          /* (25.11.26, Ayelet: "we wrote 4 and only 3 came - something must be done with it") - a big clear button, not a small grey one */
+          + (c.players.length ? `<div class="now-box" style="text-align:center;margin-top:10px"><p style="margin:0 0 6px"><strong>🙋 מישהו מהקבוצה לא הגיע?</strong> אין בעיה — ממשיכים בלעדיו:</p><button class="buy" type="button" onclick="window.groupShort(${c.players.length})">אנחנו רק ${c.players.length === 1 ? 'משתתף אחד' : c.players.length} — ממשיכים ✓</button></div>` : '');
       main.innerHTML = nowBox('מה עושים?', ['כל אחד בתורו כותב שם מלא', 'מצטלם מקרוב ולוחץ ”שמירה”', `כשכל ה־${need} הצטלמו — ”העלינו ואנחנו מוכנים”`], missing <= 0 ? 2 : 0)
         + `<p><strong>משתתפים בקבוצה: ${c.players.length} מתוך ${need}</strong></p>${members || '<p class="smallnote">עדיין לא הצטלם אף אחד.</p>'}${readyBtn}`;
       add.hidden = false;
@@ -3312,10 +3339,10 @@ function renderGroup() {
     add.hidden = true; add.innerHTML = ''; crop.innerHTML = '';
     const mine = c.results && c.results.stage1 && c.results.stage1[c.uid];
     if (!mine) { main.innerHTML = '<p>מחשבים את התוצאות…</p>'; return; }
-    const eyesOf = Object.fromEntries(((c.assignment && c.assignment.items) || []).map((it, i) => [it.pid, charCard(eyeCharFor(c.uid, i), it.eyes, null, glassesFor(c.uid, i))]));
+    /* (25.11.26) whose eyes - after the finale (no time here before the stage-2 video) */
     main.innerHTML = `<div class="now-box" style="text-align:center"><p style="font-size:24px;margin:0"><strong>🎉 ${mine.points != null ? `קיבלתם ${mine.points} נקודות — ${mine.score} זיהויים נכונים מתוך ${mine.total}!` : `קיבלתם ${mine.score} ${mine.score === 1 ? 'נקודה' : 'נקודות'} מתוך ${mine.total}!`}</strong></p></div>`
       + raceHtml(c.results, c.uid, 'race1' + c.gameId)
-      + mine.details.map((d, i) => `<div class="member eyes-card"><strong>${d.ok ? '✅ נכון!' : '❌ לא נכון'} — תמונה ${i + 1}</strong>${eyesOf[d.pid] || ''}<p style="margin:4px 0">כתבתם: ”${esc(d.guess || '—')}”<br>אלה העיניים של: <strong>${esc(d.real)}</strong></p></div>`).join('')
+      + LATER_NOTE('של מי היו העיניים')
       + scoreboard(c.results.stage1, '🏆 טבלת הניקוד — שלב 1') + nextStepHtml(c);
   } else if (['assocIntro', 'assoc', 'assocCheck', 'assocDone'].includes(c.state.stage)) {
     add.hidden = true; add.innerHTML = ''; crop.innerHTML = '';
@@ -3327,7 +3354,7 @@ function renderGroup() {
     add.hidden = true; add.innerHTML = ''; crop.innerHTML = '';
     whoStopAll(); c.whoBuilt = null;
     /* first Elkana's winners video (by itself), then the festive announcement and the table */
-    videoGate(main, c, 'final', ['elkana-winners.mp4'], 'e-trophy.jpg', '🏆 ההכרזה הגדולה!', '', finaleHtml(c.results, c.uid)
+    videoGate(main, c, 'final', ['elkana-winners.mp4'], 'e-trophy.jpg', '🏆 ההכרזה הגדולה!', '', finaleHtml(c.results, c.uid, undefined, truthBtnHtml(c) /* (25.11.26, Ayelet: "all the answers of all the stages after the announcement" - a button, after Elkana) */)
       + '<div class="order-actions" style="justify-content:center;margin-top:14px"><button class="buy" type="button" onclick="window.exitGroupGame(false)">🏠 סיום — חזרה לאתר</button><button class="game-btn" type="button" onclick="window.exitGroupGame(true)">👥 הצטרפות למשחק אחר (קוד חדש)</button></div>'
       + '<p class="smallnote" style="text-align:center">אחרי היציאה, הטלפון הזה כבר לא יחזור לבד למשחק הזה.</p>');
   }
@@ -3349,7 +3376,7 @@ function renderGroupEyes(main) {
   if (!c.guesses || c.guesses.length !== n) { c.guesses = items.map(it => ({ pid: it.pid, guess: '' })); c.cur = 0; c.review = false; }
   /* the clock right above the eyes (11.11.26, Ayelet) */
   /* (11.11.26, Ayelet: "after the photos there was no explanation what to do with the characters, the time ran out") */
-  main.innerHTML = nowBox('👀 מה עושים עכשיו?', ['בכל תמונה יש <strong>דמות מצחיקה</strong> — היא רק תחפושת! בתוכה יש <strong>עיניים אמיתיות</strong> של מישהו מהקבוצות האחרות.', 'מחליטים יחד: <strong>של מי העיניים?</strong>', 'מקלידים בתיבה את תחילת השם, בוחרים מהרשימה שנפתחת, ולוחצים ”הבא ▶”.', 'בסוף — ”בדיקה ואישור”.'], 0, '⏱️ השעון כבר רץ — לא לחשוב יותר מדי! כל תשובה נכונה = עד 100 נקודות — ⚡ מהר = יותר.')
+  main.innerHTML = nowBox('👀 מה עושים עכשיו?', ['בכל תמונה יש <strong>דמות מצחיקה</strong> — היא רק תחפושת! בתוכה יש <strong>עיניים אמיתיות</strong> של מישהו מהקבוצות האחרות.', 'מחליטים יחד: <strong>של מי העיניים?</strong>', 'מקלידים בתיבה את תחילת השם, בוחרים מהרשימה שנפתחת, ולוחצים ”הבא ▶”.', 'בסוף — ”בדיקה ואישור”.'], 0, '⏱️ השעון כבר רץ! <strong>⚡ מהר = יותר נקודות:</strong> תשובה נכונה מיד = 100, בסוף הזמן = 50.')
     + eyesTimerBar(c.state) + '<div id="eyesStage"></div>';
   if (c.review) renderEyesReview(); else showSlot(c.cur, true);
 }
@@ -3362,6 +3389,7 @@ function showSlot(i, spin) {
     <div class="order-actions" style="margin-top:10px">${i > 0 ? '<button class="game-btn" type="button" onclick="window.slotStep(-1)">◀ הקודם</button>' : ''}<button class="buy" type="button" id="slotNext" onclick="window.slotStep(1)">${i < n - 1 ? 'הבא ▶' : 'סיום — בדיקה ואישור'}</button></div>`;
   const img = document.getElementById('slotImg'), slot = document.getElementById('slot'), input = document.getElementById('slotGuess'), next = document.getElementById('slotNext');
   const land = () => { img.src = items[i].eyes; slot.classList.remove('spinning'); img.classList.remove('landed'); void img.offsetWidth; img.classList.add('landed'); input.disabled = false; next.disabled = false;
+    showNameChips(input); /* (25.11.26) the names list is open at once - tap a name */
     /* on a phone the keyboard is not opened by itself - it pushed the page down and hid the explanation (11.11.26) */
     if (!matchMedia('(pointer: coarse)').matches) input.focus(); };
   if (!spin || n < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches) return land();
@@ -3865,11 +3893,11 @@ const SEE_PICS = [
     ['מי כבר אכל סופגנייה?', ['משה ואהרן', 'אורי ורפאל', 'משה, אהרן, רפאל ואורי', 'רק רפאל']],
   ] },
   { src: 's2-salon.jpg', alt: 'שני אבות וילדים בסלון מצטלמים עם הטלפונים', qs: [
-    ['של מי המשקפיים שעל המדף?', ['יהודה', 'חיים', 'הילד עם המשקפיים', 'הילד עם הטלפון הכחול']],
     ['במה עוסקים יהודה וחיים?', ['יהודה רופא, חיים צייר', 'יהודה צלם, חיים רופא', 'יהודה רופא, חיים צלם', 'שניהם רופאים']],
     ['מה הייתה הפעילות שעסקו בה קודם?', ['נגינה', 'כדורגל', 'אפיית עוגיות', 'ציור']],
     ['מי קיבל את התה שלו ראשון?', ['חיים', 'יהודה', 'הילד עם הטלפון הכחול', 'הילד עם המשקפיים']],
     ['מה הקשר בין יהודה לחיים?', ['אחים', 'גיסים', 'בני דודים', 'שכנים']],
+    ['של מי המשקפיים שעל המדף?', ['יהודה', 'חיים', 'הילד עם המשקפיים', 'הילד עם הטלפון הכחול']], // Ayelet 25.11.26 - after the twins' names are known
     ['איזו ארוחה הם אכלו לפני כן?', ['חלבית', 'פרווה', 'בשרית']],
     ['מי כבר אכל סופגנייה?', ['הילד עם הטלפון הכחול', 'הילד שבקצה השמאלי', 'הילד עם המשקפיים', 'הילד שבקצה הימני']],
     ['מי היה לאחרונה אצל רופא?', ['חיים', 'יהודה', 'הילד עם הטלפון הכחול', 'הילד עם המשקפיים']],
@@ -4104,6 +4132,8 @@ window.seeNext = async function () {
   try { if (c.seeSave) await c.seeSave; }
   catch (e) { const h = document.getElementById('seeHint'); if (h) h.textContent = 'השמירה נכשלה — בדקו את החיבור ובחרו שוב.'; if (btn) btn.disabled = false; return; }
   const from = SEE_LIST[s.pos]; s.pos++; c.seeSave = null; seeSaveLocal(c);
+  /* Ayelet 25.11.26 - a short "ding" when the next question comes */
+  try { if (dzAudio()) { dzTone(988, 0, .12, 'sine', .14); dzTone(1319, .09, .18, 'sine', .12); } } catch (e) { }
   if (s.pos < SEE_LIST.length && SEE_LIST[s.pos].pi !== from.pi && !(SEE_LIST[s.pos].pi === SEE_BONUS_PIC && !s.spun)) flashCard(['🖼️', 'תמונה הבאה!', `תמונה ${SEE_LIST[s.pos].pi + 1} מתוך ${SEE_PICS.length}`], 'pink');
   renderSeeStep();
 };
@@ -4159,12 +4189,52 @@ function renderSeeResults(main, c, a) {
   const key = a.key || {}, marks = (mine && mine.marks) || {}; // key = {'0': [...], '1': [...], '2': [...]}
   const scores = [...new Set((a.podium || []).map(p => p.score))];
   const podium = `<div class="podium">${(a.podium || []).map(p => { const pl = scores.indexOf(p.score); return `<div class="podium-row p${pl + 1}"><span class="podium-medal">${MEDALS[pl] || ''}</span><span><strong>מקום ${PLACE_NAMES[pl] || pl + 1}: ${esc(p.name)}</strong><br>${p.score} נקודות · ${p.correct} ${p.correct === 1 ? 'תשובה נכונה' : 'תשובות נכונות'}</span></div>`; }).join('')}</div>`;
-  const review = SEE_PICS.map((pic, pi) => `<details class="info see-review"><summary><strong>🖼️ תמונה ${pi + 1} — מה בחרתם ומה נכון</strong></summary>${pi === SEE_BONUS_PIC && mine && mine.dreidel ? `<p class="dreidel-badge">🎁 בסביבון יצא לכם <strong>${esc(mine.dreidel)}׳</strong> — ${mine.bonus ? `הרווחתם עוד ${mine.bonus} נקודות בונוס!` : 'הפעם הבונוס לא עזר (צריך תשובה נכונה ב־4 השאלות הראשונות)'}</p>` : ''}<img src="${pic.src}" alt="${esc(pic.alt)}" style="width:100%;border-radius:12px;margin:6px 0"><ol>${pic.qs.map(([q, opts], qi) => {
+  /* Ayelet 25.11.26 ("no time to see the results") - between the stages only the points and the race; "what really was" is shown after the finale */
+  main.innerHTML = `<div id="seeRes"><div class="now-box" style="text-align:center"><p style="font-size:22px;margin:0"><strong>🏆 התוצאות של שלב 2!</strong></p>${mine ? `<p style="margin:6px 0 0;font-size:18px">קיבלתם <strong>${mine.points} נקודות</strong> — ${mine.correct} תשובות נכונות מתוך ${mine.total} 🎉</p>` : ''}</div>${podium}${c.results && c.results.stage2 ? raceHtml(c.results, c.uid, 'race2' + c.gameId) : ''}${LATER_NOTE('מה התשובות הנכונות')}${nextStepHtml(c)}</div>`;
+}
+const LATER_NOTE = what => `<p class="smallnote" style="text-align:center;font-size:16px">🔎 ${what}? רואים הכול בסוף המשחק, אחרי ההכרזה.</p>`;
+/* stage 2 "what you picked and what is right", per picture (shown after the finale) */
+function seeReviewHtml(c) {
+  const a = c.assoc || {}, mine = (a.standings || []).find(r => r.id === c.uid); if (!a.see || !mine) return '';
+  const key = a.key || {}, marks = mine.marks || {};
+  /* (25.11.26, Ayelet: "stage 1 and stage 3 have a title, stage 2 does not - the pictures come at once") - one "שלב 2" section, the 3 pictures inside it */
+  return `<details class="info see-review"><summary><strong>🔍 שלב 2 — מה ראיתם?</strong></summary>` + SEE_PICS.map((pic, pi) => `<details class="info see-review"><summary><strong>🖼️ תמונה ${pi + 1} — מה בחרתם ומה נכון</strong></summary>${pi === SEE_BONUS_PIC && mine.dreidel ? `<p class="dreidel-badge">🎁 בסביבון יצא לכם <strong>${esc(mine.dreidel)}׳</strong> — ${mine.bonus ? `הרווחתם עוד ${mine.bonus} נקודות בונוס!` : 'הפעם הבונוס לא עזר (צריך תשובה נכונה ב־4 השאלות הראשונות)'}</p>` : ''}<img src="${pic.src}" alt="${esc(pic.alt)}" style="width:100%;border-radius:12px;margin:6px 0"><ol>${pic.qs.map(([q, opts], qi) => {
     const m = marks[pi + '_' + qi], ok = (key[pi] || [])[qi], right = m === ok;
     return `<li>${m == null ? '⏳' : right ? '✅' : '❌'} ${esc(q)}<br><span class="smallnote">${m == null ? 'לא הספקתם לענות' : 'בחרתם: ' + esc(opts[m])}${!right && ok != null ? ` · התשובה: <strong>${esc(opts[ok])}</strong>` : ''}</span></li>`;
-  }).join('')}</ol></details>`).join('');
-  main.innerHTML = `<div id="seeRes"><div class="now-box" style="text-align:center"><p style="font-size:22px;margin:0"><strong>🏆 התוצאות של שלב 2!</strong></p>${mine ? `<p style="margin:6px 0 0;font-size:18px">קיבלתם <strong>${mine.points} נקודות</strong> — ${mine.correct} תשובות נכונות מתוך ${mine.total} 🎉</p>` : ''}</div>${podium}${c.results && c.results.stage2 ? raceHtml(c.results, c.uid, 'race2' + c.gameId) : ''}${review}${nextStepHtml(c)}</div>`;
+  }).join('')}</ol></details>`).join('') + '</details>';
 }
+/* stage 1: whose eyes were they (after the finale) */
+function eyesReviewHtml(c) {
+  const mine = c.results && c.results.stage1 && c.results.stage1[c.uid]; if (!mine) return '';
+  const eyesOf = Object.fromEntries(((c.assignment && c.assignment.items) || []).map((it, i) => [it.pid, charCard(eyeCharFor(c.uid, i), it.eyes, null, glassesFor(c.uid, i))]));
+  return `<details class="info see-review"><summary><strong>👀 שלב 1 — של מי היו העיניים?</strong></summary>${(mine.details || []).map((d, i) => `<div class="member eyes-card"><strong>${d.ok ? '✅ נכון!' : '❌ לא נכון'} — תמונה ${i + 1}</strong>${eyesOf[d.pid] || ''}<p style="margin:4px 0">כתבתם: ”${esc(d.guess || '—')}”<br>אלה העיניים של: <strong>${esc(d.real)}</strong></p></div>`).join('')}</details>`;
+}
+/* stage 3: who said it (after the finale), with the real voice */
+function whoReviewHtml(c) {
+  const mine = c.results && c.results.stage3 && c.results.stage3[c.uid]; if (!mine || !(mine.details || []).length) return '';
+  const byQ = {}; mine.details.forEach(d => (byQ[d.q] = byQ[d.q] || []).push(d));
+  return `<details class="info see-review"><summary><strong>🎙️ שלב 3 — מי אמר את זה?</strong></summary>${Object.keys(byQ).map(q => `<h3>🎙️ ${esc(WHO_SAID_QUESTIONS[q].title)}</h3>${byQ[q].map((d, i) => `<div class="who-item"><div><strong>${d.ok ? '✅ נכון!' : '❌ לא נכון'} — הקלטה ${i + 1}</strong><br>כתבתם: ”${esc(d.guess || '—')}”<br>אמר/ה: <strong>${esc(d.real)}</strong></div><button class="game-btn" type="button" data-label="▶ בקול האמיתי" onclick="window.whoPlay('${esc(d.rid)}', 1, this)">▶ בקול האמיתי</button></div>`).join('')}`).join('')}</details>`;
+}
+function answersAfterFinaleHtml(c) {
+  const s = eyesReviewHtml(c) + seeReviewHtml(c) + whoReviewHtml(c);
+  return s ? `<div class="now-box" style="text-align:center;margin-top:18px"><p style="font-size:21px;margin:0"><strong>🔎 מה באמת היה?</strong></p><p style="margin:4px 0 0">לוחצים על כל שלב ורואים את כל התשובות</p></div>${s}` : '';
+}
+/* Ayelet 25.11.26 - "not right away: after Elkana finished his words about every group, a button 'ועכשיו — מה באמת היה?' that opens
+   a page of the results, with 'חזרה' back (to go on with the photo)". The button shows after his "thanks" line ended on this phone
+   (hostPlayNext), or 2 minutes after the announcement at the latest (no AI lines - never stuck) */
+function truthBtnHtml(c) {
+  return `<div id="truthBox" style="text-align:center;margin:16px 0"${c.truthReady ? '' : ' hidden'}><button class="game-btn go-pulse" type="button" style="font-size:15px;padding:8px 14px;font-weight:700" onclick="window.openTruth()">🔎 מה באמת היה? בואו תראו את התשובות</button></div>`;
+}
+function revealTruth(c) { if (!c || c.truthReady) return; c.truthReady = true; const b = document.getElementById('truthBox'); if (b) b.hidden = false; /* (25.11.26) no jumping - it just appears in its place */ }
+window.openTruth = function () {
+  const c = groupCtx; if (!c) return;
+  window.closeTruth();
+  const ov = document.createElement('div'); ov.id = 'truthOv'; ov.className = 'truth-ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', 'מה באמת היה');
+  const back = '<button class="buy" type="button" onclick="window.closeTruth()">⬅ חזרה להכרזה</button>';
+  ov.innerHTML = `<div class="truth-in"><p style="text-align:center;margin:0 0 8px">${back}</p>${answersAfterFinaleHtml(c) || '<p>אין עוד תשובות להצגה.</p>'}<p style="text-align:center;margin:16px 0 30px">${back}</p></div>`;
+  document.body.appendChild(ov); document.body.style.overflow = 'hidden'; ov.scrollTop = 0;
+};
+window.closeTruth = function () { const ov = document.getElementById('truthOv'); if (ov) { whoStopAudio && whoStopAudio(); ov.remove(); document.body.style.overflow = ''; } };
 
 // ---------- שלב 3: ”מי אמר את זה?!” ----------
 // כל משתתף מקליט תשובות קוליות קצרות (עד 20 שניות) ל־7 השאלות. ההקלטה נשמרת רגילה — הקול משתנה רק בהשמעה (מהירות + גובה).
@@ -4403,9 +4473,8 @@ function renderGroupWho(main) {
     // בונים פעם אחת — כדי לא לעצור השמעה באמצע
     if (c.whoBuilt === 'done' && main.querySelector('#whoDone')) return;
     c.whoBuilt = 'done'; whoStopAudio();
-    const byQ = {}; (mine.details || []).forEach(d => (byQ[d.q] = byQ[d.q] || []).push(d));
     main.innerHTML = `<div id="whoDone"><div class="now-box" style="text-align:center"><p style="font-size:24px;margin:0"><strong>🎉 ${mine.points != null ? `קיבלתם ${mine.points} נקודות בשלב 3 — ${mine.score} ניחושים נכונים מתוך ${mine.total}!` : `קיבלתם ${mine.score} ${mine.score === 1 ? 'נקודה' : 'נקודות'} מתוך ${mine.total} בשלב 3!`}</strong></p></div>`
-      + Object.keys(byQ).map(q => `<div class="info"><h3>🎙️ ${esc(WHO_SAID_QUESTIONS[q].title)}</h3>${byQ[q].map((d, i) => `<div class="who-item"><div><strong>${d.ok ? '✅ נכון!' : '❌ לא נכון'} — הקלטה ${i + 1}</strong><br>כתבתם: ”${esc(d.guess || '—')}”<br>אמר/ה: <strong>${esc(d.real)}</strong></div><button class="game-btn" type="button" data-label="▶ בקול האמיתי" onclick="window.whoPlay('${esc(d.rid)}', 1, this)">▶ בקול האמיתי</button></div>`).join('')}</div>`).join('')
+      + LATER_NOTE('מי אמר מה')
       /* (11.11.26, Ayelet: "the winners video comes after we already see who won") - no total table here; it is kept for after the video */
       + scoreboard(c.results.stage3, '🏆 טבלת הניקוד — שלב 3') + '<div class="now-box" style="text-align:center"><p style="font-size:20px;margin:0"><strong>🥁 מי ניצח במשחק כולו? זה סוד — עוד רגע ההכרזה הגדולה!</strong></p></div>' + nextStepHtml(c) + '</div>';
   }
@@ -4455,7 +4524,9 @@ function renderWhoRec(force) {
   box.innerHTML = nowBox('מה עושים?', ['מי שכתוב ב”מי עונה” לוחץ 🎙️ ומדבר', 'לוחצים ”✓ שמירה” ועוברים לשאלה הבאה', 'בסוף: ”סיימנו להקליט ✓”'], cur === 3 ? 2 : cur === 2 ? 1 : 0, '🤫 לא אומרים את השם בהקלטה!')
     + `<p class="who-progress">הוקלטו <strong>${done} מתוך ${total}</strong> שאלות</p>`
     + (w.msg ? `<p class="${/✓/.test(w.msg) ? 'who-ok' : 'warn'}" style="font-weight:700">${esc(w.msg)}</p>` : '') + rows
-    + `<button class="buy" type="button" onclick="window.whoSetDone(true)" ${busy ? 'disabled' : ''}>סיימנו להקליט ✓</button>${done < total ? `<p class="smallnote">עוד ${total - done === 1 ? 'שאלה אחת לא הוקלטה' : total - done + ' שאלות לא הוקלטו'}. אפשר לסיים גם ככה — שאלה בלי הקלטה פשוט לא תושמע לאחרים.</p>` : ''}`;
+    /* (25.11.26 test: a group pressed "סיימנו" with no recording - and the whole guessing part was skipped) - at least one recording first */
+    + (done ? '' : '<p class="warn" style="margin:6px 0">קודם מקליטים לפחות שאלה אחת — בלי הקלטות אין לאחרים מה לנחש.</p>')
+    + `<button class="buy${done === total ? ' go-pulse' : ''}" type="button" onclick="window.whoSetDone(true)" ${busy || !done ? 'disabled' : ''}>סיימנו להקליט ✓</button>${done < total ? `<p class="smallnote">עוד ${total - done === 1 ? 'שאלה אחת לא הוקלטה' : total - done + ' שאלות לא הוקלטו'}. אפשר לסיים גם ככה — שאלה בלי הקלטה פשוט לא תושמע לאחרים.</p>` : ''}`;
 }
 window.whoPick = function (q, pid) { const c = groupCtx; if (!c || c.who.rec || c.who.pend || c.who.saving) return; c.who.pick[q] = pid; c.who.msg = ''; renderWhoRec(true); };
 window.whoSetDone = async function (done) {
