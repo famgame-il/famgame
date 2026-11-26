@@ -2963,7 +2963,9 @@ async function updateGroupDoc(c, data) {
 function groupsStatusHtml(c) {
   const all = c.allGroups || [], st = c.state.stage; if (all.length < 2) return '';
   const nQ = WHO_SAID_QUESTIONS.length;
+  /* Ayelet 26.11.26: everyone photographed but "ready" not pressed yet - not "still photographing" */
   const cfg = st === 'photos' ? { done: g => g.ready, at: 'readyAt', label: ['✓ מוכנה', '⏳ עוד מצטלמים'], what: 'מוכנות',
+      waitLabel: g => (g.size && (g.photoCount || 0) >= g.size) ? '👆 נשאר ללחוץ ”מוכנים”' : '',
       extra: g => ` · 📸 ${g.photoCount || 0} מתוך ${g.size || '?'}`, legend: '📸 = כמה משתתפים כבר הצטלמו. ✓ מוכנה = הקבוצה לחצה ”העלינו ואנחנו מוכנים”.' }
     : st === 'eyes' ? { done: g => g.eyesDone, at: 'eyesDoneAt', label: ['✓ אישרו', '⏳ עוד מנחשים'], what: 'אישרו',
       extra: () => '', legend: '✓ אישרו = הקבוצה סיימה לנחש ולחצה ”אישור” (את התשובות רואים רק בסוף).' }
@@ -2976,7 +2978,7 @@ function groupsStatusHtml(c) {
   const firstId = finished.length ? finished[0].id : null;
   const done = all.filter(g => cfg.done(g)).length;
   return `<div class="info" style="margin-top:12px"><h3 style="margin:0 0 4px">📊 לוח התקדמות — ${done} מתוך ${all.length} ${cfg.what}</h3><p class="smallnote" style="margin:0 0 8px">מתעדכן לבד, בזמן אמת. ${cfg.legend}</p><div class="group-list">`
-    + all.map(g => { const ok = cfg.done(g); return `<div class="group-item${g.id === c.uid ? ' mine' : ''}"><span>${esc(g.name)}${g.id === c.uid ? ' <strong class="me-tag">(אתם)</strong>' : ''}${cfg.extra(g)}${g.id === firstId ? ' · 🥇 סיימה ראשונה' : ''}</span><span class="badge ${ok ? 'paid' : 'pending'}">${ok ? cfg.label[0] : cfg.label[1]}</span></div>`; }).join('')
+    + all.map(g => { const ok = cfg.done(g); return `<div class="group-item${g.id === c.uid ? ' mine' : ''}"><span>${esc(g.name)}${g.id === c.uid ? ' <strong class="me-tag">(אתם)</strong>' : ''}${cfg.extra(g)}${g.id === firstId ? ' · 🥇 סיימה ראשונה' : ''}</span><span class="badge ${ok ? 'paid' : 'pending'}">${ok ? cfg.label[0] : ((cfg.waitLabel && cfg.waitLabel(g)) || cfg.label[1])}</span></div>`; }).join('')
     + '</div></div>';
 }
 /* Ayelet 11.11.26 */
@@ -3220,8 +3222,12 @@ const HOST_MOMENT_STAGES = {
   final: ['final'], finalIntro: ['final'], finalGroup: ['final'], finalWinners: ['final'], thanks: ['final'],
 };
 /* the stage moved on while he was still saying a line of the stage before - his voice fades out (never runs into the new stage) */
+/* Ayelet 26.11.26 ("Elkana started talking and was cut in the middle"): a short jab that already started when the last group
+   finished is said to its end on the results screen (nothing else talks there yet); the results line waits for it in the queue */
+const HOST_CARRY_ON = { eyesFirst: ['eyesDone'], seeFirst: ['assocDone'], seeMinute: ['assocDone'] };
 function hostStopStale(c) {
   if (!c.hostPlaying || !c.hostNow || !hostStale(c, c.hostNow)) return;
+  if ((HOST_CARRY_ON[c.hostNow.moment] || []).includes(c.state && c.state.stage)) return;
   clearInterval(c.hostTypeTimer); clearTimeout(c.hostDoneTimer); c.hostPlaying = false; c.hostNow = null;
   try {
     const a = hostAudio(), v0 = a.volume; let k = 0;
@@ -3360,7 +3366,7 @@ function renderGroup() {
     const mine = c.results && c.results.stage1 && c.results.stage1[c.uid];
     if (!mine) { main.innerHTML = '<p>מחשבים את התוצאות…</p>'; return; }
     /* (25.11.26) whose eyes - after the finale (no time here before the stage-2 video) */
-    main.innerHTML = `<div class="now-box" style="text-align:center"><p style="font-size:24px;margin:0"><strong>🎉 ${mine.points != null ? `קיבלתם ${mine.points} נקודות — ${mine.score} זיהויים נכונים מתוך ${mine.total}!` : `קיבלתם ${mine.score} ${mine.score === 1 ? 'נקודה' : 'נקודות'} מתוך ${mine.total}!`}</strong></p></div>`
+    main.innerHTML = `<div class="now-box" style="text-align:center"><p style="font-size:24px;margin:0"><strong>🎉 ${mine.points != null ? `קיבלתם ${mine.points} נקודות — ${mine.score === 1 ? 'זיהוי נכון אחד' : mine.score + ' זיהויים נכונים'} מתוך ${mine.total}!` : `קיבלתם ${mine.score} ${mine.score === 1 ? 'נקודה' : 'נקודות'} מתוך ${mine.total}!`}</strong></p></div>`
       + raceHtml(c.results, c.uid, 'race1' + c.gameId)
       + LATER_NOTE('של מי היו העיניים')
       + scoreboard(c.results.stage1, '🏆 טבלת הניקוד — שלב 1') + nextStepHtml(c);
@@ -4224,7 +4230,7 @@ function renderSeeResults(main, c, a) {
   const scores = [...new Set((a.podium || []).map(p => p.score))];
   const podium = `<div class="podium">${(a.podium || []).map(p => { const pl = scores.indexOf(p.score); return `<div class="podium-row p${pl + 1}"><span class="podium-medal">${MEDALS[pl] || ''}</span><span><strong>מקום ${PLACE_NAMES[pl] || pl + 1}: ${esc(p.name)}</strong><br>${p.score} נקודות · ${p.correct} ${p.correct === 1 ? 'תשובה נכונה' : 'תשובות נכונות'}</span></div>`; }).join('')}</div>`;
   /* Ayelet 25.11.26 ("no time to see the results") - between the stages only the points and the race; "what really was" is shown after the finale */
-  main.innerHTML = `<div id="seeRes"><div class="now-box" style="text-align:center"><p style="font-size:22px;margin:0"><strong>🏆 התוצאות של שלב 2!</strong></p>${mine ? `<p style="margin:6px 0 0;font-size:18px">קיבלתם <strong>${mine.points} נקודות</strong> — ${mine.correct} תשובות נכונות מתוך ${mine.total} 🎉</p>` : ''}</div>${podium}${c.results && c.results.stage2 ? raceHtml(c.results, c.uid, 'race2' + c.gameId) : ''}${LATER_NOTE('מה התשובות הנכונות')}${nextStepHtml(c)}</div>`;
+  main.innerHTML = `<div id="seeRes"><div class="now-box" style="text-align:center"><p style="font-size:22px;margin:0"><strong>🏆 התוצאות של שלב 2!</strong></p>${mine ? `<p style="margin:6px 0 0;font-size:18px">קיבלתם <strong>${mine.points} נקודות</strong> — ${mine.correct === 1 ? 'תשובה נכונה אחת' : mine.correct + ' תשובות נכונות'} מתוך ${mine.total} 🎉</p>` : ''}</div>${podium}${c.results && c.results.stage2 ? raceHtml(c.results, c.uid, 'race2' + c.gameId) : ''}${LATER_NOTE('מה התשובות הנכונות')}${nextStepHtml(c)}</div>`;
 }
 const LATER_NOTE = what => `<p class="smallnote" style="text-align:center;font-size:16px">🔎 ${what}? רואים הכול בסוף המשחק, אחרי ההכרזה.</p>`;
 /* stage 2 "what you picked and what is right", per picture (shown after the finale) */
@@ -4519,7 +4525,7 @@ function renderGroupWho(main) {
     // בונים פעם אחת — כדי לא לעצור השמעה באמצע
     if (c.whoBuilt === 'done' && main.querySelector('#whoDone')) return;
     c.whoBuilt = 'done'; whoStopAudio();
-    main.innerHTML = `<div id="whoDone"><div class="now-box" style="text-align:center"><p style="font-size:24px;margin:0"><strong>🎉 ${mine.points != null ? `קיבלתם ${mine.points} נקודות בשלב 3 — ${mine.score} ניחושים נכונים מתוך ${mine.total}!` : `קיבלתם ${mine.score} ${mine.score === 1 ? 'נקודה' : 'נקודות'} מתוך ${mine.total} בשלב 3!`}</strong></p></div>`
+    main.innerHTML = `<div id="whoDone"><div class="now-box" style="text-align:center"><p style="font-size:24px;margin:0"><strong>🎉 ${mine.points != null ? `קיבלתם ${mine.points} נקודות בשלב 3 — ${mine.score === 1 ? 'ניחוש נכון אחד' : mine.score + ' ניחושים נכונים'} מתוך ${mine.total}!` : `קיבלתם ${mine.score} ${mine.score === 1 ? 'נקודה' : 'נקודות'} מתוך ${mine.total} בשלב 3!`}</strong></p></div>`
       + LATER_NOTE('מי אמר מה')
       /* (11.11.26, Ayelet: "the winners video comes after we already see who won") - no total table here; it is kept for after the video */
       + scoreboard(c.results.stage3, '🏆 טבלת הניקוד — שלב 3') + '<div class="now-box" style="text-align:center"><p style="font-size:20px;margin:0"><strong>🥁 מי ניצח במשחק כולו? זה סוד — עוד רגע ההכרזה הגדולה!</strong></p></div>' + nextStepHtml(c) + '</div>';
