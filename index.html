@@ -138,7 +138,7 @@ footer .nagish-bottom{margin:6px 0 0;display:block}
 /* Ayelet 25.11.26 - "מה באמת היה?" opens as a page of its own over the announcement, with "חזרה" */
 .truth-ov{position:fixed;inset:0;z-index:9000;overflow-y:auto;background:var(--bg,#fff8ec);-webkit-overflow-scrolling:touch}.truth-in{max-width:640px;margin:0 auto;padding:14px 12px}
 /* Ayelet 25.11.26 - the names list: always open, scrolls inside a frame, the chosen name green */
-.name-chips.all{max-height:240px;overflow-y:auto;padding:8px;border:2px solid #d6e6fb;border-radius:14px;background:#fafcff}
+.name-chips.all{max-height:170px;overflow-y:auto;padding:8px;border:2px solid #d6e6fb;border-radius:14px;background:#fafcff}
 .name-chip.on{background:#2e7d32;border-color:#2e7d32;color:#fff}
 /* Ayelet 25.11.26 ("every button that moves on must pulse and blink, so it is clear") - הבנתי, העלינו ואנחנו מוכנים, כולנו כאן, המשך, הבא, סיימנו */
 /* (the gold flowing frame - defined above, with .save-pulse) */
@@ -2614,6 +2614,9 @@ function showNameChips(input) {
   const list = q && !exact ? names.filter(n => { const t = assocNorm(n).split(' '); return q.split(' ').every(w => t.some(x => x.startsWith(w))); }) : names;
   input.classList.toggle('bad', !!q && !exact);
   box.classList.add('all');
+  /* Ayelet 26.11.26 ("with many people the open list is needlessly long - not good"): up to 8 names the list is open; more than that -
+     type the first letter and only the matching names appear */
+  if (!q && names.length > 8) { box.classList.remove('all'); box.innerHTML = `<span class="name-warn">✍️ הקלידו את האות הראשונה של השם — והשמות המתאימים יופיעו כאן</span>`; return; }
   box.innerHTML = (q && !exact ? `<span class="name-warn">${list.length ? '👆 בחרו שם מהרשימה' : '⚠️ אין שם כזה ברשימה — מחקו ונסו תחילת שם אחרת'}</span>` : '')
     + list.map(n => `<button type="button" class="name-chip${exact && assocNorm(n) === q ? ' on' : ''}" data-name="${esc(n)}">${exact && assocNorm(n) === q ? '✓ ' : ''}${esc(n)}</button>`).join('');
 }
@@ -2987,7 +2990,7 @@ function lobbyHtml(c) {
   const all = c.allGroups || [], voted = all.filter(g => tsMs(g.startVoteAt) >= since).length, mine = tsMs(c.group.startVoteAt) >= since;
   const autoAt = tsMs(lobby.autoStartAt);
   return `<div class="now-box lobby-box" style="text-align:center"><p style="font-size:20px;margin:0 0 6px"><strong>🙋 כל הקבוצות מוכנות! כולם כאן?</strong></p>`
-    + (mine ? `<p>✅ לחצתם. מחכים לעוד ${all.length - voted === 1 ? 'קבוצה אחת' : (all.length - voted) + ' קבוצות'}.</p>`
+    + (mine ? (voted >= all.length ? '<p>✅ כולם כאן! מתחילים ברגע שאלקנה מסיים את המשפט 🎙️</p>' : `<p>✅ לחצתם. מחכים לעוד ${all.length - voted === 1 ? 'קבוצה אחת' : (all.length - voted) + ' קבוצות'}.</p>`)
       : `<p>אם כל המשפחה כבר כאן — לוחצים. מתחילים כשכל הקבוצות לוחצות.</p><button class="buy" type="button" onclick="window.groupStartVote()">כולנו כאן — מתחילים ✓</button>`)
     + (autoAt ? `<p style="margin-top:10px"><strong>⏱️ אלקנה מתחיל בעוד <span data-autostart>${fmtClock(autoAt - Date.now())}</span></strong></p><button class="game-btn" type="button" onclick="window.groupHold()">✋ רגע, עוד לא! (עוד 3 דקות)</button>` : '')
     + '</div>';
@@ -2995,7 +2998,18 @@ function lobbyHtml(c) {
 /* after a results screen: when the next stage opens, by itself */
 function nextStepHtml(c) {
   const at = tsMs(c.state && c.state.nextAt);
-  return at ? `<div class="now-box" style="text-align:center"><p style="margin:0">⏭️ אלקנה עובר לשלב הבא בעוד <strong data-next>${fmtClock(at - Date.now())}</strong></p></div>` : '';
+  return at ? `<div class="now-box" style="text-align:center"><p style="margin:0" data-next>${nextText(c.state)}</p></div>` : '';
+}
+/* Ayelet 26.11.26 ("there is no way we move on while Elkana talks, even if the clock below shows 20 s"): the server waits for him
+   (state.hostUntil = his line ends, hostPendingUntil = his line is still being written) - the clock shows the real moment */
+function nextEffMs(st) {
+  const nextAt = tsMs(st && st.nextAt); if (!nextAt) return 0;
+  return Math.max(nextAt, tsMs(st.hostUntil) ? tsMs(st.hostUntil) + 1500 : 0, tsMs(st.hostPendingUntil) || 0);
+}
+function nextText(st) {
+  const now = Date.now(), nextAt = tsMs(st && st.nextAt), eff = nextEffMs(st);
+  if (now >= nextAt - 1000 && eff > now) return '🎙️ ממשיכים לשלב הבא ברגע שאלקנה מסיים לדבר';
+  return `⏭️ אלקנה עובר לשלב הבא בעוד <strong>${fmtClock(nextAt - now)}</strong>`;
 }
 window.groupStartVote = function () { const c = groupCtx; if (c) updateGroupDoc(c, { startVoteAt: serverTimestamp() }).catch(e => console.warn(e)); };
 window.groupHold = function () { const c = groupCtx; if (c) updateGroupDoc(c, { holdAt: serverTimestamp() }).catch(e => console.warn(e)); };
@@ -3147,11 +3161,11 @@ function dueAt(st) {
   if (st.stage === 'whoRecord') return whoRecEndMs(st) + 2500;
   if (st.stage === 'whoGuess') return whoEndMs(st) + 6500;
   if (st.stage === 'photos' && st.lobby && st.lobby.autoStartAt) return tsMs(st.lobby.autoStartAt) + 500;
-  return tsMs(st.nextAt) + 500;
+  return nextEffMs(st) ? nextEffMs(st) + 500 : tsMs(st.nextAt) + 500; /* no nextAt = 500 = a tick every 8 s, as before */
 }
 function groupTick(c) {
   const due = dueAt(c.state), now = Date.now();
-  document.querySelectorAll('[data-next]').forEach(el => { el.textContent = fmtClock(tsMs(c.state.nextAt) - now); });
+  document.querySelectorAll('[data-next]').forEach(el => { const h = nextText(c.state); if (el.innerHTML !== h) el.innerHTML = h; });
   document.querySelectorAll('[data-autostart]').forEach(el => { el.textContent = fmtClock(tsMs((c.state.lobby || {}).autoStartAt) - now); });
   if (due && now > due && now - lastTick > 8000) {
     lastTick = now;
@@ -3353,6 +3367,12 @@ function renderGroup() {
   } else if (c.state.stage === 'final') {
     add.hidden = true; add.innerHTML = ''; crop.innerHTML = '';
     whoStopAll(); c.whoBuilt = null;
+    /* Ayelet 26.11.26 ("the first place appeared, disappeared and came back - as if the page loaded twice"): the announcement is drawn
+       once. Later changes (the prize code arriving, the prize box opening) update only their own small boxes - the animations never restart.
+       It is drawn again only if the scores themselves changed */
+    const finSig = JSON.stringify(totalRows(c.results).map(r => [r.id, r.total]));
+    if (main.dataset.vgate === 'final' && main.querySelector('#introGate') && main.dataset.finSig === finSig) return;
+    main.dataset.finSig = finSig;
     /* first Elkana's winners video (by itself), then the festive announcement and the table */
     videoGate(main, c, 'final', ['elkana-winners.mp4'], 'e-trophy.jpg', '🏆 ההכרזה הגדולה!', '', finaleHtml(c.results, c.uid, undefined, truthBtnHtml(c) /* (25.11.26, Ayelet: "all the answers of all the stages after the announcement" - a button, after Elkana) */)
       + '<div class="order-actions" style="justify-content:center;margin-top:14px"><button class="buy" type="button" onclick="window.exitGroupGame(false)">🏠 סיום — חזרה לאתר</button><button class="game-btn" type="button" onclick="window.exitGroupGame(true)">👥 הצטרפות למשחק אחר (קוד חדש)</button></div>'
@@ -3422,7 +3442,7 @@ function renderEyesReview() {
   const c = groupCtx, items = c.assignment.items;
   eyesStage().innerHTML = '<h3 style="margin:6px 0">בדיקה אחרונה לפני אישור</h3>'
     + items.map((it, i) => `<div class="member eyes-card"><strong>זוג ${i + 1}</strong>${charCard(eyeCharFor(c.uid, i), it.eyes, null, glassesFor(c.uid, i))}<input class="guess" data-idx="${i}" maxlength="40" autocomplete="off" placeholder="של מי העיניים? מקלידים תחילת שם…" value="${esc(c.guesses[i].guess)}" oninput="window.setGuess(${i},this.value)"></div>`).join('')
-    + '<button class="buy start-big" type="button" id="submitGuesses" onclick="window.submitGuesses(false)" disabled>אישור ✓</button><p class="smallnote" id="guessHint" style="text-align:center"></p>';
+    + '<button class="buy start-big go-pulse" type="button" id="submitGuesses" onclick="window.submitGuesses(false)" disabled>אישור ✓</button><p class="smallnote" id="guessHint" style="text-align:center"></p>';
   window.updateGuessButton();
 }
 window.updateGuessButton = function () {
@@ -3545,7 +3565,7 @@ window.saveMember = async function () {
   const used = new Set(c.players.map(x => x.id)); let slot = null;
   for (let i = 1; i <= MAX_GROUP_SIZE && !slot; i++) if (!used.has(c.uid + '_' + i)) slot = c.uid + '_' + i;
   if (!slot) { alert('הקבוצה כבר מלאה.'); return; }
-  document.getElementById('saveMemberBtn').disabled = true;
+  const sb = document.getElementById('saveMemberBtn'); sb.disabled = true; sb.classList.remove('save-pulse'); sb.textContent = '⏳ שומרים…';
   try {
     // המונה מבטיח שאי־אפשר לרשום יותר משתתפים ממה שנרכש
     await retryBusy(() => runTransaction(db, async tx => {
@@ -3553,6 +3573,9 @@ window.saveMember = async function () {
       tx.set(doc(db, 'familyGames', c.gameId, 'players', slot), { groupId: c.uid, name: p.name, eyes: p.dataUrl, createdAt: serverTimestamp() });
       tx.update(liveDoc(c.gameId, 'playerCount'), { count: counter.data().count + 1, lastPlayer: slot });
     }), 6, true);
+    /* Ayelet 26.11.26 ("I saved and it said 'one more participant needed', and only later my picture appeared"): the saved member is
+       shown at once - the players listener brings the same document a moment later and replaces the list */
+    if (!c.players.some(x => x.id === slot)) { c.players = [...c.players, { id: slot, groupId: c.uid, name: p.name, eyes: p.dataUrl }].sort((a, b) => a.id.localeCompare(b.id)); renderGroup(); }
     URL.revokeObjectURL(p.img.src); pendingFace = null;
     document.getElementById('cropBox').innerHTML = ''; renderAddForm();
   } catch (e) {
@@ -4223,7 +4246,9 @@ function answersAfterFinaleHtml(c) {
    a page of the results, with 'חזרה' back (to go on with the photo)". The button shows after his "thanks" line ended on this phone
    (hostPlayNext), or 2 minutes after the announcement at the latest (no AI lines - never stuck) */
 function truthBtnHtml(c) {
-  return `<div id="truthBox" style="text-align:center;margin:16px 0"${c.truthReady ? '' : ' hidden'}><button class="game-btn go-pulse" type="button" style="font-size:15px;padding:8px 14px;font-weight:700" onclick="window.openTruth()">🔎 מה באמת היה? בואו תראו את התשובות</button></div>`;
+  /* Ayelet 26.11.26 ("it comes after he finishes talking, but it does not stand out at all - it must always be there"): always shown
+     (with the table), an orange button with the gold frame */
+  return `<div id="truthBox" style="text-align:center;margin:18px 0"><button class="buy go-pulse" type="button" style="font-size:16px;padding:10px 18px" onclick="window.openTruth()">🔎 מה באמת היה? בואו תראו את התשובות</button></div>`;
 }
 function revealTruth(c) { if (!c || c.truthReady) return; c.truthReady = true; const b = document.getElementById('truthBox'); if (b) b.hidden = false; /* (25.11.26) no jumping - it just appears in its place */ }
 window.openTruth = function () {
@@ -4504,7 +4529,9 @@ function renderWhoRec(force) {
   const done = whoDoneCount(c), total = WHO_SAID_QUESTIONS.length;
   if (c.group.whoDone) {
     box.innerHTML = nowBox('מה עושים עכשיו?', ['הקלטתם את התשובות.', 'לחצתם ”סיימנו להקליט”.', 'מחכים לשאר הקבוצות. כשכולן יסיימו (או כשהזמן ייגמר) — מתחילים לנחש מי אמר מה!'], 2, `⏱️ בניחוש יהיו לכם עד ${secsText(c.state.whoGuessSecsPlan || WHO_GUESS_SECS)} לכל שאלה. לא צריך לרענן ולא לסגור את המסך.`)
-      + `<p class="who-progress">✅ הקלטתם <strong>${done} מתוך ${total}</strong> שאלות</p><button class="game-btn" type="button" onclick="window.whoSetDone(false)">רגע, עוד לא — חזרה להקלטות</button>`;
+      + `<p class="who-progress">✅ הקלטתם <strong>${done} מתוך ${total}</strong> שאלות</p>`;
+    /* Ayelet 26.11.26 ("after 'we finished' I can go back, but if everyone already finished it does not let me - confusing"):
+       no "back" button - "סיימנו להקליט" asks first, and after it the recordings are final */
     return;
   }
   const busy = w.rec || w.pend || w.saving;
@@ -4515,7 +4542,7 @@ function renderWhoRec(force) {
       : `<p class="who-who">🙋 מי עונה: <strong>${esc(whoName(c, pid))}</strong></p>`;
     let act;
     if (w.rec && w.rec.q === q) act = `<p class="who-recording"><span class="rec-dot"></span> ${esc(whoName(c, pid))} מקליט/ה… נשארו <strong id="whoRecClock">0:${String(WHO_MAX_SECS).padStart(2, '0')}</strong> שניות</p><button class="buy" type="button" onclick="window.whoRecStop()">⏹ סיימתי לדבר — עצירה</button>`;
-    else if (w.pend && w.pend.q === q) act = `<p><strong>יצא טוב? לוחצים ”▶ שמיעה”, ואם טוב — ”✓ שמירה”:</strong></p><div class="order-actions"><button class="game-btn" type="button" data-label="▶ שמיעה" onclick="window.whoPlayPending(this)" ${w.saving ? 'disabled' : ''}>▶ שמיעה</button><button class="buy" type="button" onclick="window.whoSave()" ${w.saving ? 'disabled' : ''}>${w.saving ? 'שומרים…' : '✓ שמירה'}</button><button class="game-btn" type="button" onclick="window.whoRecStart(${q})" ${w.saving ? 'disabled' : ''}>↻ הקלטה מחדש</button></div>`;
+    else if (w.pend && w.pend.q === q) act = `<p><strong>יצא טוב? לוחצים ”▶ שמיעה”, ואם טוב — ”✓ שמירה”:</strong></p><div class="order-actions"><button class="game-btn" type="button" data-label="▶ שמיעה" onclick="window.whoPlayPending(this)" ${w.saving ? 'disabled' : ''}>▶ שמיעה</button><button class="buy${w.saving ? '' : ' save-pulse'}" type="button" onclick="window.whoSave()" ${w.saving ? 'disabled' : ''}>${w.saving ? 'שומרים…' : '✓ שמירה'}</button><button class="game-btn" type="button" onclick="window.whoRecStart(${q})" ${w.saving ? 'disabled' : ''}>↻ הקלטה מחדש</button></div>`;
     else if (mine) act = `<div class="order-actions"><button class="game-btn" type="button" data-label="▶ שמיעה" onclick="window.whoPlay('${esc(rid)}', 1, this)" ${busy ? 'disabled' : ''}>▶ שמיעה</button><button class="game-btn" type="button" onclick="window.whoRecStart(${q})" ${busy ? 'disabled' : ''}>↻ הקלטה מחדש</button></div>`;
     else act = `${saved ? `<p class="smallnote">כבר הקליט/ה: ${esc(whoName(c, saved))}. אם ${esc(whoName(c, pid))} יקליט/תקליט — ההקלטה הקודמת תוחלף.</p>` : ''}<button class="buy" type="button" onclick="window.whoRecStart(${q})" ${busy ? 'disabled' : ''}>🎙️ הקלטה — ${esc(whoName(c, pid))}</button>`;
     return `<div class="who-q${active ? ' active' : ''}"><div class="who-q-head"><strong>שאלה ${q + 1} מתוך ${total}: ${esc(Q.title)}</strong>${saved ? '<span class="badge paid">✅ הוקלט</span>' : ''}</div>${who}<p class="who-q-text">❓ ${esc(Q.q)}</p>${act}</div>`;
@@ -4532,7 +4559,7 @@ window.whoPick = function (q, pid) { const c = groupCtx; if (!c || c.who.rec || 
 window.whoSetDone = async function (done) {
   const c = groupCtx; if (!c) return;
   const left = WHO_SAID_QUESTIONS.length - whoDoneCount(c);
-  if (done && left && !confirm(`${left === 1 ? 'שאלה אחת עוד לא הוקלטה' : left + ' שאלות עוד לא הוקלטו'}. לסיים בכל זאת?`)) return;
+  if (done && !confirm(`${left ? (left === 1 ? 'שאלה אחת עוד לא הוקלטה. ' : left + ' שאלות עוד לא הוקלטו. ') : ''}סיימתם להקליט? אחרי הלחיצה אי אפשר לחזור ולהקליט עוד.`)) return;
   try { await updateGroupDoc(c, done ? { whoDone: done, whoDoneAt: serverTimestamp() } : { whoDone: done }); }
   catch (e) { console.warn(e); alert('לא הצלחנו לעדכן. בדקו את החיבור ונסו שוב.'); }
 };
