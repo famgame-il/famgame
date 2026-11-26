@@ -2186,7 +2186,7 @@ let ticker = null;
 function eyesEndMs(state) { return state && state.eyesStartedAt ? state.eyesStartedAt.toMillis() + (state.eyesSeconds || 180) * 1000 : 0; }
 function fmtClock(ms) { const s = Math.max(0, Math.ceil(ms / 1000)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
 // ”60 שניות”, ”דקה וחצי”, ”2 דקות” — כדי שכל משתתף ידע בדיוק כמה זמן יש
-function secsText(s) { s = Number(s) || 0; return s === 60 ? 'דקה' : s === 90 ? 'דקה וחצי' : s === 120 ? '2 דקות' : s === 150 ? '2.5 דקות' : s >= 120 && s % 60 === 0 ? s / 60 + ' דקות' : s + ' שניות'; }
+function secsText(s) { s = Number(s) || 0; return s === 60 ? 'דקה' : s === 90 ? 'דקה וחצי' : s === 120 ? '2 דקות' : s === 150 ? '2.5 דקות' : s >= 120 && s % 30 === 0 ? s / 60 + ' דקות' /* (26.11.26) 210 = "3.5 דקות", not "210 שניות" */ : s + ' שניות'; }
 // שעון שרץ + כמה זמן יש בסך הכול
 function timerBar(clock, label) { return `<div class="timer-bar">⏱️ <span data-countdown>${clock}</span>${label ? `<span class="timer-of">${label}</span>` : ''}</div>`; }
 // הבחירות של מנהל המשחק (כמה זמן) נשמרות במשחק מיד — כדי שהקבוצות יראו את הזמן עוד לפני שהחלק מתחיל
@@ -3009,6 +3009,7 @@ function nextEffMs(st) {
 function nextText(st) {
   const now = Date.now(), nextAt = tsMs(st && st.nextAt), eff = nextEffMs(st);
   if (now >= nextAt - 1000 && eff > now) return '🎙️ ממשיכים לשלב הבא ברגע שאלקנה מסיים לדבר';
+  if (now >= nextAt) return '⏭️ עוברים לשלב הבא…';
   return `⏭️ אלקנה עובר לשלב הבא בעוד <strong>${fmtClock(nextAt - now)}</strong>`;
 }
 window.groupStartVote = function () { const c = groupCtx; if (c) updateGroupDoc(c, { startVoteAt: serverTimestamp() }).catch(e => console.warn(e)); };
@@ -3173,7 +3174,7 @@ function groupTick(c) {
   }
   /* (13.11.26) the server waits until Elkana finished talking (state.hostUntil) - once he did, wake it once (e.g. all pressed "הבנתי" meanwhile) */
   const hu = tsMs(c.state.hostUntil);
-  if (hu && now > hu + 2500 && c.tickedHost !== hu && now - lastTick > 2500) {
+  if (hu && now > hu + 1700 && c.tickedHost !== hu && now - lastTick > 1500) { /* (26.11.26) sooner after he finished: ~2 s, not ~4 */
     c.tickedHost = hu; lastTick = now;
     setDoc(liveDoc(c.gameId, 'tick'), { at: serverTimestamp() }).catch(() => { });
   }
@@ -3241,7 +3242,7 @@ function hostPlayNext(c) {
   const openingDue = c.state && c.state.stage === 'photos' && !c.state.photosOpen && !(c.group && c.group.gotIt && c.group.gotIt.s1) && !((c.vidDone || {}).s1 || hostVideoSeen(c, 's1'));
   /* (25.11.26) the finale: quiet until the winners appeared + the prize recording ended (window.__finHoldUntil, set by the 'win' cue).
      Never stuck: at most 70 s after the finale screen opened */
-  const videoUp = document.getElementById('vidOverlay') || c.vidPending || openingDue || document.querySelector('#grpMain .vg-body[hidden]');
+  const videoUp = document.getElementById('vidOverlay') || document.getElementById('truthOv') || c.vidPending || openingDue || document.querySelector('#grpMain .vg-body[hidden]');
   let finHold = false;
   if (!videoUp && c.state && c.state.stage === 'final') {
     if (!c.finalSeenAt) { c.finalSeenAt = Date.now(); setTimeout(() => revealTruth(c), 150000); } /* counted from when the announcement itself is on the screen (after the video); the results button at the latest 2.5 min later */
@@ -3257,7 +3258,12 @@ function hostPlayNext(c) {
   clearInterval(c.hostTypeTimer); c.hostTyped = 0; hostRender(c);
   const full = String(m.text || '');
   c.hostTypeTimer = setInterval(() => {
-    c.hostTyped = Math.min(full.length, c.hostTyped + 2);
+    /* (26.11.26, Ayelet: "his speech comes after he writes") - with a voice, the words appear at the pace of the voice
+       (by how much of the audio played), not faster than he speaks */
+    const au = m.audio ? hostAudio() : null;
+    if (au && !c.hostMuted && au.duration > 0 && isFinite(au.duration)) c.hostTyped = Math.min(full.length, Math.max(c.hostTyped, Math.ceil(full.length * Math.min(1, au.currentTime / (au.duration * 0.9)))));
+    else if (au && !c.hostMuted && !(au.currentTime > 0) && Date.now() - c.hostStartAt < 2500) return; /* the voice did not start yet - wait for it (2.5 s at most) */
+    else c.hostTyped = Math.min(full.length, c.hostTyped + 2);
     const el = document.querySelector('#hostBox .host-text'); if (el) el.textContent = full.slice(0, c.hostTyped);
     if (c.hostTyped >= full.length) clearInterval(c.hostTypeTimer);
   }, 45);
@@ -3336,7 +3342,7 @@ function renderGroup() {
       // ”העלינו ואנחנו מוכנים” נפתח רק כשהקבוצה העלתה בדיוק את מספר המשתתפים שלה
       const readyBtn = missing <= 0
         ? '<button class="buy go-pulse" type="button" onclick="window.setGroupReady(true)">העלינו ואנחנו מוכנים ✓</button>'
-        : `<button class="buy" type="button" disabled>העלינו ואנחנו מוכנים ✓</button><p class="warn" style="margin:4px 0">צריך עוד ${missing === 1 ? 'משתתף אחד' : missing + ' משתתפים'} כדי להמשיך — הקבוצה שלכם צריכה ${need}.</p>`
+        : `<button class="buy" type="button" disabled>העלינו ואנחנו מוכנים ✓</button>${window.__savingMember ? '<p style="margin:4px 0;font-weight:700">⏳ שומרים את התמונה…</p>' /* (26.11.26) not "one more needed" while the picture is being saved */ : `<p class="warn" style="margin:4px 0">צריך עוד ${missing === 1 ? 'משתתף אחד' : missing + ' משתתפים'} כדי להמשיך — הקבוצה שלכם צריכה ${need}.</p>`}`
           /* without a manager: a group whose member did not come may continue with fewer */
           /* (25.11.26, Ayelet: "we wrote 4 and only 3 came - something must be done with it") - a big clear button, not a small grey one */
           + (c.players.length ? `<div class="now-box" style="text-align:center;margin-top:10px"><p style="margin:0 0 6px"><strong>🙋 מישהו מהקבוצה לא הגיע?</strong> אין בעיה — ממשיכים בלעדיו:</p><button class="buy" type="button" onclick="window.groupShort(${c.players.length})">אנחנו רק ${c.players.length === 1 ? 'משתתף אחד' : c.players.length} — ממשיכים ✓</button></div>` : '');
@@ -3406,7 +3412,7 @@ function showSlot(i, spin) {
   c.cur = i;
   eyesStage().innerHTML = `<div class="slot char-slot" id="slot">${charCard(eyeCharFor(c.uid, i), '', 'slotImg', glassesFor(c.uid, i))}<span class="slot-count">זוג ${i + 1} מתוך ${n}</span></div>
     <label style="display:block;margin-top:10px"><strong>של מי העיניים שבתוך הדמות? 👀</strong><input id="slotGuess" class="guess" maxlength="40" autocomplete="off" placeholder="מקלידים תחילת שם ובוחרים…" value="${esc(c.guesses[i].guess)}" oninput="window.setGuess(-1,this.value)"></label>
-    <div class="order-actions" style="margin-top:10px">${i > 0 ? '<button class="game-btn" type="button" onclick="window.slotStep(-1)">◀ הקודם</button>' : ''}<button class="buy" type="button" id="slotNext" onclick="window.slotStep(1)">${i < n - 1 ? 'הבא ▶' : 'סיום — בדיקה ואישור'}</button></div>`;
+    <div class="order-actions" style="margin-top:10px">${i > 0 ? '<button class="game-btn" type="button" onclick="window.slotStep(-1)">◀ הקודם</button>' : ''}<button class="buy go-pulse" type="button" id="slotNext" onclick="window.slotStep(1)">${i < n - 1 ? 'הבא ▶' : 'סיום — בדיקה ואישור'}</button></div>`;
   const img = document.getElementById('slotImg'), slot = document.getElementById('slot'), input = document.getElementById('slotGuess'), next = document.getElementById('slotNext');
   const land = () => { img.src = items[i].eyes; slot.classList.remove('spinning'); img.classList.remove('landed'); void img.offsetWidth; img.classList.add('landed'); input.disabled = false; next.disabled = false;
     showNameChips(input); /* (25.11.26) the names list is open at once - tap a name */
@@ -3566,6 +3572,7 @@ window.saveMember = async function () {
   for (let i = 1; i <= MAX_GROUP_SIZE && !slot; i++) if (!used.has(c.uid + '_' + i)) slot = c.uid + '_' + i;
   if (!slot) { alert('הקבוצה כבר מלאה.'); return; }
   const sb = document.getElementById('saveMemberBtn'); sb.disabled = true; sb.classList.remove('save-pulse'); sb.textContent = '⏳ שומרים…';
+  window.__savingMember = true; renderGroup();
   try {
     // המונה מבטיח שאי־אפשר לרשום יותר משתתפים ממה שנרכש
     await retryBusy(() => runTransaction(db, async tx => {
@@ -3575,11 +3582,13 @@ window.saveMember = async function () {
     }), 6, true);
     /* Ayelet 26.11.26 ("I saved and it said 'one more participant needed', and only later my picture appeared"): the saved member is
        shown at once - the players listener brings the same document a moment later and replaces the list */
-    if (!c.players.some(x => x.id === slot)) { c.players = [...c.players, { id: slot, groupId: c.uid, name: p.name, eyes: p.dataUrl }].sort((a, b) => a.id.localeCompare(b.id)); renderGroup(); }
+    window.__savingMember = false;
+    if (!c.players.some(x => x.id === slot)) c.players = [...c.players, { id: slot, groupId: c.uid, name: p.name, eyes: p.dataUrl }].sort((a, b) => a.id.localeCompare(b.id));
+    renderGroup();
     URL.revokeObjectURL(p.img.src); pendingFace = null;
     document.getElementById('cropBox').innerHTML = ''; renderAddForm();
   } catch (e) {
-    console.warn(e);
+    console.warn(e); window.__savingMember = false; renderGroup();
     document.getElementById('cropBox').innerHTML = '<div class="info"><p class="warn">השמירה נכשלה. ייתכן שכבר נרשמו כל המשתתפים שנרכשו, או שמנהל המשחק כבר לחץ ”המשך”. פנו למנהל המשחק.</p></div>';
   }
 };
@@ -4140,6 +4149,7 @@ function renderSeeStep(scroll) {
 }
 window.seePick = function (i) {
   const c = groupCtx, s = c && c.see; if (!s || c.seeOver || s.pos >= SEE_LIST.length || Date.now() >= seeEndMs(c.state)) return;
+  if (document.getElementById('dreidelOv')) return; /* (26.11.26) no answers behind the dreidel screen - the picture comes only after it */
   const it = SEE_LIST[s.pos];
   s.picks[s.pos] = i; seeSaveLocal(c);
   document.querySelectorAll('#seeQ .see-opt').forEach((b, j) => { b.classList.toggle('on', j === i); b.setAttribute('aria-pressed', String(j === i)); });
@@ -4151,6 +4161,7 @@ window.seePick = function (i) {
 };
 window.seeNext = async function () {
   const c = groupCtx, s = c && c.see; if (!s || c.seeOver || s.pos >= SEE_LIST.length || s.picks[s.pos] == null) return;
+  if (document.getElementById('dreidelOv')) return;
   const btn = document.getElementById('seeNextBtn'); if (btn) btn.disabled = true;
   try { if (c.seeSave) await c.seeSave; }
   catch (e) { const h = document.getElementById('seeHint'); if (h) h.textContent = 'השמירה נכשלה — בדקו את החיבור ובחרו שוב.'; if (btn) btn.disabled = false; return; }
@@ -4254,12 +4265,22 @@ function revealTruth(c) { if (!c || c.truthReady) return; c.truthReady = true; c
 window.openTruth = function () {
   const c = groupCtx; if (!c) return;
   window.closeTruth();
+  /* (26.11.26, Ayelet: "what if someone presses it while Elkana talks - will they hear him?") - he stops, and says the line again
+     (from its start) when they come back to the announcement; nothing of his runs behind this page */
+  try {
+    if (c.hostPlaying) {
+      try { hostAudio().pause(); } catch (e) { }
+      clearInterval(c.hostTypeTimer); clearTimeout(c.hostDoneTimer); c.hostPlaying = false;
+      if (c.hostNow) { hostUnmark(c, c.hostNow.seq); c.hostQueue.unshift(c.hostNow); }
+      hostRender(c);
+    }
+  } catch (e) { }
   const ov = document.createElement('div'); ov.id = 'truthOv'; ov.className = 'truth-ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', 'מה באמת היה');
   const back = '<button class="buy" type="button" onclick="window.closeTruth()">⬅ חזרה להכרזה</button>';
   ov.innerHTML = `<div class="truth-in"><p style="text-align:center;margin:0 0 8px">${back}</p>${answersAfterFinaleHtml(c) || '<p>אין עוד תשובות להצגה.</p>'}<p style="text-align:center;margin:16px 0 30px">${back}</p></div>`;
   document.body.appendChild(ov); document.body.style.overflow = 'hidden'; ov.scrollTop = 0;
 };
-window.closeTruth = function () { const ov = document.getElementById('truthOv'); if (ov) { whoStopAudio && whoStopAudio(); ov.remove(); document.body.style.overflow = ''; } };
+window.closeTruth = function () { const ov = document.getElementById('truthOv'); if (ov) { whoStopAudio && whoStopAudio(); ov.remove(); document.body.style.overflow = ''; if (groupCtx) setTimeout(() => hostPlayNext(groupCtx), 400); } };
 
 // ---------- שלב 3: ”מי אמר את זה?!” ----------
 // כל משתתף מקליט תשובות קוליות קצרות (עד 20 שניות) ל־7 השאלות. ההקלטה נשמרת רגילה — הקול משתנה רק בהשמעה (מהירות + גובה).
@@ -4528,13 +4549,16 @@ function renderWhoRec(force) {
   if (!force && (w.rec || w.pend || w.saving || c.whoPlaying)) return;
   const done = whoDoneCount(c), total = WHO_SAID_QUESTIONS.length;
   if (c.group.whoDone) {
-    box.innerHTML = nowBox('מה עושים עכשיו?', ['הקלטתם את התשובות.', 'לחצתם ”סיימנו להקליט”.', 'מחכים לשאר הקבוצות. כשכולן יסיימו (או כשהזמן ייגמר) — מתחילים לנחש מי אמר מה!'], 2, `⏱️ בניחוש יהיו לכם עד ${secsText(c.state.whoGuessSecsPlan || WHO_GUESS_SECS)} לכל שאלה. לא צריך לרענן ולא לסגור את המסך.`)
+    box.innerHTML = nowBox('מה עושים עכשיו?', ['הקלטתם את התשובות.', 'לחצתם ”סיימנו להקליט”.', 'מחכים לשאר הקבוצות. כשכולן יסיימו — מתחילים לנחש מי אמר מה!'], 2, `⏱️ בניחוש יהיו לכם עד ${secsText(c.state.whoGuessSecsPlan || WHO_GUESS_SECS)} לכל שאלה. לא צריך לרענן ולא לסגור את המסך.`)
       + `<p class="who-progress">✅ הקלטתם <strong>${done} מתוך ${total}</strong> שאלות</p>`;
     /* Ayelet 26.11.26 ("after 'we finished' I can go back, but if everyone already finished it does not let me - confusing"):
        no "back" button - "סיימנו להקליט" asks first, and after it the recordings are final */
     return;
   }
   const busy = w.rec || w.pend || w.saving;
+  /* Ayelet 26.11.26 ("every saved recording should disappear, so nobody has to scroll all the time - the list goes down until one
+     recording is left"): a saved question leaves the list; the saved ones wait closed in "✅ הקלטות ששמרתם" (to hear / record again) */
+  const savedQ = q => whoSavedPid(c, q) && !((w.rec && w.rec.q === q) || (w.pend && w.pend.q === q));
   const rows = WHO_SAID_QUESTIONS.map((Q, q) => {
     const pid = whoAnswerer(c, q), saved = whoSavedPid(c, q), mine = saved && saved === pid, rid = pid + '_' + q, active = (w.rec && w.rec.q === q) || (w.pend && w.pend.q === q);
     const who = c.players.length > 1
@@ -4546,15 +4570,19 @@ function renderWhoRec(force) {
     else if (mine) act = `<div class="order-actions"><button class="game-btn" type="button" data-label="▶ שמיעה" onclick="window.whoPlay('${esc(rid)}', 1, this)" ${busy ? 'disabled' : ''}>▶ שמיעה</button><button class="game-btn" type="button" onclick="window.whoRecStart(${q})" ${busy ? 'disabled' : ''}>↻ הקלטה מחדש</button></div>`;
     else act = `${saved ? `<p class="smallnote">כבר הקליט/ה: ${esc(whoName(c, saved))}. אם ${esc(whoName(c, pid))} יקליט/תקליט — ההקלטה הקודמת תוחלף.</p>` : ''}<button class="buy" type="button" onclick="window.whoRecStart(${q})" ${busy ? 'disabled' : ''}>🎙️ הקלטה — ${esc(whoName(c, pid))}</button>`;
     return `<div class="who-q${active ? ' active' : ''}"><div class="who-q-head"><strong>שאלה ${q + 1} מתוך ${total}: ${esc(Q.title)}</strong>${saved ? '<span class="badge paid">✅ הוקלט</span>' : ''}</div>${who}<p class="who-q-text">❓ ${esc(Q.q)}</p>${act}</div>`;
-  }).join('');
+  });
+  const openRows = rows.filter((_, q) => !savedQ(q)).join(''), doneRows = rows.filter((_, q) => savedQ(q));
+  const savedBox = doneRows.length ? `<details class="info who-saved"${w.savedOpen ? ' open' : ''} ontoggle="window.whoSavedToggle(this.open)"><summary><strong>✅ הקלטות ששמרתם (${doneRows.length}) — לשמיעה או להקלטה מחדש</strong></summary>${doneRows.join('')}</details>` : '';
   const cur = w.pend ? 2 : done === total ? 3 : 1;
   box.innerHTML = nowBox('מה עושים?', ['מי שכתוב ב”מי עונה” לוחץ 🎙️ ומדבר', 'לוחצים ”✓ שמירה” ועוברים לשאלה הבאה', 'בסוף: ”סיימנו להקליט ✓”'], cur === 3 ? 2 : cur === 2 ? 1 : 0, '🤫 לא אומרים את השם בהקלטה!')
     + `<p class="who-progress">הוקלטו <strong>${done} מתוך ${total}</strong> שאלות</p>`
-    + (w.msg ? `<p class="${/✓/.test(w.msg) ? 'who-ok' : 'warn'}" style="font-weight:700">${esc(w.msg)}</p>` : '') + rows
+    + (w.msg ? `<p class="${/✓/.test(w.msg) ? 'who-ok' : 'warn'}" style="font-weight:700">${esc(w.msg)}</p>` : '') + openRows
+    + (done === total ? '<p class="who-ok" style="text-align:center;font-weight:700;font-size:18px">🎉 כל השאלות הוקלטו! לוחצים ”סיימנו להקליט”</p>' : '')
     /* (25.11.26 test: a group pressed "סיימנו" with no recording - and the whole guessing part was skipped) - at least one recording first */
     + (done ? '' : '<p class="warn" style="margin:6px 0">קודם מקליטים לפחות שאלה אחת — בלי הקלטות אין לאחרים מה לנחש.</p>')
-    + `<button class="buy${done === total ? ' go-pulse' : ''}" type="button" onclick="window.whoSetDone(true)" ${busy || !done ? 'disabled' : ''}>סיימנו להקליט ✓</button>${done < total ? `<p class="smallnote">עוד ${total - done === 1 ? 'שאלה אחת לא הוקלטה' : total - done + ' שאלות לא הוקלטו'}. אפשר לסיים גם ככה — שאלה בלי הקלטה פשוט לא תושמע לאחרים.</p>` : ''}`;
+    + `<button class="buy${done === total ? ' go-pulse' : ''}" type="button" onclick="window.whoSetDone(true)" ${busy || !done ? 'disabled' : ''}>סיימנו להקליט ✓</button>${done < total ? `<p class="smallnote">עוד ${total - done === 1 ? 'שאלה אחת לא הוקלטה' : total - done + ' שאלות לא הוקלטו'}. אפשר לסיים גם ככה — שאלה בלי הקלטה פשוט לא תושמע לאחרים.</p>` : ''}` + savedBox;
 }
+window.whoSavedToggle = function (open) { const c = groupCtx; if (c && c.who) c.who.savedOpen = open; };
 window.whoPick = function (q, pid) { const c = groupCtx; if (!c || c.who.rec || c.who.pend || c.who.saving) return; c.who.pick[q] = pid; c.who.msg = ''; renderWhoRec(true); };
 window.whoSetDone = async function (done) {
   const c = groupCtx; if (!c) return;
@@ -4652,11 +4680,13 @@ function renderGroupWhoGuess(main) {
       : '<div class="now-box"><p style="margin:0"><strong>בשאלה הזו אין לכם הקלטות לנחש</strong> — כל ההקלטות שנבחרו הן של הקבוצה שלכם 🙂 מחכים לשאלה הבאה.</p></div>'}</div>
     <p class="smallnote" id="whoHint" style="text-align:center"></p>`;
   if (!items.length) return;
+  /* (26.11.26 test: in stage 3 the names appeared only after tapping the box - like stage 1, they are there at once) */
+  document.querySelectorAll('#whoGuessBox input[data-rid]').forEach(inp => { try { showNameChips(inp); } catch (e) { } });
   // אחרי רענון: מחזירים את מה שהקבוצה כבר כתבה בשאלה הזו
   getDoc(doc(db, 'familyGames', c.gameId, 'whoAnswers', c.uid + '_' + r)).then(s => {
     if (groupCtx !== c || c.whoBuilt !== key || !s.exists()) return;
     const saved = Object.fromEntries((s.data().guesses || []).map(g => [g.rid, g.guess]));
-    document.querySelectorAll('#whoGuessBox input[data-rid]').forEach(inp => { if (!inp.value && saved[inp.dataset.rid]) inp.value = saved[inp.dataset.rid]; });
+    document.querySelectorAll('#whoGuessBox input[data-rid]').forEach(inp => { if (!inp.value && saved[inp.dataset.rid]) { inp.value = saved[inp.dataset.rid]; showNameChips(inp); } });
   }).catch(() => { });
   // טוענים מראש את ההקלטות של השאלה הזו, ואז של הבאה
   Promise.allSettled(items.map(it => whoLoad(it.rid))).then(() => { if (qs[r + 1] !== undefined) whoItemsFor(c, qs[r + 1]).forEach(it => whoLoad(it.rid).catch(() => { })); });
