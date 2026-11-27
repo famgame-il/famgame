@@ -1435,7 +1435,7 @@ async function showAdminPanel(user) {
   if (adminUnsub) adminUnsub();
   // הרשימה מתעדכנת בזמן אמת — הזמנה חדשה מופיעה מיד בלי לרענן
   adminUnsub = onSnapshot(query(collection(db, 'gameOrders'), orderBy('createdAt', 'desc'), limit(300)),
-    snap => { adminOrders = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderOrders(); refreshOnceUse().catch(e => console.warn(e)); },
+    snap => { adminOrders = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderOrders(); refreshOnceUse().catch(e => console.warn(e)); syncCodePlaces().catch(e => console.warn('codes', e)); },
     // ”אין הרשאה” כמעט תמיד = באותו דפדפן נכנסו בינתיים כמנהל משחק (ההתחברות התחלפה), לא כללי האבטחה
     err => {
       console.warn(err);
@@ -1764,7 +1764,7 @@ window.adminApprove = async function (id) {
   try { ({ uid: ownerUid, password } = await createOrderLogin(o.email)); }
   catch (e) { console.warn(e); credBox.innerHTML = `<div class="cred warn">יצירת המשתמש נכשלה (${esc(e.code || e.message)}). נסי שוב.</div>`; return; }
   // קוד ההצטרפות לקבוצות נוצר כבר עכשיו ונשלח במייל (קוד קיים נדחה ב־Firebase, ואז מנסים אחר)
-  const joinCode = await createJoinCode(id, o.gameDate);
+  const joinCode = await createJoinCode(id, o.gameDate, o.participants);
   try {
     const batch = writeBatch(db);
     batch.set(doc(db, 'familyGames', id), {
@@ -1855,7 +1855,7 @@ window.adminTestGame = async function (btn) {
   try {
     await setDoc(doc(db, 'gameOrders', id), o);
     const { uid: ownerUid, password } = await createOrderLogin(email);
-    const joinCode = await createJoinCode(id, today);
+    const joinCode = await createJoinCode(id, today, o.participants);
     const batch = writeBatch(db);
     batch.set(doc(db, 'familyGames', id), {
       ownerUid, ownerEmail: email, buyerName: o.buyerName, phone: o.phone, test: true,
@@ -1877,10 +1877,20 @@ window.adminTestGame = async function (btn) {
   }
   btn.disabled = false;
 };
-async function createJoinCode(gameId, gameDate) {
+/* (26.11.26 night) codes made before the "places" check: the admin page adds the purchased number to them (once per visit, only where missing) */
+let codePlacesSynced = false;
+async function syncCodePlaces() {
+  if (codePlacesSynced) return; codePlacesSynced = true;
+  for (const o of adminOrders.filter(x => x.status === 'paid' && Number(x.participants) > 0)) {
+    const codes = await getDocs(query(collection(db, 'gameCodes'), where('gameId', '==', o.gameId || o.id)));
+    for (const d of codes.docs) if (d.data().purchased == null) await updateDoc(d.ref, { purchased: Number(o.participants) });
+  }
+}
+/* (26.11.26 night) the code also keeps the purchased places - a group sees before joining whether there is room for it */
+async function createJoinCode(gameId, gameDate, purchased) {
   for (let i = 0; i < 8; i++) {
     const c = randomCode();
-    try { await setDoc(doc(db, 'gameCodes', c), { gameId, gameDate, createdAt: serverTimestamp() }); return c; }
+    try { await setDoc(doc(db, 'gameCodes', c), { gameId, gameDate, ...(Number(purchased) > 0 ? { purchased: Number(purchased) } : {}), createdAt: serverTimestamp() }); return c; }
     catch (e) { if (e.code !== 'permission-denied') { console.warn(e); return null; } }
   }
   return null; // לא נורא — מנהל המשחק יקבל קוד כשהוא פותח את המשחק
@@ -2021,6 +2031,11 @@ window.adminChangePeople = async function (id) {
     batch.update(doc(db, 'gameOrders', id), { participants: n });
     if (o.status === 'paid') batch.update(gameRef, { purchasedParticipants: n, maxGroups: maxGroupsFor(n) });
     await batch.commit();
+    /* (26.11.26 night) the phones check the free places by live/state.purchased - keep it the same as the game */
+    if (o.status === 'paid') {
+      await updateDoc(liveDoc(o.gameId || id, 'state'), { purchased: n }).catch(e => console.warn('state purchased', e));
+      (await getDocs(query(collection(db, 'gameCodes'), where('gameId', '==', o.gameId || id)))).docs.forEach(d => updateDoc(d.ref, { purchased: n }).catch(e => console.warn('code purchased', e)));
+    }
   } catch (e) { console.warn(e); alert('השינוי נכשל. נסי שוב.'); }
 };
 // הלקוח שכח את הסיסמה — נוצרת סיסמה חדשה למשחק הזה (הקודמת מפסיקה לעבוד)
@@ -2138,12 +2153,12 @@ window.openManagerPlay = async function () {
       if (game.joinCode) {
         const cd = await getDoc(doc(db, 'gameCodes', game.joinCode)).catch(() => null);
         if (cd && cd.exists() && cd.data().gameId === game.id) code = game.joinCode;
-        else try { await setDoc(doc(db, 'gameCodes', game.joinCode), { gameId: game.id, gameDate: game.gameDate, createdAt: serverTimestamp() }); code = game.joinCode; } catch (e) { console.warn(e); }
+        else try { await setDoc(doc(db, 'gameCodes', game.joinCode), { gameId: game.id, gameDate: game.gameDate, ...(Number(game.purchasedParticipants) > 0 ? { purchased: Number(game.purchasedParticipants) } : {}), createdAt: serverTimestamp() }); code = game.joinCode; } catch (e) { console.warn(e); }
       }
       // קוד הצטרפות ייחודי: אם הקוד כבר תפוס, Firebase דוחה ומנסים קוד אחר
       for (let i = 0; i < 6 && !code; i++) {
         const c = randomCode();
-        try { await setDoc(doc(db, 'gameCodes', c), { gameId: game.id, gameDate: game.gameDate, createdAt: serverTimestamp() }); code = c; }
+        try { await setDoc(doc(db, 'gameCodes', c), { gameId: game.id, gameDate: game.gameDate, ...(Number(game.purchasedParticipants) > 0 ? { purchased: Number(game.purchasedParticipants) } : {}), createdAt: serverTimestamp() }); code = c; }
         catch (e) { if (e.code !== 'permission-denied') throw e; }
       }
       if (!code) throw new Error('no-code');
@@ -2885,6 +2900,19 @@ window.joinGame = async function () {
     if (!mine.exists()) {
       const all = await getDocs(collection(db, 'familyGames', gameId, 'groups'));
       if (all.docs.some(d => String(d.data().name).trim().toLowerCase() === name.toLowerCase())) { msg.textContent = 'כבר יש קבוצה בשם הזה. בחרו שם אחר.'; btn.disabled = false; return; }
+      /* Ayelet 26.11.26 night (12-group test): a group could join when all the purchased places were already taken - and then no one of it
+         could be photographed ("save failed"). Now it is told before joining how many places are left */
+      try {
+        const purchased = Number(codeDoc.data().purchased) || 0; /* (a phone that did not join yet cannot read the game itself) */
+        if (purchased) {
+          const taken = all.docs.reduce((s, d) => { const g = d.data(); return s + (g.shortOk ? (Number(g.photoCount) || 0) : (Number(g.size) || 0)); }, 0), left = purchased - taken;
+          if (size > left) {
+            msg.textContent = left <= 0 ? `המשחק מלא: כל ${purchased} המקומות שהוזמנו כבר שמורים לקבוצות שהצטרפו. כדי להוסיף משתתפים — פנו למי שהזמין את המשחק.`
+              : `נשארו במשחק רק ${left === 1 ? 'מקום אחד' : left + ' מקומות'} (הוזמנו ${purchased} משתתפים). ${left >= MIN_GROUP_SIZE || String(gameId).startsWith('test') ? `כתבו ${left} במספר המשתתפים, ` : 'זה פחות מקבוצה — הצטרפו לקבוצה שכבר במשחק, '}או פנו למי שהזמין את המשחק כדי להוסיף משתתפים.`;
+            btn.disabled = false; return;
+          }
+        }
+      } catch (e) { console.warn('places check', e); }
       // הקוד נכון, אבל מנהל המשחק עוד לא לחץ ”פתיחת המשחק” (המונה נוצר רק אז)
       if (!(await getDoc(liveDoc(gameId, 'groupCount'))).exists()) { msg.textContent = 'הקוד נכון ✓ — אבל המשחק עוד לא מוכן. נסו שוב בעוד דקה, ואם זה ממשיך — פנו למי שרכש את המשחק.'; btn.disabled = false; return; }
       // המונה מבטיח שאי־אפשר לפתוח יותר קבוצות ממה שנרכש — גם אם כמה קבוצות מצטרפות באותו רגע
@@ -3248,7 +3276,10 @@ function hostPlayNext(c) {
   const openingDue = c.state && c.state.stage === 'photos' && !c.state.photosOpen && !(c.group && c.group.gotIt && c.group.gotIt.s1) && !((c.vidDone || {}).s1 || hostVideoSeen(c, 's1'));
   /* (25.11.26) the finale: quiet until the winners appeared + the prize recording ended (window.__finHoldUntil, set by the 'win' cue).
      Never stuck: at most 70 s after the finale screen opened */
-  const videoUp = document.getElementById('vidOverlay') || document.getElementById('truthOv') || c.vidPending || openingDue || document.querySelector('#grpMain .vg-body[hidden]');
+  /* Ayelet 26.11.26 night ("everything understandable, nothing cut"): never talk over a recording that is playing (stage 3 guessing),
+     and never into the microphone while the group records an answer (his voice would be recorded into it) */
+  const videoUp = document.getElementById('vidOverlay') || document.getElementById('truthOv') || c.vidPending || openingDue || document.querySelector('#grpMain .vg-body[hidden]')
+    || c.whoPlaying || (c.who && (c.who.rec || c.who.starting));
   let finHold = false;
   if (!videoUp && c.state && c.state.stage === 'final') {
     if (!c.finalSeenAt) { c.finalSeenAt = Date.now(); setTimeout(() => revealTruth(c), 150000); } /* counted from when the announcement itself is on the screen (after the video); the results button at the latest 2.5 min later */
@@ -3321,6 +3352,12 @@ window.hostIntroAgain = function () {
     : st === 'final' ? ['elkana-winners.mp4', 'e-trophy.jpg', 'ההכרזה'] : ['elkana-stage1.mp4', 'e-welcome.jpg', 'אלקנה מסביר את שלב 1'];
   openVideoOverlay(c, 'again', [v[0]], v[1], v[2], true);
 };
+/* Ayelet 26.11.26 night ("nothing jumps"): with many groups every update of any group re-drew the whole screen (the gold frames restarted,
+   the page flickered). A screen is written again only when its content really changed */
+function setMain(main, html) {
+  if (main.__h === html && main.__hNode && main.__hNode === main.firstElementChild && main.__hNode.isConnected) return false;
+  main.innerHTML = html; main.__h = html; main.__hNode = main.firstElementChild; return true;
+}
 function renderGroup() {
   const c = groupCtx; if (!c || !c.state || !c.group) return;
   groupTick(c);
@@ -3342,7 +3379,7 @@ function renderGroup() {
       add.hidden = true; return;
     }
     if (c.group.ready) {
-      main.innerHTML = lobbyHtml(c) + nowBox('מה עושים עכשיו?', ['כל המשתתפים הצטלמו.', 'לחצתם ”העלינו ואנחנו מוכנים”.', 'מחכים לשאר הקבוצות. כשכולן מוכנות — אלקנה מתחיל את המשחק לבד, עם שעון עצר.'], 2, `⏱️ כשיתחיל: יהיו לכם כ־${secsText(c.state.eyesPerPair || 15)} לכל תמונה, והשעון רץ למעלה במסך.<br><strong>⚡ מי שעונה מהר — מקבל יותר נקודות!</strong> (תשובה נכונה מיד = 100, בסוף הזמן = 50)`) + `<p><strong>✅ העליתם ${c.players.length === 1 ? 'משתתף אחד' : c.players.length + ' משתתפים'}:</strong></p>${members}<button class="game-btn" type="button" onclick="window.setGroupReady(false)">רגע, עוד לא — חזרה לצילום (או לתיקון שם)</button>`;
+      setMain(main, lobbyHtml(c) + nowBox('מה עושים עכשיו?', ['כל המשתתפים הצטלמו.', 'לחצתם ”העלינו ואנחנו מוכנים”.', 'מחכים לשאר הקבוצות. כשכולן מוכנות — אלקנה מתחיל את המשחק לבד, עם שעון עצר.'], 2, `⏱️ כשיתחיל: יהיו לכם כ־${secsText(c.state.eyesPerPair || 15)} לכל תמונה, והשעון רץ למעלה במסך.<br><strong>⚡ מי שעונה מהר — מקבל יותר נקודות!</strong> (תשובה נכונה מיד = 100, בסוף הזמן = 50)`) + `<p><strong>✅ העליתם ${c.players.length === 1 ? 'משתתף אחד' : c.players.length + ' משתתפים'}:</strong></p>${members}<button class="game-btn" type="button" onclick="window.setGroupReady(false)">רגע, עוד לא — חזרה לצילום (או לתיקון שם)</button>`);
       add.hidden = true; crop.innerHTML = ''; pendingFace = null;
     } else {
       // ”העלינו ואנחנו מוכנים” נפתח רק כשהקבוצה העלתה בדיוק את מספר המשתתפים שלה
@@ -3352,8 +3389,8 @@ function renderGroup() {
           /* without a manager: a group whose member did not come may continue with fewer */
           /* (25.11.26, Ayelet: "we wrote 4 and only 3 came - something must be done with it") - a big clear button, not a small grey one */
           + (c.players.length ? `<div class="now-box" style="text-align:center;margin-top:10px"><p style="margin:0 0 6px"><strong>🙋 מישהו מהקבוצה לא הגיע?</strong> אין בעיה — ממשיכים בלעדיו:</p><button class="buy" type="button" onclick="window.groupShort(${c.players.length})">אנחנו רק ${c.players.length === 1 ? 'משתתף אחד' : c.players.length} — ממשיכים ✓</button></div>` : '');
-      main.innerHTML = nowBox('מה עושים?', ['כל אחד בתורו כותב שם מלא', 'מצטלם מקרוב ולוחץ ”שמירה”', `כשכל ה־${need} הצטלמו — ”העלינו ואנחנו מוכנים”`], missing <= 0 ? 2 : 0)
-        + `<p><strong>משתתפים בקבוצה: ${c.players.length} מתוך ${need}</strong></p>${members || '<p class="smallnote">עדיין לא הצטלם אף אחד.</p>'}${readyBtn}`;
+      setMain(main, nowBox('מה עושים?', ['כל אחד בתורו כותב שם מלא', 'מצטלם מקרוב ולוחץ ”שמירה”', `כשכל ה־${need} הצטלמו — ”העלינו ואנחנו מוכנים”`], missing <= 0 ? 2 : 0)
+        + `<p><strong>משתתפים בקבוצה: ${c.players.length} מתוך ${need}</strong></p>${members || '<p class="smallnote">עדיין לא הצטלם אף אחד.</p>'}${readyBtn}`);
       add.hidden = false;
       if (c.players.length >= cap) add.innerHTML = `<p class="smallnote">✅ הקבוצה מלאה — ${cap === 1 ? 'משתתף אחד' : cap + ' משתתפים'}.</p>`;
       else if (!document.getElementById('memberName')) renderAddForm();
@@ -3366,10 +3403,10 @@ function renderGroup() {
     const mine = c.results && c.results.stage1 && c.results.stage1[c.uid];
     if (!mine) { main.innerHTML = '<p>מחשבים את התוצאות…</p>'; return; }
     /* (25.11.26) whose eyes - after the finale (no time here before the stage-2 video) */
-    main.innerHTML = `<div class="now-box" style="text-align:center"><p style="font-size:24px;margin:0"><strong>🎉 ${mine.points != null ? `קיבלתם ${mine.points} נקודות — ${mine.score === 1 ? 'זיהוי נכון אחד' : mine.score + ' זיהויים נכונים'} מתוך ${mine.total}!` : `קיבלתם ${mine.score} ${mine.score === 1 ? 'נקודה' : 'נקודות'} מתוך ${mine.total}!`}</strong></p></div>`
+    setMain(main, `<div class="now-box" style="text-align:center"><p style="font-size:24px;margin:0"><strong>🎉 ${mine.points != null ? `קיבלתם ${mine.points} נקודות — ${mine.score === 1 ? 'זיהוי נכון אחד' : mine.score + ' זיהויים נכונים'} מתוך ${mine.total}!` : `קיבלתם ${mine.score} ${mine.score === 1 ? 'נקודה' : 'נקודות'} מתוך ${mine.total}!`}</strong></p></div>`
       + raceHtml(c.results, c.uid, 'race1' + c.gameId)
       + LATER_NOTE('של מי היו העיניים')
-      + scoreboard(c.results.stage1, '🏆 טבלת הניקוד — שלב 1') + nextStepHtml(c);
+      + scoreboard(c.results.stage1, '🏆 טבלת הניקוד — שלב 1') + nextStepHtml(c));
   } else if (['assocIntro', 'assoc', 'assocCheck', 'assocDone'].includes(c.state.stage)) {
     add.hidden = true; add.innerHTML = ''; crop.innerHTML = '';
     renderGroupAssoc(main);
@@ -3595,7 +3632,19 @@ window.saveMember = async function () {
     document.getElementById('cropBox').innerHTML = ''; renderAddForm();
   } catch (e) {
     console.warn(e); window.__savingMember = false; renderGroup();
-    document.getElementById('cropBox').innerHTML = '<div class="info"><p class="warn">השמירה נכשלה. ייתכן שכבר נרשמו כל המשתתפים שנרכשו, או שמנהל המשחק כבר לחץ ”המשך”. פנו למנהל המשחק.</p></div>';
+    /* (26.11.26 night) there is no game manager any more - a clear reason, and the photo stays so "שמירה" can simply be pressed again.
+       "Full" only when the server refused AND the counter really reached the purchased places (the server decides, never the phone) */
+    let full = false;
+    if (e && e.code === 'permission-denied' && c.state.stage === 'photos') {
+      try { const pc = await getDoc(liveDoc(c.gameId, 'playerCount')); full = !!(c.state.purchased && pc.data().count >= Number(c.state.purchased)); } catch (x) { }
+    }
+    const why = full ? `כל ${Number(c.state.purchased)} המקומות שהוזמנו למשחק כבר תפוסים, אז אי אפשר להוסיף עוד משתתף.${c.players.length ? ` מי שלא הספיק להצטלם — ממשיכים בלעדיו: לוחצים ”אנחנו רק ${c.players.length === 1 ? 'משתתף אחד' : c.players.length} — ממשיכים”.` : ' פנו למי שהזמין את המשחק כדי להוסיף משתתפים.'}`
+      : c.state.stage !== 'photos' ? 'המשחק כבר התחיל, אז אי אפשר להוסיף עוד משתתף.' : 'השמירה לא הצליחה — כנראה האינטרנט נפל לרגע. לוחצים שוב ”שמירה”.';
+    const sb2 = document.getElementById('saveMemberBtn');
+    if (sb2 && !full) { sb2.disabled = false; sb2.textContent = '✓ שמירה'; sb2.classList.add('save-pulse'); }
+    const box = document.getElementById('cropBox');
+    if (full || !sb2) box.innerHTML = `<div class="info"><p class="warn" style="font-weight:700">${esc(why)}</p></div>`;
+    else { let w = document.getElementById('saveErr'); if (!w) { w = document.createElement('p'); w.id = 'saveErr'; w.className = 'warn'; w.style.fontWeight = '700'; sb2.insertAdjacentElement('afterend', w); } w.textContent = why; }
   }
 };
 // תיקון שם של משתתף (בלי לצלם מחדש) — עד שמנהל המשחק לוחץ ”המשך”
@@ -4480,8 +4529,16 @@ function whoStartAudio(url, rate, btn) {
   a.play().catch(e => { console.warn(e); if (c.whoPlaying && c.whoPlaying.a === a) { whoStopAudio(); btn.textContent = e && e.name === 'NotAllowedError' ? '▶ לחצו שוב לשמיעה' : '❌ לא נשמע — נסו שוב'; } });
 }
 // rate: 1 = הקול האמיתי. באייפון ההשמעה חייבת להתחיל מלחיצה — לכן אם ההקלטה עוד נטענת, מבקשים ללחוץ שוב
+/* (26.11.26 night) a recording / the microphone never runs over Elkana: pressed while he talks -> it starts right after his sentence */
+function afterHost(c, btn, label, go) {
+  if (!c.hostPlaying) return false;
+  if (btn) btn.textContent = label;
+  clearInterval(c.afterHostT); c.afterHostT = setInterval(() => { if (groupCtx !== c) return clearInterval(c.afterHostT); if (!c.hostPlaying) { clearInterval(c.afterHostT); go(); } }, 250);
+  return true;
+}
 window.whoPlay = function (rid, rate, btn) {
   const c = groupCtx; if (!c || !btn) return;
+  if (afterHost(c, btn, '⏳ מתנגן כשאלקנה מסיים…', () => { if (btn.isConnected) { btn.textContent = btn.dataset.label; window.whoPlay(rid, rate, btn); } })) return;
   if (c.whoPlaying && c.whoPlaying.btn === btn) return whoStopAudio();
   whoStopAudio();
   const url = c.whoUrl[rid];
@@ -4585,15 +4642,16 @@ function renderWhoRec(force) {
     + (w.msg ? `<p class="${/✓/.test(w.msg) ? 'who-ok' : 'warn'}" style="font-weight:700">${esc(w.msg)}</p>` : '') + openRows
     + (done === total ? '<p class="who-ok" style="text-align:center;font-weight:700;font-size:18px">🎉 כל השאלות הוקלטו! לוחצים ”סיימנו להקליט”</p>' : '')
     /* (25.11.26 test: a group pressed "סיימנו" with no recording - and the whole guessing part was skipped) - at least one recording first */
-    + (done ? '' : '<p class="warn" style="margin:6px 0">קודם מקליטים לפחות שאלה אחת — בלי הקלטות אין לאחרים מה לנחש.</p>')
-    + `<button class="buy${done === total ? ' go-pulse' : ''}" type="button" onclick="window.whoSetDone(true)" ${busy || !done ? 'disabled' : ''}>סיימנו להקליט ✓</button>${done < total ? `<p class="smallnote">עוד ${total - done === 1 ? 'שאלה אחת לא הוקלטה' : total - done + ' שאלות לא הוקלטו'}. אפשר לסיים גם ככה — שאלה בלי הקלטה פשוט לא תושמע לאחרים.</p>` : ''}` + savedBox;
+    /* Ayelet 26.11.26 night: "in a real game you must record all 10, otherwise it does not work well" - "סיימנו" only after all of them */
+    + `<button class="buy${done === total ? ' go-pulse' : ''}" type="button" onclick="window.whoSetDone(true)" ${busy || done < total ? 'disabled' : ''}>סיימנו להקליט ✓</button>${done < total ? `<p class="warn" style="margin:6px 0">מקליטים את כל ${total} השאלות — ${total - done === 1 ? 'נשארה עוד שאלה אחת' : 'נשארו עוד ' + (total - done) + ' שאלות'}. אחרי כולן נפתח ”סיימנו להקליט”.</p>` : ''}` + savedBox;
 }
 window.whoSavedToggle = function (open) { const c = groupCtx; if (c && c.who) c.who.savedOpen = open; };
 window.whoPick = function (q, pid) { const c = groupCtx; if (!c || c.who.rec || c.who.pend || c.who.saving) return; c.who.pick[q] = pid; c.who.msg = ''; renderWhoRec(true); };
 window.whoSetDone = async function (done) {
   const c = groupCtx; if (!c) return;
   const left = WHO_SAID_QUESTIONS.length - whoDoneCount(c);
-  if (done && !confirm(`${left ? (left === 1 ? 'שאלה אחת עוד לא הוקלטה. ' : left + ' שאלות עוד לא הוקלטו. ') : ''}סיימתם להקליט? אחרי הלחיצה אי אפשר לחזור ולהקליט עוד.`)) return;
+  if (done && left) { alert(`מקליטים את כל השאלות קודם — ${left === 1 ? 'נשארה עוד שאלה אחת' : 'נשארו עוד ' + left + ' שאלות'}.`); return; } /* (26.11.26) all 10 first */
+  if (done && !confirm('סיימתם להקליט? אחרי הלחיצה אי אפשר לחזור ולהקליט עוד.')) return;
   try { await updateGroupDoc(c, done ? { whoDone: done, whoDoneAt: serverTimestamp() } : { whoDone: done }); }
   catch (e) { console.warn(e); alert('לא הצלחנו לעדכן. בדקו את החיבור ונסו שוב.'); }
 };
@@ -4607,6 +4665,7 @@ function blobToDataUrl(blob, mime) {
 window.whoRecStart = async function (q) {
   const c = groupCtx, w = c && c.who; if (!w || w.rec || w.saving || w.starting || c.state.stage !== 'whoRecord') return;
   const pid = whoAnswerer(c, q); if (!pid) return;
+  if (c.hostPlaying) { w.msg = '🎙️ ההקלטה מתחילה ברגע שאלקנה מסיים את המשפט…'; renderWhoRec(true); afterHost(c, null, '', () => { w.msg = ''; window.whoRecStart(q); }); return; }
   whoStopAudio(); w.pend = null; w.msg = '';
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined') { w.msg = 'המכשיר הזה לא יכול להקליט. אפשר להקליט מטלפון אחר של הקבוצה (באייפון — לעדכן את המערכת), או לדלג.'; return renderWhoRec(true); }
   w.starting = true;
@@ -4737,12 +4796,24 @@ authReady.then(async user => {
   if (!user || !user.isAnonymous || location.hash === '#admin' || location.hash === '#ai-test' || /[?&]ai-test\b/.test(location.search) || location.hash === '#check' || /[?&]check\b/.test(location.search) || location.hash.startsWith('#join=')) return;
   let gameId = null; try { gameId = localStorage.getItem(GROUP_KEY); } catch (e) { }
   if (!gameId) return;
-  try {
-    if (!(await getDoc(doc(db, 'familyGames', gameId, 'groups', user.uid))).exists()) return;
-    const st = await getDoc(liveDoc(gameId, 'state'));
-    if (st.exists() && st.data().stage === 'final') { forgetGroupGame(); return; }
-    startGroup(gameId);
-  } catch (e) { if (e && e.code === 'permission-denied') forgetGroupGame(); else console.warn('autoResume', e); }
+  /* (26.11.26 night test, weak internet): the check failed once ("offline") and the phone stayed on the home page with no way back.
+     Now it tries again (every 3 s, up to a minute), and meanwhile a big "🎮 חזרה למשחק" button is there */
+  for (let attempt = 0; attempt < 20; attempt++) {
+    try {
+      if (!(await getDoc(doc(db, 'familyGames', gameId, 'groups', user.uid))).exists()) return;
+      const st = await getDoc(liveDoc(gameId, 'state'));
+      if (st.exists() && st.data().stage === 'final') { forgetGroupGame(); return; }
+      if (!window.inGroupGame()) startGroup(gameId);
+      return;
+    } catch (e) {
+      if (e && e.code === 'permission-denied') { forgetGroupGame(); return; }
+      console.warn('autoResume', e);
+      const box = document.getElementById('resumeBox');
+      if (box && box.hidden && !window.inGroupGame()) { window.resumeGameId = gameId; box.innerHTML = '<button class="buy" type="button" style="width:100%;font-size:20px;margin:0 0 14px" onclick="window.resumeGame()">🎮 חזרה למשחק</button><p class="smallnote" style="margin:-8px 0 12px">החיבור לאינטרנט חלש — מנסים לחזור לבד…</p>'; box.hidden = false; }
+      if (window.inGroupGame()) return;
+      await new Promise(r => setTimeout(r, 3000));
+    }
+  }
 });
 function forgetGroupGame() { try { localStorage.removeItem(GROUP_KEY); } catch (e) { } window.resumeGameId = null; const b = document.getElementById('resumeBox'); if (b) b.hidden = true; }
 /* Ayelet 11.11.26 - "I want to leave, and if I stopped in the middle - continue from where the game stopped":
