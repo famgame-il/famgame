@@ -2972,7 +2972,8 @@ window.joinGame = async function () {
     startGroup(gameId);
   } catch (e) {
     console.warn(e);
-    msg.textContent = e.code === 'permission-denied' ? 'אי־אפשר להצטרף: המשחק מלא (הצטרפו כבר כל הקבוצות האפשריות), או שעוד לא 6:00 בבוקר.'
+    /* (27.11.26) after the game started (stage 1) no group can join any more - said first, it is the usual reason */
+    msg.textContent = e.code === 'permission-denied' ? 'אי־אפשר להצטרף: המשחק כבר התחיל — אחרי שהקבוצות התחילו לשחק אי־אפשר להצטרף. (או שהמשחק מלא, או שעוד לא 6:00 בבוקר.)'
       : e.code === 'auth/operation-not-allowed' ? 'ההצטרפות לקבוצות עוד לא הופעלה במערכת. פנו לבעלת האתר.'
       : 'ההצטרפות נכשלה. בדקו את החיבור לאינטרנט ונסו שוב.';
     btn.disabled = false;
@@ -3371,7 +3372,7 @@ function hostStale(c, m) {
 function hostPlayNext(c) {
   if (c.hostPlaying || !c.hostQueue.length) return;
   /* never talk over one of Elkana's videos - wait until it is closed */
-  const openingDue = c.state && c.state.stage === 'photos' && !c.state.photosOpen && !(c.group && c.group.gotIt && c.group.gotIt.s1) && !((c.vidDone || {}).s1 || hostVideoSeen(c, 's1'));
+  const openingDue = c.state && c.state.stage === 'photos' && !(c.group && c.group.gotIt && c.group.gotIt.s1) /* (27.11.26) also a late group */ && !((c.vidDone || {}).s1 || hostVideoSeen(c, 's1'));
   /* (25.11.26) the finale: quiet until the winners appeared + the prize recording ended (window.__finHoldUntil, set by the 'win' cue).
      Never stuck: at most 70 s after the finale screen opened */
   /* Ayelet 26.11.26 night ("everything understandable, nothing cut"): never talk over a recording that is playing (stage 3 guessing),
@@ -3482,7 +3483,9 @@ function renderGroup() {
   if (c.state.stage === 'photos') {
     const editable = !c.group.ready, need = requiredFor(c.state, { ...c.group, id: c.uid }, c.players.length), cap = maxFor(c.state, need), missing = need - c.players.length;
     const members = c.players.map(p => `<div class="member"><img src="${esc(p.eyes)}" alt="העיניים של ${esc(p.name)}"><div><strong>${esc(p.name)}</strong>${editable ? ` <button class="game-btn" type="button" onclick="window.renameMember('${esc(p.id)}')">✏️ שינוי שם</button> <button class="game-btn" type="button" onclick="window.removeMember('${esc(p.id)}')">מחיקה</button>` : ''}</div></div>`).join('');
-    if (!c.state.photosOpen && !c.group.ready && !c.players.length) {
+    /* Ayelet 27.11.26 ("I joined and it went straight to stage 1, I did not see Elkana's videos - as if I came in the middle"): a group
+       that joins after the others already opened the registration still gets Elkana's videos + the explanation + "הבנתי" first */
+    if ((!c.state.photosOpen || !(c.group.gotIt && c.group.gotIt.s1)) && !c.group.ready && !c.players.length) {
       // מסך פתיחה: הוראות + הסבר, ”הבנו”, ומחכים שמנהל המשחק יפתח את הצילום לכולם
       /* 11.11.26 (Ayelet): the opening video of Elkana plays by itself; "הבנתי" appears only when the video ends (or if it cannot load - never stuck) */
       /* the opening video + the stage-1 video play by themselves; "הבנתי" appears only when they end (never stuck) */
@@ -3490,6 +3493,7 @@ function renderGroup() {
       add.hidden = true; return;
     }
     if (c.group.ready) {
+      setTimeout(() => lobbyScroll(c), 0); /* (27.11.26) the "כולם כאן?" button in view */
       setMain(main, lobbyHtml(c) + nowBox('מה עושים עכשיו?', ['כל המשתתפים הצטלמו.', 'לחצתם ”העלינו ואנחנו מוכנים”.', 'מחכים לשאר הקבוצות. כשכולן מוכנות — אלקנה מתחיל את המשחק לבד, עם שעון עצר.'], 2, `⏱️ כשיתחיל: יהיו לכם כ־${secsText(c.state.eyesPerPair || 15)} לכל תמונה, והשעון רץ למעלה במסך.<br><strong>⚡ מי שעונה מהר — מקבל יותר נקודות!</strong> (תשובה נכונה מיד = 100, בסוף הזמן = 50)`) + `<p><strong>✅ העליתם ${c.players.length === 1 ? 'משתתף אחד' : c.players.length + ' משתתפים'}:</strong></p>${members}<button class="game-btn" type="button" onclick="window.setGroupReady(false)">רגע, עוד לא — חזרה לצילום (או לתיקון שם)</button>`);
       add.hidden = true; crop.innerHTML = ''; pendingFace = null;
     } else {
@@ -3790,9 +3794,16 @@ window.setGroupReady = async function (ready) {
     const need = requiredFor(c.state, { ...c.group, id: c.uid }, c.players.length);
     if (c.players.length !== need) { alert(`הקבוצה שלכם צריכה ${need} משתתפים — כרגע יש ${c.players.length}.`); return; }
   }
-  try { await updateGroupDoc(c, ready ? { ready, readyAt: serverTimestamp() } : { ready }); }
+  try { await updateGroupDoc(c, ready ? { ready, readyAt: serverTimestamp() } : { ready }); if (ready) setTimeout(scrollTop, 150); /* (27.11.26) after the photos they were at the bottom - the waiting screen starts at the top */ }
   catch (e) { console.warn(e); alert('לא הצלחנו לעדכן. נסו שוב.'); }
 };
+/* Ayelet 27.11.26 ("the 'כולנו כאן — מתחילים' button stands at the top; after photographing I was at the end of the page and could not see
+   it - you have to scroll up to see it lit"): the moment the question "כולם כאן?" appears, the page goes to it by itself (once) */
+function lobbyScroll(c) {
+  const since = tsMs(((c.state && c.state.lobby) || {}).allReadyAt); if (!since || c.lobbySeen === since) return;
+  const b = document.querySelector('.lobby-box'); if (!b) return;
+  c.lobbySeen = since; setTimeout(() => { try { b.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) { b.scrollIntoView(); } }, 250);
+}
 
 // ---------- שלב 2: ”מה זה מזכיר לכם?” ----------
 // 8 סבבים: תמונה רצה ועוצרת (אותה תמונה לכולם), כדקה (40/60/90 שניות, לבחירת מנהל המשחק) לכתוב כמה שיותר דברים שהיא מזכירה על המשפחה או על החג.
