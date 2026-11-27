@@ -139,8 +139,8 @@ footer .nagish-bottom{margin:6px 0 0;display:block}
 /* (27.11.26) while Elkana talks: the buttons that move the game on are grey with ⏳; a press shows #elkToast */
 /* Ayelet 27.11.26 (later): NOT the "הבא" buttons of the timed stages (stage 1, stage 2, stage 3 guessing) - there speed = points, so
    the group may go on while he talks (the pink card does not jump over him). Only the buttons that move between stages wait */
-.elk-talking :is(button[onclick*="groupGotIt"],button[onclick*="setGroupReady(true)"],button[onclick*="groupShort"],button[onclick*="groupStartVote"],button[onclick*="whoSetDone(true)"],button[onclick*="whoSave()"]){background:#d9d4cc!important;color:#5c574f!important;box-shadow:none!important;animation:none!important;border-color:#bdb6aa!important}
-.elk-talking :is(button[onclick*="groupGotIt"],button[onclick*="setGroupReady(true)"],button[onclick*="groupShort"],button[onclick*="groupStartVote"],button[onclick*="whoSetDone(true)"],button[onclick*="whoSave()"])::after{content:' ⏳'}
+.elk-talking :is(button[onclick*="groupGotIt"],button[onclick*="setGroupReady(true)"],button[onclick*="groupShort"],button[onclick*="groupStartVote"],button[onclick*="whoSetDone(true)"]){background:#d9d4cc!important;color:#5c574f!important;box-shadow:none!important;animation:none!important;border-color:#bdb6aa!important}
+.elk-talking :is(button[onclick*="groupGotIt"],button[onclick*="setGroupReady(true)"],button[onclick*="groupShort"],button[onclick*="groupStartVote"],button[onclick*="whoSetDone(true)"])::after{content:' ⏳'}
 .elk-toast{position:fixed;left:12px;right:12px;bottom:18px;margin:0 auto;max-width:420px;background:#3b3020;color:#fff;padding:10px 14px;border-radius:14px;text-align:center;z-index:9500;opacity:0;pointer-events:none;transition:opacity .2s;font-size:15px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
 .elk-toast.on{opacity:1}
 .buy.truth-wait{background:#d9d4cc!important;color:#5c574f!important;box-shadow:none!important;animation:none!important;border-color:#bdb6aa!important} /* (27.11.26) not yet - Elkana still talks */
@@ -2643,6 +2643,8 @@ window.managerRevealResults = async function () {
 // --- טלפון של קבוצה ---
 window.openJoin = function (code) {
   const c = /^\d{6}$/.test(code || '') ? code : '';
+  /* (27.11.26) a new version of the site was uploaded while this page was open - take it before joining */
+  if ((window.__siteVer || {}).isNew) { location.hash = '#join=' + c; location.reload(); return; }
   showPlay(`<div class="play-wrap"><h2>הצטרפות למשחק</h2>${nowBox('מה עושים עכשיו?', [c ? 'הקוד כבר ממולא (הגעתם מהקישור).' : 'מקלידים את הקוד בן 6 הספרות שמנהל המשחק נתן.', 'כותבים שם לקבוצה (למשל: הנמרים).', 'כותבים כמה משתתפים יש בקבוצה — עד 5. אתם יותר? מתחלקים לשתי קבוצות.', 'לוחצים ”הצטרפות”.'], c ? 1 : 0, 'טלפון אחד לכל קבוצה — כל הקבוצה משחקת ממנו. את הקוד מקבלים ממנהל המשחק.')}<form class="game-form" onsubmit="event.preventDefault();window.joinGame()"><label>קוד משחק<input id="joinCode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="קוד בן 6 ספרות" value="${c}"></label><label>שם הקבוצה<input id="joinGroupName" maxlength="30" required placeholder="למשל: הנמרים"></label><label>כמה משתתפים בקבוצה?<input id="joinGroupSize" type="number" inputmode="numeric" min="1" max="${MAX_GROUP_SIZE}" required placeholder="למשל: 4"></label><p class="smallnote" style="margin:-4px 0 0">כל משתתף בקבוצה יצטלם — המשחק ימשיך רק אחרי שכולם הצטלמו.</p><button class="buy" type="submit" id="joinBtn">הצטרפות</button><p id="joinMsg" class="smallnote" role="status"></p><button class="game-btn" type="button" onclick="leavePlay()">← חזרה</button></form>${CONN_CHECK_HTML}</div>`);
 };
 // תיבת ”מה עושים עכשיו?” — צעדים ממוספרים: מה שבוצע מסומן ✓, והצעד הנוכחי מודגש
@@ -3012,6 +3014,7 @@ function startGroup(gameId) {
     /* every move forward (a stage, a picture, a question) starts at the top of the page (11.11.26, Ayelet) */
     if (prev && (prev !== c.state.stage || prevStep !== (c.state.assocRound + ':' + c.state.whoRound + ':' + !!c.state.photosOpen))) { setTimeout(scrollTop, 50); setTimeout(scrollTop, 1000); showTransition(c); } /* (25.11.26, Ayelet: "after הבנתי the next stage opened in the middle") once more after pictures loaded */
     stageSound(prev, c.state.stage); r();
+    siteReloadIfNew(c, prev); /* (27.11.26) a new version of the site was uploaded - take it at this stage change */
   };
   playUnsubs.push(onSnapshot(doc(db, 'familyGames', gameId, 'answers', uid), s => { const was = c.submitted; c.submitted = s.exists(); c.savedGuesses = s.exists() ? s.data().guesses : null; if (was !== c.submitted) c.eyesBuilt = false; r(); }, playError));
   // כל הקבוצות — כדי שכל קבוצה תראה מי כבר מוכנה (כמו שמנהל המשחק רואה)
@@ -3172,6 +3175,29 @@ function transitionText(st) {
   if (s === 'whoRecord') return ['🎙️', 'מקליטים!', 'שלב 3 — חלק א׳'];
   if (s === 'whoGuess') return ['🎧', st.whoRound ? `שאלה ${st.whoRound + 1} מתוך ${(st.whoQuestions || []).length}` : 'עכשיו מנחשים!', st.whoRound ? 'מי אמר את זה?' : `שלב 3 — חלק ב׳ · שאלה 1 מתוך ${(st.whoQuestions || []).length}`];
   return null;
+}
+/* Ayelet 27.11.26 (her phone kept an old copy of the site open since the morning, so stage 3 worked the old way after the upload):
+   the page checks every 2 minutes (and when the phone comes back to it) whether a new version was uploaded. Then it reloads when
+   a group opens the join page, or in a game at the next stage change (never in the middle of a question or a recording, never in
+   a form). After a reload the game comes back by itself (autoResume) */
+const SITE_VER = window.__siteVer = { tag: null, isNew: false };
+async function siteVersion() {
+  try { const r = await fetch(location.pathname + '?vcheck=' + Date.now(), { method: 'HEAD', cache: 'no-store' }); return r.headers.get('etag') || r.headers.get('last-modified') || null; } catch (e) { return null; }
+}
+async function siteVersionCheck() {
+  if (SITE_VER.isNew) return;
+  const v = await siteVersion(); if (!v) return;
+  if (!SITE_VER.tag) { SITE_VER.tag = v; return; }
+  if (v !== SITE_VER.tag) SITE_VER.isNew = true; /* never a reload in the middle of a form (an order, the admin) - only when a game starts (openJoin) or at a stage change */
+}
+if (!/^(localhost|127\.)/.test(location.hostname)) {
+  siteVersionCheck(); setInterval(siteVersionCheck, 120000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) siteVersionCheck(); });
+}
+function siteReloadIfNew(c, prevStage) {
+  if (!SITE_VER.isNew || !c || !prevStage || c.state.stage === prevStage || c.state.stage === 'final') return;
+  if (c.who && (c.who.rec || c.who.pend || c.who.saving)) return;
+  setTimeout(() => location.reload(), 300);
 }
 /* (27.11.26) the step on the screen: stage + picture + question + registration open */
 function stateStep(x) { return x ? x.stage + ':' + x.assocRound + ':' + x.whoRound + ':' + !!x.photosOpen : ''; }
@@ -3802,7 +3828,11 @@ window.setGroupReady = async function (ready) {
 function lobbyScroll(c) {
   const since = tsMs(((c.state && c.state.lobby) || {}).allReadyAt); if (!since || c.lobbySeen === since) return;
   const b = document.querySelector('.lobby-box'); if (!b) return;
-  c.lobbySeen = since; setTimeout(() => { try { b.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) { b.scrollIntoView(); } }, 250);
+  c.lobbySeen = since;
+  /* (27.11.26 test: a smooth scroll was cut by Elkana's bubble growing at that moment) - a plain jump, and once more a second later
+     if the box is still not on the screen */
+  const go = () => { const x = document.querySelector('.lobby-box'); if (!x) return; const r = x.getBoundingClientRect(); if (r.top < 0 || r.bottom > innerHeight) x.scrollIntoView({ block: 'center' }); };
+  setTimeout(go, 250); setTimeout(go, 1300);
 }
 
 // ---------- שלב 2: ”מה זה מזכיר לכם?” ----------
@@ -4771,7 +4801,7 @@ function renderWhoRec(force) {
       ? `<label class="who-who">🙋 מי עונה: <select onchange="window.whoPick(${q}, this.value)" ${busy ? 'disabled' : ''}>${c.players.map(p => `<option value="${esc(p.id)}" ${p.id === pid ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label>`
       : `<p class="who-who">🙋 מי עונה: <strong>${esc(whoName(c, pid))}</strong></p>`;
     let act;
-    if (w.rec && w.rec.q === q) act = `<p class="who-recording"><span class="rec-dot"></span> ${esc(whoName(c, pid))} מקליט/ה… נשארו <strong id="whoRecClock">0:${String(WHO_MAX_SECS).padStart(2, '0')}</strong> שניות</p><button class="buy" type="button" onclick="window.whoRecStop()">⏹ סיימתי לדבר — עצירה</button>`;
+    if (w.rec && w.rec.q === q) act = `<p class="who-recording"><span class="rec-dot"></span> 🔴 <strong>מקליטים — דברו עכשיו!</strong> ${esc(whoName(c, pid))} מקליט/ה… נשארו <strong id="whoRecClock">0:${String(WHO_MAX_SECS).padStart(2, '0')}</strong> שניות</p><button class="buy" type="button" onclick="window.whoRecStop()">⏹ סיימתי לדבר — עצירה</button>`;
     else if (w.pend && w.pend.q === q) act = `<p><strong>יצא טוב? לוחצים ”▶ שמיעה”, ואם טוב — ”✓ שמירה”:</strong></p><div class="order-actions"><button class="game-btn" type="button" data-label="▶ שמיעה" onclick="window.whoPlayPending(this)" ${w.saving ? 'disabled' : ''}>▶ שמיעה</button><button class="buy${w.saving ? '' : ' save-pulse'}" type="button" onclick="window.whoSave()" ${w.saving ? 'disabled' : ''}>${w.saving ? 'שומרים…' : '✓ שמירה'}</button><button class="game-btn" type="button" onclick="window.whoRecStart(${q})" ${w.saving ? 'disabled' : ''}>↻ הקלטה מחדש</button></div>`;
     else if (mine) act = `<div class="order-actions"><button class="game-btn" type="button" data-label="▶ שמיעה" onclick="window.whoPlay('${esc(rid)}', 1, this)" ${busy ? 'disabled' : ''}>▶ שמיעה</button><button class="game-btn" type="button" onclick="window.whoRecStart(${q})" ${busy ? 'disabled' : ''}>↻ הקלטה מחדש</button></div>`;
     else act = `${saved ? `<p class="smallnote">כבר הקליט/ה: ${esc(whoName(c, saved))}. אם ${esc(whoName(c, pid))} יקליט/תקליט — ההקלטה הקודמת תוחלף.</p>` : ''}<button class="buy" type="button" onclick="window.whoRecStart(${q})" ${busy ? 'disabled' : ''}>🎙️ הקלטה — ${esc(whoName(c, pid))}</button>`;
@@ -4830,7 +4860,7 @@ window.whoRecStart = async function (q) {
     w.rec = null;
     const secs = (Date.now() - rec.started) / 1000, type = ((mr.mimeType || mime || chunks[0] && chunks[0].type || 'audio/webm').split(';')[0]) || 'audio/webm';
     const blob = new Blob(chunks, { type });
-    if (secs < 1.2 || blob.size < 1000) { w.msg = 'ההקלטה קצרה מדי — נסו שוב, ודברו קרוב לטלפון 🙂'; return renderWhoRec(true); }
+    if (secs < 1.2 || blob.size < 1000) { w.msg = '⚠️ ההקלטה לא נקלטה — היא קצרה מדי. לוחצים 🎙️, מחכים לצפצוף, מדברים, ורק אז ⏹ עצירה'; return renderWhoRec(true); }
     const data = await blobToDataUrl(blob, type);
     if (data.length > WHO_MAX_AUDIO) { w.msg = 'ההקלטה גדולה מדי. נסו שוב — קצת יותר קצר.'; return renderWhoRec(true); }
     w.pend = { q, pid, data, url: URL.createObjectURL(blob) };
@@ -4838,6 +4868,10 @@ window.whoRecStart = async function (q) {
   };
   w.rec = rec;
   mr.start();
+  /* (27.11.26) a short beep + a buzz = "talk now" - so nobody talks before the microphone is really on (also when it started by itself
+     after Elkana finished his line) */
+  try { if (dzAudio()) dzTone(880, 0, .12, 'sine', .16); } catch (e) { }
+  try { navigator.vibrate && navigator.vibrate(120); } catch (e) { }
   rec.timer = setInterval(() => { const el = document.getElementById('whoRecClock'); if (el) el.textContent = fmtClock(WHO_MAX_SECS * 1000 - (Date.now() - rec.started)); }, 250);
   rec.cap = setTimeout(() => window.whoRecStop(), WHO_MAX_SECS * 1000 + 200);
   renderWhoRec(true);
@@ -4850,7 +4884,9 @@ window.whoPlayPending = function (btn) {
 };
 window.whoSave = async function () {
   const c = groupCtx, w = c && c.who, p = w && w.pend; if (!p || w.saving) return;
-  if (elkGate()) return; /* (27.11.26) "✓ שמירה" moves to the next question - waits for Elkana like every "move on" button */
+  /* (27.11.26, Ayelet: "I recorded and it was as if it did not catch, I had to again") - a press while Elkana talks is not lost any more:
+     it says so and saves by itself the moment he finished (a "blocked" press looked like the recording was gone) */
+  if (c.hostPlaying) { w.msg = '⏳ ההקלטה נשמרת ברגע שאלקנה מסיים את המשפט — לא צריך ללחוץ שוב'; renderWhoRec(true); afterHost(c, null, '', () => window.whoSave()); return; }
   whoStopAudio();
   // הקלטה אחת לכל שאלה בקבוצה: אם מישהו אחר כבר הקליט את השאלה הזו — ההקלטה החדשה מחליפה אותו
   const rid = p.pid + '_' + p.q, recs = [...(c.group.whoRecs || []).filter(r => ridQ(r) !== p.q), rid];
