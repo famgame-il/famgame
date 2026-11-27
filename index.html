@@ -136,6 +136,16 @@ footer .nagish-bottom{margin:6px 0 0;display:block}
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
 @media (prefers-reduced-motion:reduce){.save-pulse,.go-pulse,.gotit-btn,#vidNext,.lobby-box .buy,.see-next{animation:none!important}.save-pulse::before,.go-pulse::before,.gotit-btn::before,#vidNext::before,.lobby-box .buy::before,.see-next::before{animation:none!important}}
 /* Ayelet 25.11.26 - "מה באמת היה?" opens as a page of its own over the announcement, with "חזרה" */
+/* (27.11.26) while Elkana talks: the buttons that move the game on are grey with ⏳; a press shows #elkToast */
+/* Ayelet 27.11.26 (later): NOT the "הבא" buttons of the timed stages (stage 1, stage 2, stage 3 guessing) - there speed = points, so
+   the group may go on while he talks (the pink card does not jump over him). Only the buttons that move between stages wait */
+.elk-talking :is(button[onclick*="groupGotIt"],button[onclick*="setGroupReady(true)"],button[onclick*="groupShort"],button[onclick*="groupStartVote"],button[onclick*="whoSetDone(true)"],button[onclick*="whoSave()"]){background:#d9d4cc!important;color:#5c574f!important;box-shadow:none!important;animation:none!important;border-color:#bdb6aa!important}
+.elk-talking :is(button[onclick*="groupGotIt"],button[onclick*="setGroupReady(true)"],button[onclick*="groupShort"],button[onclick*="groupStartVote"],button[onclick*="whoSetDone(true)"],button[onclick*="whoSave()"])::after{content:' ⏳'}
+.elk-toast{position:fixed;left:12px;right:12px;bottom:18px;margin:0 auto;max-width:420px;background:#3b3020;color:#fff;padding:10px 14px;border-radius:14px;text-align:center;z-index:9500;opacity:0;pointer-events:none;transition:opacity .2s;font-size:15px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.elk-toast.on{opacity:1}
+.buy.truth-wait{background:#d9d4cc!important;color:#5c574f!important;box-shadow:none!important;animation:none!important;border-color:#bdb6aa!important} /* (27.11.26) not yet - Elkana still talks */
+.who-picked{margin:8px 0 0;padding:8px 10px;border-radius:12px;text-align:center;font-size:16px;color:#7a6f60;background:#f4efe6;border:2px dashed #d8cdb9}
+.who-picked.on{font-size:20px;color:#14602f;background:#e6f7ea;border:2px solid #34a65a} /* (27.11.26) "✅ בחרתם: דינה" - big and clear */
 .truth-ov{position:fixed;inset:0;z-index:9000;overflow-y:auto;background:var(--bg,#fff8ec);-webkit-overflow-scrolling:touch}.truth-in{max-width:640px;margin:0 auto;padding:14px 12px}
 /* Ayelet 25.11.26 - the names list: always open, scrolls inside a frame, the chosen name green */
 .name-chips.all{max-height:170px;overflow-y:auto;padding:8px;border:2px solid #d6e6fb;border-radius:14px;background:#fafcff}
@@ -2260,14 +2270,43 @@ function fxD(key, base) { return fxSec(key, base).toFixed(2) + 's'; }
 function fxCue(key, base, cue) { return fxSec(key, base) > 0 ? ` data-cue="${cue}" data-k="${esc(key || 'g')}"` : ''; }
 const fxPlayed = new Set();
 const SOUND_DRUM = Array.from({ length: 26 }, (_, i) => [i % 2 ? 92 : 104, i * 0.095, 0.08, 'triangle']).concat([[65, 2.5, 0.45, 'square']]);
+/* Ayelet 27.11.26 ("the drums of first place are really quiet - I want real drums"): the old roll was low notes (92-104 Hz) that a phone
+   speaker hardly plays. Now a real snare roll (noise, in the range a phone plays loud) that grows for 2.5 s, then a boom + a cymbal crash */
+function playDrumroll() {
+  const ctx = audioCtx(); if (!ctx) return;
+  const t0 = ctx.currentTime + 0.05, ROLL = 2.5;
+  const out = ctx.createDynamicsCompressor(); out.threshold.value = -10; out.ratio.value = 4;
+  const master = ctx.createGain(); master.gain.value = 0.42; /* loud, without clipping (peak ~0.95) */ out.connect(master); master.connect(ctx.destination);
+  const noise = (secs) => { const b = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * secs), ctx.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; return b; };
+  const hitBuf = noise(0.09);
+  const hit = (at, vol) => {
+    const s = ctx.createBufferSource(); s.buffer = hitBuf;
+    const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 2200; f.Q.value = 0.6;
+    const g = ctx.createGain(); g.gain.setValueAtTime(vol, at); g.gain.exponentialRampToValueAtTime(0.001, at + 0.08);
+    s.connect(f); f.connect(g); g.connect(out); s.start(at); s.stop(at + 0.09);
+    /* the drum's body - a short tone in the middle range (heard on a phone) */
+    const o = ctx.createOscillator(), og = ctx.createGain(); o.type = 'triangle'; o.frequency.setValueAtTime(330, at); o.frequency.exponentialRampToValueAtTime(180, at + 0.06);
+    og.gain.setValueAtTime(vol * 0.5, at); og.gain.exponentialRampToValueAtTime(0.001, at + 0.07); o.connect(og); og.connect(out); o.start(at); o.stop(at + 0.08);
+  };
+  /* the roll: hits closer and closer, louder and louder */
+  for (let t = 0, gap = 0.085; t < ROLL; t += gap, gap = Math.max(0.045, gap * 0.985)) hit(t0 + t, 0.35 + 0.65 * (t / ROLL));
+  /* the end: a deep boom (with a higher layer, so a phone plays it) + a cymbal crash */
+  const at = t0 + ROLL;
+  [[150, 60, 1], [300, 120, 0.6]].forEach(([from, to, v]) => { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(from, at); o.frequency.exponentialRampToValueAtTime(to, at + 0.45); g.gain.setValueAtTime(v, at); g.gain.exponentialRampToValueAtTime(0.001, at + 0.6); o.connect(g); g.connect(out); o.start(at); o.stop(at + 0.65); });
+  const cs = ctx.createBufferSource(); cs.buffer = noise(1.6);
+  const cf = ctx.createBiquadFilter(); cf.type = 'highpass'; cf.frequency.value = 4500;
+  const cg = ctx.createGain(); cg.gain.setValueAtTime(0.9, at); cg.gain.exponentialRampToValueAtTime(0.001, at + 1.5);
+  cs.connect(cf); cf.connect(cg); cg.connect(out); cs.start(at); cs.stop(at + 1.6);
+}
 document.addEventListener('animationstart', e => {
   const el = e.target, cue = el && el.dataset && el.dataset.cue; if (!cue || e.animationName !== 'finIn') return;
   const k = cue + '|' + el.dataset.k; if (fxPlayed.has(k)) return; fxPlayed.add(k);
-  if (cue === 'prize') return window.prizePlay();
-  /* Ayelet 25.11.26 ("Elkana's roast started while the prize recording played - wait until it ends"): from the winners on, little
-     Elkana is quiet on EVERY phone (same room) for the prize recording: 3 s + 23.4 s + a breath. Meanwhile he prepares his words */
-  if (cue === 'win') window.__finHoldUntil = Date.now() + (3 + 23.4 + 1.5) * 1000;
-  try { playNotes(cue === 'drum' ? SOUND_DRUM : SOUND_FINALE); } catch (er) { }
+  /* Ayelet 27.11.26 ("after the drums end and he shows the winners, Elkana must come - here I felt I waited"): the 28 s of quiet for
+     the prize recording are gone - Elkana talks a breath after the winners appear. The prize recording (only on the winners' phone)
+     plays AFTER his last line ("thanks"), so the two voices never meet (25.11.26) - or at the latest 90 s later */
+  if (cue === 'prize') { window.__prizeDue = true; setTimeout(() => { if (window.__prizeDue) window.prizePlay(); }, 90000); return; }
+  if (cue === 'win') window.__finHoldUntil = Date.now() + 1500;
+  try { if (cue === 'drum') playDrumroll(); else playNotes(SOUND_FINALE); } catch (er) { }
 });
 /* Race board after stages 1 and 2: total points so far, bars that grow, arrows for who went up, and a headline from Elkana.
    After stage 3 it is NOT shown - who won the whole game stays a secret until the big announcement. */
@@ -2327,7 +2366,7 @@ function certBtnHtml(rows, tops, myId, winAt, after /* (25.11.26) the "מה בא
   /* Ayelet 18.11.26 - first place wins a (joking) family vacation + a real 50% voucher: they send the photo on WhatsApp and get a personal one-time code */
   /* (18.11.26, Ayelet: "do not show the text of what he says - only while he says it") - Elkana says it in his voice (elkana-prize.mp3)
      a moment after the winners are revealed, the words appear one line at a time as he speaks, and the prize box opens only after he finishes */
-  const talk = myId && place === 0 ? `<div class="prize-talk" id="prizeTalk" style="animation-delay:${(winAt || 0) + 3}s" data-cue="prize" data-k="g"><img src="./how-elkana-cheer.webp" class="prize-elk" alt="" width="96" height="94"><div class="prize-bubble" id="prizeCap">🎁 רגע… אלקנה רוצה להגיד לכם משהו!</div><button class="game-btn" id="prizePlay" type="button" onclick="window.prizePlay()" hidden>▶ לשמוע את אלקנה</button></div>` : '';
+  const talk = myId && place === 0 ? `<div class="prize-talk" id="prizeTalk" style="animation-delay:${(winAt || 0) + 3}s" data-cue="prize" data-k="g"><img src="./how-elkana-cheer.webp" class="prize-elk" alt="" width="96" height="94"><div class="prize-bubble" id="prizeCap">🎁 כשאלקנה מסיים — יש לו משהו מיוחד בשבילכם!</div><button class="game-btn" id="prizePlay" type="button" onclick="window.prizePlay()" hidden>▶ לשמוע את אלקנה</button></div>` : '';
   const prize = myId && place === 0 ? talk + `<div class="prize-box" id="prizeBox"${window.__prizeDone ? '' : ' hidden'}><p class="prize-h">🎁 הפרס שלכם!</p><p>🏖️ <strong>זכיתם בחופשה משפחתית!</strong> עכשיו רק תגידו לאבא שייקח אתכם, בארץ או בחו״ל 😄</p><p>🎟️ <strong>ושובר 50% הנחה למשחק הבא — בחנוכה או בכל משחק אחר, עלינו!</strong></p><div id="prizeCodeBox">${prizeCodeHtml(r.name)}</div></div>` : '';
   if (myId && place === 0) setTimeout(() => window.loadPrizeCode(r.name), 0);
   return `${prize}${selfie}${after || ''}<div class="cert-box"><button class="${myId ? 'game-btn' : 'buy'}" type="button" onclick="window.shareCert(this)">🏅 ${place === 0 ? 'תעודת ניצחון' : 'תעודה'} לשיתוף בוואטסאפ</button>${myId ? '' : `<p class="smallnote">התעודה של הקבוצה המנצחת — אפשר לשלוח לה.</p>`}<div id="certOut"></div></div>`;
@@ -2364,6 +2403,9 @@ document.addEventListener('pointerdown', function unlockGameSound() {
   if (groupCtx && !window.__prizeAudio) { const a = window.__prizeAudio = new Audio('./elkana-prize.mp3?v=2'); a.preload = 'auto'; a.muted = true; a.play().then(() => { a.pause(); a.currentTime = 0; a.muted = false; }).catch(() => { a.muted = false; }); }
 }, { passive: true });
 window.prizePlay = function () {
+  /* (27.11.26) never over Elkana: while he talks a press only says why (and it plays by itself after his last line) */
+  if (groupCtx && groupCtx.hostPlaying) { window.__prizeDue = true; elkGate(); return; }
+  window.__prizeDue = false;
   const cap = document.getElementById('prizeCap'), btn = document.getElementById('prizePlay'), talk = document.getElementById('prizeTalk'); if (!cap) return;
   const showBox = () => { window.__prizeDone = true; const b = document.getElementById('prizeBox'); if (b) b.hidden = false; };
   const a = window.__prizeAudio || (window.__prizeAudio = new Audio('./elkana-prize.mp3?v=2'));
@@ -2951,16 +2993,25 @@ function startGroup(gameId) {
   playUnsubs.push(onSnapshot(liveDoc(gameId, 'state'), s => {
     // המשחק נמחק (יום אחרי המשחק) — מודיעים במקום להיתקע
     if (!s.exists()) { stopPlay(); const el = document.getElementById('grpMain'); if (el) el.innerHTML = '<div class="now-box"><strong>המשחק הסתיים 👋</strong><p>תודה ששיחקתם!</p></div>'; return; }
-    const prev = c.state && c.state.stage, prevStep = c.state && (c.state.assocRound + ':' + c.state.whoRound + ':' + !!c.state.photosOpen);
+    const prev0 = c.state && c.state.stage;
     /* Ayelet 25.11.26 ("most important: never back - in stage 3 never return to stage 2") - a second guard on the phone (the server fix is in
        engine.js): a state with an EARLIER stage than the one on the screen is ignored */
     const nd = s.data({ serverTimestamps: 'estimate' });
-    if (prev && STAGE_ORDER.indexOf(nd.stage) >= 0 && STAGE_ORDER.indexOf(nd.stage) < STAGE_ORDER.indexOf(prev)) { console.warn('stage went back - ignored', prev, nd.stage); return; }
+    if (prev0 && STAGE_ORDER.indexOf(nd.stage) >= 0 && STAGE_ORDER.indexOf(nd.stage) < STAGE_ORDER.indexOf(prev0)) { console.warn('stage went back - ignored', prev0, nd.stage); return; }
+    /* Ayelet 27.11.26 ("again: nothing changes on the screen while Elkana talks - a rule: no next stage, nothing jumps in"): the server
+       already waits for him, but on THIS phone his line may run a little later (it waited for a video). A new stage / picture / question
+       that arrives while he is talking here waits until his line ended (at most 25 s), then the screen moves on */
+    if (prev0 && c.hostPlaying && stateStep(nd) !== stateStep(c.state)) { holdState(c, nd); return; }
+    c.heldState = null; clearTimeout(c.heldTimer);
+    c.applyState(nd);
+  }, playError));
+  c.applyState = nd => {
+    const prev = c.state && c.state.stage, prevStep = c.state && (c.state.assocRound + ':' + c.state.whoRound + ':' + !!c.state.photosOpen);
     c.state = nd; if (prev !== c.state.stage) c.eyesBuilt = false;
     /* every move forward (a stage, a picture, a question) starts at the top of the page (11.11.26, Ayelet) */
     if (prev && (prev !== c.state.stage || prevStep !== (c.state.assocRound + ':' + c.state.whoRound + ':' + !!c.state.photosOpen))) { setTimeout(scrollTop, 50); setTimeout(scrollTop, 1000); showTransition(c); } /* (25.11.26, Ayelet: "after הבנתי the next stage opened in the middle") once more after pictures loaded */
     stageSound(prev, c.state.stage); r();
-  }, playError));
+  };
   playUnsubs.push(onSnapshot(doc(db, 'familyGames', gameId, 'answers', uid), s => { const was = c.submitted; c.submitted = s.exists(); c.savedGuesses = s.exists() ? s.data().guesses : null; if (was !== c.submitted) c.eyesBuilt = false; r(); }, playError));
   // כל הקבוצות — כדי שכל קבוצה תראה מי כבר מוכנה (כמו שמנהל המשחק רואה)
   playUnsubs.push(onSnapshot(collection(db, 'familyGames', gameId, 'groups'), s => { c.allGroups = s.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.index || 0) - (b.index || 0)); r(); }, () => { }));
@@ -2991,6 +3042,13 @@ async function updateGroupDoc(c, data) {
   }
 }// 📊 לוח ההתקדמות — מתעדכן בזמן אמת מהנתונים של המשחק: בצילום (כמה הצטלמו ומי מוכנה), בניחוש העיניים (מי אישרה),
 // בהקלטות (כמה שאלות הוקלטו ומי סיימה), ומי סיימה ראשונה. בלי תשובות, בלי שמות משתתפים ובלי תמונות של קבוצות אחרות
+/* (27.11.26) a group's stage-3 guessing progress - only if it is about the question on the screen now */
+function whoGotNow(c, g) { const w = g.whoGot; return w && c.state && w.r === c.state.whoRound ? w : null; }
+/* (27.11.26) tell the other groups how far we got (the progress board) - one small write when the number changes */
+function groupProgress(c, field, val) {
+  const k = field + ':' + JSON.stringify(val); if (!c || c.lastProgress === k) return;
+  c.lastProgress = k; updateGroupDoc(c, { [field]: val }).catch(() => { c.lastProgress = null; });
+}
 function groupsStatusHtml(c) {
   const all = c.allGroups || [], st = c.state.stage; if (all.length < 2) return '';
   const nQ = WHO_SAID_QUESTIONS.length;
@@ -2999,8 +3057,24 @@ function groupsStatusHtml(c) {
       waitLabel: g => (g.size && (g.photoCount || 0) >= g.size) ? '👆 נשאר ללחוץ ”מוכנים”' : '',
       extra: g => ` · 📸 ${g.photoCount || 0} מתוך ${g.size || '?'}`, legend: '📸 = כמה משתתפים כבר הצטלמו. ✓ מוכנה = הקבוצה לחצה ”העלינו ואנחנו מוכנים”.' }
     : st === 'eyes' ? { done: g => g.eyesDone, at: 'eyesDoneAt', label: ['✓ אישרו', '⏳ עוד מנחשים'], what: 'אישרו',
-      extra: () => '', legend: '✓ אישרו = הקבוצה סיימה לנחש ולחצה ”אישור” (את התשובות רואים רק בסוף).' }
+      /* (27.11.26) like the 📸 count while photographing - every group gets the same number of pairs */
+      extra: g => { const N = (c.assignment && c.assignment.items && c.assignment.items.length) || 0; return N ? ` · 👀 ${g.eyesDone ? N : Math.min(N, g.eyesN || 0)} מתוך ${N}` : ''; },
+      legend: '👀 = כמה זוגות עיניים הקבוצה כבר ניחשה. ✓ אישרו = הקבוצה סיימה לנחש ולחצה ”אישור” (את התשובות רואים רק בסוף).' }
+    /* Ayelet 27.11.26 ("in stage 2 I finished and I don't see the progress of all the groups, only a clock") - the same board in stage 2 */
+    : st === 'assoc' && c.state.see ? { done: g => g.seeDone, at: 'seeDoneAt', label: ['✓ סיימו', '⏳ עוד עונים'], what: 'סיימו',
+      extra: g => ` · 📝 ${g.seeDone ? SEE_LIST.length : Math.min(SEE_LIST.length, g.seeN || 0)} מתוך ${SEE_LIST.length}`,
+      legend: `📝 = על כמה מתוך ${SEE_LIST.length} השאלות הקבוצה כבר ענתה. כשכל הקבוצות סיימו (או כשהשעון נגמר) — רואים את התוצאות.` }
+    /* (27.11.26) stage 3 guessing - every question: how many recordings each group already named */
+    /* (27.11.26) own pace: which question every group is on, and who finished */
+    : st === 'whoGuess' && c.state.whoPace ? { done: g => g.whoGuessDone, at: 'whoGuessDoneAt', label: ['✓ סיימו לנחש', '⏳ עוד מנחשים'], what: 'סיימו',
+      extra: g => { const w = g.whoGot; return g.whoGuessDone || !w || !w.of ? '' : ` · ✍️ סיימו ${Math.min(w.n, w.of)} מתוך ${w.of} שאלות`; },
+      legend: '✍️ = כמה שאלות הקבוצה כבר סיימה. כשכל הקבוצות סיימו (או כשהשעון נגמר) — אלקנה מגלה מי אמר מה.' }
+    : st === 'whoGuess' ? { done: g => whoGotNow(c, g) && whoGotNow(c, g).n >= whoGotNow(c, g).of, at: '-', label: ['✓ סיימו את השאלה', '⏳ עוד מנחשים'], what: 'סיימו את השאלה',
+      extra: g => { const w = whoGotNow(c, g); return w ? (w.of ? ` · ✍️ ${w.n} מתוך ${w.of}` : ' · אין להם הקלטות בשאלה הזו') : ''; },
+      legend: '✍️ = לכמה מההקלטות של השאלה הזו הקבוצה כבר בחרה שם. כשכל הקבוצות סיימו (או כשהשעון נגמר) — עוברים לשאלה הבאה.' }
     : st === 'whoRecord' ? { done: g => g.whoDone, at: 'whoDoneAt', label: ['✓ סיימו להקליט', '⏳ מקליטים'], what: 'סיימו',
+      /* (27.11.26, Ayelet: "why does it say we are recording if we did 10 of 10?") - all recorded, "סיימנו" not pressed yet */
+      waitLabel: g => (g.whoRecs || []).length >= nQ ? '👆 נשאר ללחוץ ”סיימנו להקליט”' : '',
       extra: g => ` · 🎙️ ${(g.whoRecs || []).length} מתוך ${nQ}`, legend: `🎙️ = כמה מתוך ${nQ} השאלות הקבוצה כבר הקליטה.` }
     : null;
   if (!cfg) return '';
@@ -3045,9 +3119,10 @@ function nextText(st) {
   if (now >= nextAt) return '⏭️ עוברים לשלב הבא…';
   return `⏭️ אלקנה עובר לשלב הבא בעוד <strong>${fmtClock(nextAt - now)}</strong>`;
 }
-window.groupStartVote = function () { const c = groupCtx; if (c) updateGroupDoc(c, { startVoteAt: serverTimestamp() }).catch(e => console.warn(e)); };
+window.groupStartVote = function () { const c = groupCtx; if (elkGate()) return; if (c) updateGroupDoc(c, { startVoteAt: serverTimestamp() }).catch(e => console.warn(e)); };
 window.groupHold = function () { const c = groupCtx; if (c) updateGroupDoc(c, { holdAt: serverTimestamp() }).catch(e => console.warn(e)); };
 window.groupShort = function (n) {
+  if (elkGate()) return;
   const c = groupCtx; if (!c || !confirm(`להמשיך עם ${n === 1 ? 'משתתף אחד' : n + ' משתתפים'} בלבד? (מי שלא הגיע לא ישתתף)`)) return;
   updateGroupDoc(c, { shortOk: true }).catch(e => { console.warn(e); alert('לא הצלחנו לעדכן. נסו שוב.'); });
 };
@@ -3097,11 +3172,31 @@ function transitionText(st) {
   if (s === 'whoGuess') return ['🎧', st.whoRound ? `שאלה ${st.whoRound + 1} מתוך ${(st.whoQuestions || []).length}` : 'עכשיו מנחשים!', st.whoRound ? 'מי אמר את זה?' : `שלב 3 — חלק ב׳ · שאלה 1 מתוך ${(st.whoQuestions || []).length}`];
   return null;
 }
+/* (27.11.26) the step on the screen: stage + picture + question + registration open */
+function stateStep(x) { return x ? x.stage + ':' + x.assocRound + ':' + x.whoRound + ':' + !!x.photosOpen : ''; }
+function holdState(c, nd) {
+  if (!c.heldState) c.heldSince = Date.now();
+  c.heldState = nd; clearTimeout(c.heldTimer);
+  const check = () => { if (!c.heldState) return; if (!c.hostPlaying || Date.now() - c.heldSince > 25000) releaseHeld(c); else c.heldTimer = setTimeout(check, 400); };
+  c.heldTimer = setTimeout(check, 400);
+}
+function releaseHeld(c) { const nd = c && c.heldState; if (!nd || groupCtx !== c) return; c.heldState = null; clearTimeout(c.heldTimer); c.applyState(nd); }
 function showTransition(c) {
-  const t = c.state && transitionText(c.state); if (t) flashCard(t);
+  const t = c.state && transitionText(c.state); if (!t) return;
+  /* Ayelet 27.11.26 (watching a test: "after 'הבנתי' the pink 'מצטלמים' card jumped in while Elkana was talking"): on this phone he
+     may still be saying a line that waited for the video - the card waits until he finished (flushTransition, from the end of his line) */
+  if (c.hostPlaying) { const p = c.pendingFlash = { t, stage: c.state.stage }; setTimeout(() => { if (c.pendingFlash === p && !c.hostPlaying) flushTransition(c); }, 20000); /* never lost (a line stopped in the middle) */ return; }
+  c.pendingFlash = null; flashCard(t);
+}
+function flushTransition(c) {
+  const p = c && c.pendingFlash; if (!p) return; c.pendingFlash = null;
+  if (c.state && c.state.stage === p.stage) flashCard(p.t); /* the stage moved on meanwhile - its own card is the one that counts */
 }
 /* Ayelet 16.11.26 - also used inside stage 2 ("תמונה הבאה" - a pink card, cls 'pink') */
 function flashCard(t, cls) {
+  /* Ayelet 27.11.26 ("again Elkana talked and the pink 'השאלה הבאה' square came"): the pink cards come from the group's own "הבא" -
+     while Elkana talks on this phone the next question just appears in its place, without the big card over him */
+  if (cls === 'pink' && groupCtx && groupCtx.hostPlaying) return;
   const old = document.getElementById('stepFlash'); if (old) old.remove();
   const el = document.createElement('div'); el.id = 'stepFlash'; el.className = 'step-flash' + (cls ? ' ' + cls : ''); el.setAttribute('role', 'status');
   el.innerHTML = `<div class="sf-card"><div class="sf-icon" aria-hidden="true">${t[0]}</div><div class="sf-title">${esc(t[1])}</div><div class="sf-sub">${esc(t[2])}</div></div>`;
@@ -3285,7 +3380,7 @@ function hostPlayNext(c) {
     || c.whoPlaying || (c.who && (c.who.rec || c.who.starting));
   let finHold = false;
   if (!videoUp && c.state && c.state.stage === 'final') {
-    if (!c.finalSeenAt) { c.finalSeenAt = Date.now(); setTimeout(() => revealTruth(c), 150000); } /* counted from when the announcement itself is on the screen (after the video); the results button at the latest 2.5 min later */
+    if (!c.finalSeenAt) { c.finalSeenAt = Date.now(); window.__finHoldUntil = 0; /* (27.11.26) a hold left from an earlier game on this phone never lets him talk before the first place */ setTimeout(() => revealTruth(c), 150000); } /* counted from when the announcement itself is on the screen (after the video); the results button at the latest 2.5 min later */
     finHold = Date.now() - c.finalSeenAt < 70000 && (!window.__finHoldUntil || Date.now() < window.__finHoldUntil);
   }
   if (finHold || videoUp) { clearTimeout(c.hostWait); c.hostWait = setTimeout(() => hostPlayNext(c), 1000); return; }
@@ -3307,7 +3402,7 @@ function hostPlayNext(c) {
     const el = document.querySelector('#hostBox .host-text'); if (el) el.textContent = full.slice(0, c.hostTyped);
     if (c.hostTyped >= full.length) clearInterval(c.hostTypeTimer);
   }, 45);
-  const done = () => { c.hostPlaying = false; hostRender(c); if (m.moment === 'thanks') revealTruth(c); /* (25.11.26) after his last word - "מה באמת היה?" */ setTimeout(() => hostPlayNext(c), 600); };
+  const done = () => { c.hostPlaying = false; releaseHeld(c); /* (27.11.26) a stage that waited for the end of his line */ hostRender(c); flushTransition(c); /* (27.11.26) a stage card that waited for him */ if (m.moment === 'thanks') { revealTruth(c); if (window.__prizeDue) setTimeout(() => { if (window.__prizeDue && !c.hostPlaying) window.prizePlay(); }, 800); /* (27.11.26) the prize recording after his last word */ } /* (25.11.26) after his last word - "מה באמת היה?" */ setTimeout(() => hostPlayNext(c), 600); };
   if (!m.audio) { c.hostDoneTimer = setTimeout(done, Math.min(9000, 2500 + String(m.text || '').length * 60)); return; }
   const a = hostAudio(); a.onended = done; a.onerror = done; a.src = m.audio;
   /* (11.11.26, Ayelet: "he talks a bit slowly") - 12% faster, same pitch */
@@ -3315,7 +3410,20 @@ function hostPlayNext(c) {
   /* the phone did not allow sound yet (no tap since the page opened) - show the line, and "🔁" plays it */
   a.play().then(() => { c.hostMuted = false; }).catch(() => { c.hostMuted = true; hostRender(c); c.hostDoneTimer = setTimeout(done, Math.min(9000, 2500 + String(m.text || '').length * 60)); });
 }
+/* Ayelet 27.11.26 ("every place you can press to move on to the next question or stage, while Elkana talks - like 'מה באמת היה?'"):
+   while he talks on this phone these buttons are grey with ⏳ (.elk-talking, set in hostRender), and a press only says why.
+   The buttons: הבנתי, העלינו ואנחנו מוכנים, ממשיכים עם פחות, כולנו כאן, ✓ שמירה + סיימנו להקליט (שלב 3), מה באמת היה?, the prize.
+   Not: "הבא" of the timed stages (Ayelet: speed = points - free), "המשחק תקוע?", "רגע, עוד לא!", picking an answer, recording, playing */
+function elkGate() {
+  const c = groupCtx; if (!c || !c.hostPlaying) return false;
+  let t = document.getElementById('elkToast');
+  if (!t) { t = document.createElement('div'); t.id = 'elkToast'; t.className = 'elk-toast'; t.setAttribute('role', 'status'); t.setAttribute('aria-live', 'polite'); document.body.appendChild(t); }
+  t.innerHTML = '<strong>⏳ אפשר ללחוץ רק אחרי שאלקנה מסיים לדבר</strong><br>עוד רגע הכפתור נדלק 🙂';
+  t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 2800);
+  return true;
+}
 function hostRender(c) {
+  const wrap = document.querySelector('.play-wrap'); if (wrap && c) wrap.classList.toggle('elk-talking', !!c.hostPlaying); /* (27.11.26) the "move on" buttons wait for him */
   const box = document.getElementById('hostBox'); if (!box || !c) return;
   /* before the first line: only "אלקנה מקליד…" if he is already writing */
   const m = c.hostNow || (c.hostTypingAt && Date.now() - c.hostTypingAt < 45000 ? { text: '', pose: 'welcome' } : null);
@@ -3486,6 +3594,8 @@ window.slotStep = function (dir) {
     if (ok === null && dir > 0) { showNameChips(input); input.focus(); return; }
     c.guesses[c.cur].guess = ok === null ? input.value : ok;
   }
+  /* (27.11.26) the progress board: how many pairs of eyes this group already named */
+  groupProgress(c, 'eyesN', c.guesses.filter(g => nameFromList(g.guess || '')).length);
   if (dir < 0) return showSlot(Math.max(0, c.cur - 1), false);
   if (c.cur < n - 1) return showSlot(c.cur + 1, !c.guesses[c.cur + 1].guess);
   c.review = true; renderEyesReview();
@@ -3551,6 +3661,7 @@ function gotItHtml(c, k) {
 }
 window.groupGotIt = function (k) {
   const c = groupCtx; if (!c) return;
+  if (elkGate()) return;
   c.group.gotIt = { ...(c.group.gotIt || {}), [k]: true }; renderGroup();
   updateGroupDoc(c, { ['gotIt.' + k]: true }).catch(e => console.warn(e));
 };
@@ -3674,6 +3785,7 @@ window.removeMember = async function (id) {
 };
 window.setGroupReady = async function (ready) {
   const c = groupCtx; if (!c) return;
+  if (ready && elkGate()) return;
   if (ready) {
     const need = requiredFor(c.state, { ...c.group, id: c.uid }, c.players.length);
     if (c.players.length !== need) { alert(`הקבוצה שלכם צריכה ${need} משתתפים — כרגע יש ${c.players.length}.`); return; }
@@ -4179,6 +4291,8 @@ function renderSeeStep(scroll) {
   if (!box || !picBox || !s) return;
   if (s.pos >= SEE_LIST.length || c.group.seeDone) {
     picBox.innerHTML = ''; picBox.dataset.pi = '';
+    /* (27.11.26 test) after the last question the clock counts to the end of the whole stage - say so (it said "per picture") */
+    const of = document.querySelector('#grpMain .timer-bar .timer-of'); if (of) of.textContent = 'עד סוף שלב 2 (אם לא כל הקבוצות מסיימות קודם)';
     box.innerHTML = '<div class="now-box" style="text-align:center"><p style="font-size:20px;margin:0"><strong>✅ סיימתם את כל השאלות!</strong></p><p style="margin:6px 0 0">מחכים לשאר הקבוצות (או לסוף השעון) — ואז רואים מי ראה הכי טוב 🏆</p></div>';
     if (s.pos >= SEE_LIST.length && !c.group.seeDone && !c.seeDoneSent) { c.seeDoneSent = true; updateGroupDoc(c, { seeDone: true, seeDoneAt: serverTimestamp() }).catch(e => { console.warn(e); c.seeDoneSent = false; }); }
     return;
@@ -4224,6 +4338,7 @@ window.seeNext = async function () {
   try { if (c.seeSave) await c.seeSave; }
   catch (e) { const h = document.getElementById('seeHint'); if (h) h.textContent = 'השמירה נכשלה — בדקו את החיבור ובחרו שוב.'; if (btn) btn.disabled = false; return; }
   const from = SEE_LIST[s.pos]; s.pos++; c.seeSave = null; seeSaveLocal(c);
+  if (s.pos < SEE_LIST.length) groupProgress(c, 'seeN', s.pos); /* (27.11.26) the progress board (the last one = seeDone) */
   /* Ayelet 25.11.26 - a short "ding" when the next question comes */
   try { if (dzAudio()) { dzTone(988, 0, .12, 'sine', .14); dzTone(1319, .09, .18, 'sine', .12); } } catch (e) { }
   if (s.pos < SEE_LIST.length && SEE_LIST[s.pos].pi !== from.pi && !(SEE_LIST[s.pos].pi === SEE_BONUS_PIC && !s.spun)) flashCard(['🖼️', 'תמונה הבאה!', `תמונה ${SEE_LIST[s.pos].pi + 1} מתוך ${SEE_PICS.length}`], 'pink');
@@ -4241,6 +4356,7 @@ function seeTick(st) {
   if (c && s && !c.seeOver && left <= 0 && s.pos < SEE_LIST.length && document.getElementById('seeQ') && !document.getElementById('dreidelOv')) {
     const pi = SEE_LIST[s.pos].pi; let n = s.pos; while (n < SEE_LIST.length && SEE_LIST[n].pi === pi) n++;
     s.pos = n; c.seeSave = null; seeSaveLocal(c); seeZoomClose();
+    if (n < SEE_LIST.length) groupProgress(c, 'seeN', n);
     if (n < SEE_LIST.length) flashCard(['⏰', 'הזמן לתמונה נגמר!', `ממשיכים לתמונה ${SEE_LIST[n].pi + 1} מתוך ${SEE_PICS.length}`], 'pink');
     renderSeeStep();
   }
@@ -4317,11 +4433,24 @@ function answersAfterFinaleHtml(c) {
 function truthBtnHtml(c) {
   /* Ayelet 26.11.26 ("it comes after he finishes talking, but it does not stand out at all - it must always be there"): always shown
      (with the table), an orange button with the gold frame */
-  return `<div id="truthBox" style="text-align:center;margin:18px 0"><button class="buy go-pulse" type="button" style="font-size:16px;padding:10px 18px" onclick="window.openTruth()">🔎 מה באמת היה? בואו תראו את התשובות</button></div>`;
+  /* Ayelet 27.11.26 ("press 'מה באמת היה?' only after Elkana finished talking, and if I press before - an explanation"): until then the
+     button is there but grey (no jumping), and a press says why it does not open yet */
+  const ready = !!c.truthReady;
+  return `<div id="truthBox" style="text-align:center;margin:18px 0"><button id="truthBtn" class="buy${ready ? ' go-pulse' : ' truth-wait'}" type="button" style="font-size:16px;padding:10px 18px" onclick="window.openTruth()">${ready ? TRUTH_READY_TXT : TRUTH_WAIT_TXT}</button><p class="smallnote" id="truthMsg" style="margin:6px 0 0;min-height:1.4em" aria-live="polite"></p></div>`;
 }
-function revealTruth(c) { if (!c || c.truthReady) return; c.truthReady = true; const b = document.getElementById('truthBox'); if (b) b.hidden = false; /* (25.11.26) no jumping - it just appears in its place */ }
+const TRUTH_READY_TXT = '🔎 מה באמת היה? בואו תראו את התשובות', TRUTH_WAIT_TXT = '🔎 מה באמת היה? (נפתח כשאלקנה מסיים)';
+function revealTruth(c) {
+  if (!c || c.truthReady) return; c.truthReady = true;
+  const b = document.getElementById('truthBtn'); if (b) { b.classList.remove('truth-wait'); b.classList.add('go-pulse'); b.textContent = TRUTH_READY_TXT; }
+  const m = document.getElementById('truthMsg'); if (m) m.textContent = '';
+}
 window.openTruth = function () {
   const c = groupCtx; if (!c) return;
+  if (!c.truthReady || c.hostPlaying) {
+    const m = document.getElementById('truthMsg');
+    if (m) m.innerHTML = '<strong>⏳ אפשר ללחוץ רק אחרי שאלקנה מסיים לדבר</strong> — עוד רגע הכפתור נדלק 🙂';
+    return;
+  }
   window.closeTruth();
   /* (26.11.26, Ayelet: "what if someone presses it while Elkana talks - will they hear him?") - he stops, and says the line again
      (from its start) when they come back to the announcement; nothing of his runs behind this page */
@@ -4350,7 +4479,7 @@ const WHO_MAX_SECS = 20, WHO_PER_Q = 6, WHO_REC_MINUTES = 40, WHO_GUESS_SECS = 9
 const WHO_MIC_DENIED = 'צריך לאשר גישה למיקרופון: לוחצים על 🔒 ליד הכתובת למעלה ← מיקרופון ← אפשר, ומנסים שוב. אם זה לא מסתדר — אפשר לדלג, והמשחק ימשיך בלי ההקלטות מהמכשיר הזה.';
 const ridPid = rid => rid.slice(0, rid.lastIndexOf('_')), ridQ = rid => Number(rid.slice(rid.lastIndexOf('_') + 1));
 function whoRecEndMs(st) { return st && st.whoRecordStartedAt ? st.whoRecordStartedAt.toMillis() + (st.whoRecordSeconds || WHO_REC_MINUTES * 60) * 1000 : 0; }
-function whoEndMs(st) { return st && st.whoStartedAt ? st.whoStartedAt.toMillis() + (st.whoSeconds || WHO_GUESS_SECS) * 1000 : 0; }
+function whoEndMs(st) { return st && st.whoStartedAt ? st.whoStartedAt.toMillis() + (st.whoPace ? (st.whoTotalSecs || 180) : (st.whoSeconds || WHO_GUESS_SECS)) * 1000 : 0; /* (27.11.26) own pace = one clock for all the guessing */ }
 function whoTick(st) {
   const rec = st.stage === 'whoRecord', left = (rec ? whoRecEndMs(st) : whoEndMs(st)) - Date.now();
   document.querySelectorAll('[data-countdown]').forEach(el => { el.textContent = fmtClock(left); el.closest('.timer-bar')?.classList.toggle('urgent', left < (rec ? 120000 : 15000)); });
@@ -4652,6 +4781,7 @@ window.whoSavedToggle = function (open) { const c = groupCtx; if (c && c.who) c.
 window.whoPick = function (q, pid) { const c = groupCtx; if (!c || c.who.rec || c.who.pend || c.who.saving) return; c.who.pick[q] = pid; c.who.msg = ''; renderWhoRec(true); };
 window.whoSetDone = async function (done) {
   const c = groupCtx; if (!c) return;
+  if (done && elkGate()) return;
   const left = WHO_SAID_QUESTIONS.length - whoDoneCount(c);
   if (done && left) { alert(`מקליטים את כל השאלות קודם — ${left === 1 ? 'נשארה עוד שאלה אחת' : 'נשארו עוד ' + left + ' שאלות'}.`); return; } /* (26.11.26) all 10 first */
   if (done && !confirm('סיימתם להקליט? אחרי הלחיצה אי אפשר לחזור ולהקליט עוד.')) return;
@@ -4709,6 +4839,7 @@ window.whoPlayPending = function (btn) {
 };
 window.whoSave = async function () {
   const c = groupCtx, w = c && c.who, p = w && w.pend; if (!p || w.saving) return;
+  if (elkGate()) return; /* (27.11.26) "✓ שמירה" moves to the next question - waits for Elkana like every "move on" button */
   whoStopAudio();
   // הקלטה אחת לכל שאלה בקבוצה: אם מישהו אחר כבר הקליט את השאלה הזו — ההקלטה החדשה מחליפה אותו
   const rid = p.pid + '_' + p.q, recs = [...(c.group.whoRecs || []).filter(r => ridQ(r) !== p.q), rid];
@@ -4728,11 +4859,102 @@ window.whoSave = async function () {
 };
 // סבב ניחוש: בונים את המסך פעם אחת לכל שאלה — כדי לא למחוק את מה שמקלידים
 function whoItemsFor(c, q) { return ((c.whoAssign && c.whoAssign.items) || []).filter(i => i.q === q); }
+/* Ayelet 27.11.26 ("when I pick a name it is not clear it was saved - something big like 'בחרתם דינה'. I want to pick and press
+   'השאלה הבאה', not that it moves on by itself - at my own pace, with a button that stands out"). The server marks such a game
+   state.whoPace: one clock for all the guessing (state.whoTotalSecs); every group goes through ITS questions (only questions where it
+   has recordings), "השאלה הבאה" after a name was picked for every recording, "סיימנו ✓" on the last -> groups/{uid}.whoGuessDone */
+const whoPaceKey = c => 'famWho_' + c.gameId + '_' + c.uid;
+function whoPaceRounds(c) { const qs = c.state.whoQuestions || []; return qs.map((q, r) => r).filter(r => whoItemsFor(c, qs[r]).length); }
+function whoPaceSave(c) { try { localStorage.setItem(whoPaceKey(c), JSON.stringify(c.wp)); } catch (e) { } }
+function whoPaceLoad(c, key) {
+  if (c.wp && c.wp.key === key) return c.wp;
+  let s = null; try { s = JSON.parse(localStorage.getItem(whoPaceKey(c)) || 'null'); } catch (e) { }
+  if (s && s.key === key) return (c.wp = s);
+  c.wp = { key, pos: 0 };
+  /* another phone / cleared storage: go on from the first question that does not have a name for every recording yet (saved on the server) */
+  const rounds = whoPaceRounds(c), qs = c.state.whoQuestions || [];
+  Promise.all(rounds.map(r => getDoc(doc(db, 'familyGames', c.gameId, 'whoAnswers', c.uid + '_' + r))
+    .then(d => { const g = d.exists() ? (d.data().guesses || []) : []; return g.length >= whoItemsFor(c, qs[r]).length && g.every(x => x && x.guess); }).catch(() => false)))
+    .then(full => {
+      if (groupCtx !== c || !c.wp || c.wp.key !== key || c.wp.pos) return;
+      const first = full.findIndex(f => !f); if (first === 0) return;
+      c.wp.pos = first < 0 ? rounds.length : first; whoPaceSave(c); c.whoBuilt = null;
+      const main = document.getElementById('grpMain'); if (main && c.state.stage === 'whoGuess') renderGroupWhoGuess(main);
+    });
+  return c.wp;
+}
+function renderWhoPace(main) {
+  const c = groupCtx, st = c.state, key = st.whoStartedAt.toMillis() + ':pace';
+  const wp = whoPaceLoad(c, key), rounds = whoPaceRounds(c), qs = st.whoQuestions || [];
+  const done = wp.pos >= rounds.length || !!(c.group && c.group.whoGuessDone);
+  const bkey = key + ':' + (done ? 'done' : wp.pos);
+  if (c.whoBuilt === bkey && document.getElementById('whoGuessBox')) return;
+  whoStopAudio(); clearTimeout(c.whoSaveTimer);
+  c.whoBuilt = bkey; c.whoOver = false; c.whoDirty = false;
+  const clock = timerBar(fmtClock(whoEndMs(st) - Date.now()), done ? 'עד סוף הניחושים (אם לא כל הקבוצות מסיימות קודם)' : `עד ${secsText(st.whoTotalSecs || 180)} לכל הניחושים`);
+  if (done) {
+    if (!(c.group && c.group.whoGuessDone) && !c.whoGuessDoneSent) { c.whoGuessDoneSent = true; updateGroupDoc(c, { whoGuessDone: true, whoGuessDoneAt: serverTimestamp() }).catch(e => { console.warn(e); c.whoGuessDoneSent = false; }); }
+    main.innerHTML = `${clock}<div id="whoGuessBox"><div class="now-box" style="text-align:center"><p style="font-size:20px;margin:0"><strong>✅ סיימתם לנחש!</strong></p><p style="margin:6px 0 0">מחכים לשאר הקבוצות (או לסוף השעון) — ואז אלקנה מגלה מי אמר מה 🏆</p></div></div><p class="smallnote" id="whoHint" style="text-align:center"></p>`;
+    return;
+  }
+  const r = rounds[wp.pos], q = qs[r], Q = WHO_SAID_QUESTIONS[q] || {}, items = whoItemsFor(c, q), last = wp.pos === rounds.length - 1;
+  c.whoBoxRound = r;
+  main.innerHTML = `${wp.pos === 0 ? '<div class="stage-headline c3"><span class="sh-num">שלב 3 — חלק ב׳</span><span class="sh-top">ההקלטות מוכנות!</span><span class="sh-word">עכשיו מנחשים 🎧</span></div>'
+      + nowBox('🎧 מה עושים עכשיו?', ['לוחצים ”▶ שמע הקלטה” ומקשיבים (הקול קצת מעוות — בכוונה 😉)', 'מחליטים יחד: מי אמר את זה? בוחרים שם מהרשימה', 'לוחצים ”השאלה הבאה ◀” — כל קבוצה בקצב שלה'], 0, '🔊 הגבירו את הווליום! ⚡ נכון ומהר = יותר נקודות') : ''}
+    ${clock}
+    <p style="text-align:center;margin:6px 0"><strong>שאלה ${wp.pos + 1} מתוך ${rounds.length}</strong></p>
+    <div class="who-q active"><strong>🎙️ ${esc(Q.title || '')}</strong><p>${esc(Q.q || '')}</p></div>
+    <div id="whoGuessBox">${items.map((it, i) => `<div class="who-item"><button class="game-btn who-play" type="button" data-label="▶ שמע הקלטה ${items.length > 1 ? i + 1 : ''}" onclick="window.whoPlay('${esc(it.rid)}', ${Number(it.pitch) || 1}, this)">▶ שמע הקלטה ${items.length > 1 ? i + 1 : ''}</button><label class="who-guess">✍️ מי אמר את ${items.length > 1 ? 'הקלטה ' + (i + 1) : 'זה'}?<input data-rid="${esc(it.rid)}" maxlength="40" autocomplete="off" placeholder="מקלידים תחילת שם ובוחרים…" oninput="window.whoGuessInput()"></label><p class="who-picked" data-picked="${esc(it.rid)}" aria-live="polite"></p></div>`).join('')}</div>
+    <button class="buy see-next" type="button" id="whoNextBtn" onclick="window.whoPaceNext()" disabled>${last ? 'סיימנו ✓' : 'השאלה הבאה ◀'}</button>
+    <p class="smallnote" id="whoHint" style="text-align:center;margin:6px 0 0"></p>`;
+  document.querySelectorAll('#whoGuessBox input[data-rid]').forEach(inp => { try { showNameChips(inp); } catch (e) { } });
+  whoPaceMark(c);
+  /* after a refresh: what the group already picked in this question */
+  getDoc(doc(db, 'familyGames', c.gameId, 'whoAnswers', c.uid + '_' + r)).then(s => {
+    if (groupCtx !== c || c.whoBuilt !== bkey || !s.exists()) return;
+    const saved = Object.fromEntries((s.data().guesses || []).map(g => [g.rid, g.guess]));
+    document.querySelectorAll('#whoGuessBox input[data-rid]').forEach(inp => { if (!inp.value && saved[inp.dataset.rid]) { inp.value = saved[inp.dataset.rid]; showNameChips(inp); } });
+    whoPaceMark(c);
+  }).catch(() => { });
+  /* the recordings of this question first, then the next question's */
+  const nextQ = rounds[wp.pos + 1] != null ? qs[rounds[wp.pos + 1]] : undefined;
+  Promise.allSettled(items.map(it => whoLoad(it.rid))).then(() => { if (nextQ !== undefined) whoItemsFor(c, nextQ).forEach(it => whoLoad(it.rid).catch(() => { })); });
+  whoGuessGroupTick();
+}
+/* under every recording, big and clear: "✅ בחרתם: דינה"; "השאלה הבאה" lights up when every recording has a name */
+function whoPaceMark(c) {
+  const inputs = [...document.querySelectorAll('#whoGuessBox input[data-rid]')]; if (!inputs.length) return;
+  let all = true;
+  inputs.forEach(inp => {
+    const name = nameFromList(inp.value), p = document.querySelector(`#whoGuessBox [data-picked="${CSS.escape(inp.dataset.rid)}"]`);
+    if (!name) all = false;
+    if (p) { p.classList.toggle('on', !!name); p.innerHTML = name ? `✅ בחרתם: <strong>${esc(name)}</strong>` : '👆 עוד לא בחרתם שם'; }
+  });
+  const btn = document.getElementById('whoNextBtn'), hint = document.getElementById('whoHint'), last = btn && btn.textContent.includes('סיימנו');
+  if (btn) { btn.disabled = !all || c.whoOver; btn.classList.toggle('go-pulse', all && !c.whoOver); }
+  if (hint && !c.whoOver) hint.textContent = all ? `מעולה! לוחצים ”${last ? 'סיימנו ✓' : 'השאלה הבאה ◀'}” (אפשר עוד להחליף שם)` : `בוחרים שם ${inputs.length > 1 ? 'לכל הקלטה' : 'מהרשימה'} — ואז ”${last ? 'סיימנו ✓' : 'השאלה הבאה ◀'}”`;
+}
+window.whoPaceNext = async function () {
+  const c = groupCtx, st = c && c.state, wp = c && c.wp; if (!wp || !st || !st.whoPace || c.whoOver || c.whoNexting) return;
+  const btn = document.getElementById('whoNextBtn'); if (btn) btn.disabled = true;
+  c.whoNexting = true; c.whoDirty = true;
+  const ok = await whoSaveGuesses(false);
+  c.whoNexting = false;
+  if (!ok) { whoPaceMark(c); const h = document.getElementById('whoHint'); if (h) h.textContent = 'השמירה נכשלה — בדקו את החיבור ולחצו שוב.'; return; }
+  wp.pos++; whoPaceSave(c);
+  const rounds = whoPaceRounds(c);
+  groupProgress(c, 'whoGot', { r: Math.min(wp.pos, 30), n: Math.min(wp.pos, rounds.length), of: rounds.length }); /* the progress board */
+  try { if (dzAudio()) { dzTone(988, 0, .12, 'sine', .14); dzTone(1319, .09, .18, 'sine', .12); } } catch (e) { }
+  if (wp.pos < rounds.length) flashCard(['🎧', 'שאלה הבאה!', `שאלה ${wp.pos + 1} מתוך ${rounds.length}`], 'pink');
+  const main = document.getElementById('grpMain'); if (main) renderWhoPace(main);
+  scrollTop();
+};
 function renderGroupWhoGuess(main) {
   const c = groupCtx, st = c.state, r = st.whoRound, key = st.whoStartedAt ? st.whoStartedAt.toMillis() + ':' + r : null;
   if (!key) { main.innerHTML = '<p>מתחילים…</p>'; return; }
   if (!c.whoAssign) { main.innerHTML = '<p>מחלקים את ההקלטות…</p>'; return; }
   c.nameList = c.whoAssign.names || [];
+  if (st.whoPace) return renderWhoPace(main);
   if (c.whoBuilt === key && document.getElementById('whoGuessBox')) return;
   whoStopAudio(); clearTimeout(c.whoSaveTimer);
   c.whoBuilt = key; c.whoBoxRound = r; c.whoOver = false; c.whoDirty = false;
@@ -4747,7 +4969,7 @@ function renderGroupWhoGuess(main) {
     <div id="whoGuessBox">${items.length ? items.map((it, i) => `<div class="who-item"><button class="game-btn who-play" type="button" data-label="▶ שמע הקלטה ${i + 1}" onclick="window.whoPlay('${esc(it.rid)}', ${Number(it.pitch) || 1}, this)">▶ שמע הקלטה ${i + 1}</button><label class="who-guess">✍️ מי אמר את הקלטה ${i + 1}?<input data-rid="${esc(it.rid)}" maxlength="40" autocomplete="off" placeholder="מקלידים תחילת שם ובוחרים…" oninput="window.whoGuessInput()"></label></div>`).join('')
       : '<div class="now-box"><p style="margin:0"><strong>בשאלה הזו אין לכם הקלטות לנחש</strong> — כל ההקלטות שנבחרו הן של הקבוצה שלכם 🙂 מחכים לשאלה הבאה.</p></div>'}</div>
     <p class="smallnote" id="whoHint" style="text-align:center"></p>`;
-  if (!items.length) return;
+  if (!items.length) { groupProgress(c, 'whoGot', { r, n: 0, of: 0 }); return; } /* (27.11.26) nothing to guess = finished, on the board */
   /* (26.11.26 test: in stage 3 the names appeared only after tapping the box - like stage 1, they are there at once) */
   document.querySelectorAll('#whoGuessBox input[data-rid]').forEach(inp => { try { showNameChips(inp); } catch (e) { } });
   // אחרי רענון: מחזירים את מה שהקבוצה כבר כתבה בשאלה הזו
@@ -4762,35 +4984,43 @@ function renderGroupWhoGuess(main) {
 }
 window.whoGuessInput = function () {
   const c = groupCtx; if (!c) return;
+  if (c.state && c.state.whoPace) whoPaceMark(c); /* (27.11.26) "✅ בחרתם: …" at once */
   c.whoDirty = true; clearTimeout(c.whoSaveTimer);
   c.whoSaveTimer = setTimeout(() => whoSaveGuesses(false), 600);
 };
 // שומרים את כל הניחושים של השאלה (רק בזמן השעון — ואחרי שהזמן נגמר, פעם אחרונה)
 function whoSaveGuesses(final) {
   // רק לשאלה שעל המסך — אם כבר עברו לשאלה הבאה, לא שומרים תחתיה את הניחושים הישנים
-  const c = groupCtx, st = c && c.state; if (!c || !c.whoDirty || !st || st.stage !== 'whoGuess' || c.whoBoxRound !== st.whoRound) return;
-  const box = document.getElementById('whoGuessBox'); if (!box) return;
+  /* (27.11.26) own pace (state.whoPace): the question on the screen is the group's own (c.whoBoxRound), not state.whoRound.
+     Returns a promise: true = saved */
+  const c = groupCtx, st = c && c.state; if (!c || !c.whoDirty || !st || st.stage !== 'whoGuess' || (!st.whoPace && c.whoBoxRound !== st.whoRound)) return Promise.resolve(false);
+  const box = document.getElementById('whoGuessBox'); if (!box || !box.querySelector('input[data-rid]')) return Promise.resolve(false);
   // נשמר רק שם מהרשימה (שם שלא ברשימה נשמר כריק עד שבוחרים)
-  const r = st.whoRound, guesses = [...box.querySelectorAll('input[data-rid]')].map(inp => ({ rid: inp.dataset.rid, guess: (nameFromList(inp.value) || '').slice(0, 40) }));
-  if (Date.now() > whoEndMs(st) + 4000) return;
+  const r = st.whoPace ? c.whoBoxRound : st.whoRound, guesses = [...box.querySelectorAll('input[data-rid]')].map(inp => ({ rid: inp.dataset.rid, guess: (nameFromList(inp.value) || '').slice(0, 40) }));
+  if (Date.now() > whoEndMs(st) + 4000) return Promise.resolve(false);
   c.whoDirty = false; clearTimeout(c.whoSaveTimer);
   const hint = document.getElementById('whoHint');
-  setDoc(doc(db, 'familyGames', c.gameId, 'whoAnswers', c.uid + '_' + r), { guesses, updatedAt: serverTimestamp() })
+  return setDoc(doc(db, 'familyGames', c.gameId, 'whoAnswers', c.uid + '_' + r), { guesses, updatedAt: serverTimestamp() })
     .then(() => {
-      if (!hint || c.whoOver || !hint.isConnected) return;
+      if (st.whoPace) return true; /* own pace: "✅ בחרתם" + the button say it all (whoPaceMark) */
+      /* (27.11.26) the progress board: how many recordings of this question we named */
+      if (!final) groupProgress(c, 'whoGot', { r, n: guesses.filter(g => g.guess).length, of: guesses.length });
+      if (!hint || c.whoOver || !hint.isConnected) return true;
       /* all recordings of this question have a name -> say what happens now (11.11.26, Ayelet: "can I move on to the next one?") */
       const all = guesses.length && guesses.every(g => g.guess);
       hint.innerHTML = all ? '<strong>✅ סיימתם את השאלה הזו!</strong> עוברים לשאלה הבאה ברגע שכל הקבוצות מסיימות (או כשהשעון נגמר). אפשר עדיין לתקן.' : '✓ נשמר';
+      return true;
     })
-    .catch(e => { console.warn(e); c.whoDirty = true; if (hint && hint.isConnected && !final) hint.textContent = 'השמירה נכשלה — בדקו את החיבור.'; });
+    .catch(e => { console.warn(e); c.whoDirty = true; if (hint && hint.isConnected && !final && !st.whoPace) hint.textContent = 'השמירה נכשלה — בדקו את החיבור.'; return false; });
 }
 function whoGuessGroupTick() {
   const c = groupCtx, st = c && c.state; if (!st || st.stage !== 'whoGuess' || !document.getElementById('whoGuessBox')) return;
   if (!c.whoOver && Date.now() >= whoEndMs(st)) {
     c.whoOver = true;
     document.querySelectorAll('#whoGuessBox input').forEach(i => { i.disabled = true; });
+    const nb = document.getElementById('whoNextBtn'); if (nb) { nb.disabled = true; nb.classList.remove('go-pulse'); }
     whoSaveGuesses(true);
-    const hint = document.getElementById('whoHint'); if (hint) hint.innerHTML = '<strong>⏰ הזמן נגמר! מיד השאלה הבאה…</strong>';
+    const hint = document.getElementById('whoHint'); if (hint) hint.innerHTML = st.whoPace ? '<strong>⏰ הזמן נגמר! אלקנה בודק מי ניחש נכון…</strong>' : '<strong>⏰ הזמן נגמר! מיד השאלה הבאה…</strong>';
   }
 }
 
