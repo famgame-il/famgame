@@ -150,6 +150,9 @@ footer .nagish-bottom{margin:6px 0 0;display:block}
 /* Ayelet 25.11.26 - the names list: always open, scrolls inside a frame, the chosen name green */
 .name-chips.all{max-height:170px;overflow-y:auto;padding:8px;border:2px solid #d6e6fb;border-radius:14px;background:#fafcff}
 .name-chip.on{background:#2e7d32;border-color:#2e7d32;color:#fff}
+.who-item .who-guess{flex-basis:100%}
+.who-hint{flex-basis:100%;margin:0;padding:8px 10px;background:#fff6d6;border:2px dashed #f0b400;border-radius:10px;color:#5a4300;font-size:16px;line-height:1.5}
+.name-select{display:block;width:100%;box-sizing:border-box;margin:0 0 8px;padding:12px 10px;font-size:18px;font-family:inherit;border:2px solid #1565c0;border-radius:12px;background:#fff;color:#0d2a4d;font-weight:700}
 /* Ayelet 25.11.26 ("every button that moves on must pulse and blink, so it is clear") - הבנתי, העלינו ואנחנו מוכנים, כולנו כאן, המשך, הבא, סיימנו */
 /* (the gold flowing frame - defined above, with .save-pulse) */
 /* Ayelet 25.11.26 - a new question slides in from the side, and "שאלה X מתוך Y" flashes yellow */
@@ -449,7 +452,7 @@ input.unsaved{outline:3px solid #ff9800;background:#fff3e0}.date-words{margin:4p
   if (!calm) setInterval(() => { if (onScreen && !document.hidden && Date.now() > pausedUntil) show(i + 1); }, 3500);
 })();
 </script>
-<p class="swipe-hint" style="font-weight:700">👨‍👦 נבנה במיוחד למשפחות עם ילדים — גדולים וילדים יחד! לפחות 4 קבוצות של 3 עד 5 משתתפים.</p>
+<p class="swipe-hint" style="font-weight:700">👨‍👦 נבנה במיוחד למשפחות עם ילדים — גדולים וילדים יחד! לפחות 4 קבוצות — הכי כיף בקבוצות של 3–4 משתתפים.</p>
 <section class="section" id="before"><div class="head"><h2>מה צריך כדי לשחק?</h2></div>
 <!-- Ayelet 11.11.26: Elkana gets a wide card of his own (in the grid his picture made the other cards look empty) - new for Chanukah: an AI host -->
 <div class="ai-feature"><!-- Ayelet 12.11.26: Elkana's opening video ("ברוכים הבאים, גיבורים!") instead of the round picture; loads only when pressed --><div class="ai-vid"><video id="elkanaIntroVid" src="./elkana-intro.mp4" poster="./how-elkana-welcome.jpg" preload="none" playsinline aria-label="סרטון: אלקנה החשמונאי מברך את המשפחות"></video><button type="button" onclick="const v=document.getElementById('elkanaIntroVid');this.hidden=true;v.controls=true;v.play().catch(()=>{this.hidden=false;})">▶ אלקנה מברך</button></div>
@@ -457,7 +460,7 @@ input.unsaved{outline:3px solid #ff9800;background:#fff3e0}.date-words{margin:4p
 <p>לראשונה — משחק משפחתי עם <strong>דמות AI</strong> שמנחה אותו בשבילכם! אלקנה מדבר בקול בכל הטלפונים, מסביר כל שלב, עוקץ בחיוך, מעביר הלאה לבד, ובסוף אומר מה הוא חושב על כל קבוצה ומכריז על המנצחים.</p>
 <p class="ai-pts"><span>🙌 אין מנהל משחק — כולם משחקים</span><span>🗣️ מדבר ומקליד כמו בוואטסאפ</span><span>😂 בדיחות חדשות בכל משחק</span></p></div></div>
 <div class="before-grid">
-<article class="info"><strong>👥 קבוצות של 3 עד 5</strong>מתחלקים במקום לקבוצות של 3 עד 5 משתתפים — לפחות 4 קבוצות, כלומר לפחות 12 משתתפים. כדאי לערבב בכל קבוצה גדולים וילדים.</article>
+<article class="info"><strong>👥 קבוצות של 3–4</strong>מתחלקים במקום לקבוצות של 3 או 4 משתתפים (אפשר גם 5, אבל עדיף עוד קבוצה) — לפחות 4 קבוצות, כלומר לפחות 12 משתתפים. כדאי לערבב בכל קבוצה גדולים וילדים.</article>
 <article class="info"><strong>🧒 נבנה במיוחד למשפחות עם ילדים!</strong>משחק משפחתי באמת: סבא, הורים, נוער וילדים משחקים יחד — בלי ילדים זה כבר לא אותו דבר 😉 ילדים מגיל 3 שיכולים להקליט בטלפון נספרים כמשתתפים, וילדים קטנים שעוד לא קוראים משחקים יחד עם הגדולים בקבוצה.</article>
 <article class="info"><strong>📱 טלפון אחד לכל קבוצה</strong>כל הקבוצה משחקת מטלפון אחד: מצלמים, כותבים ומקליטים בו — רק כשהמשחק מבקש. אפשר גם מחשב עם מצלמה ומיקרופון, אבל טלפון נוח יותר ומומלץ.</article>
 <article class="info"><strong>🤖 אלקנה החשמונאי — דמות AI — מנחה</strong>אין מנהל משחק ואין טלפון נוסף — כולם משחקים! אלקנה, דמות ה־AI המצחיקה שמנחה את המשחק, מסביר כל שלב, מעביר הלאה לבד ומכריז על המנצחים.</article>
@@ -498,7 +501,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <section class="section" id="who"><div class="head"><h2>למי זה מתאים?</h2><p>במיוחד למשפחות עם ילדים — גדולים וקטנים משחקים יחד 🧒👴</p></div><div class="who-chips"><span>🏡 משפחות עם ילדים</span><span>🧑‍🤝‍🧑 חברים</span><span>👴 סבא, סבתא והנכדים</span><span>🕎 חגים ואירועים משפחתיים</span><span>🎉 וכל קבוצה</span></div><p style="text-align:center;margin:12px 0 0">🕍 מותאם לציבור הדתי</p></section>
 <section class="section" id="faq"><div class="head"><h2>שאלות נפוצות</h2></div>
 <details><summary>האם צריך להכין משהו מראש?</summary><p><strong>לא.</strong> המשחק מוכן מראש. לא מכינים תמונות, שאלות או חומרי משחק — האתר מנחה אתכם במהלך המשחק.</p></details>
-<details><summary>כמה אנשים בכל קבוצה?</summary><p>בכל קבוצה 3 עד 5 משתתפים, ולפחות 4 קבוצות — כלומר המשחק מתאים ל־12 משתתפים ומעלה. האתר לא מאפשר לרשום פחות מ־3 או יותר מ־5 בקבוצה — אם אתם יותר, מתחלקים לשתי קבוצות. <strong>כדאי לערבב בכל קבוצה גדולים וילדים</strong> — ככה כולם משחקים יחד.</p></details>
+<details><summary>כמה אנשים בכל קבוצה?</summary><p>הכי כיף בקבוצות של 3 או 4 משתתפים, ולפחות 4 קבוצות — כלומר המשחק מתאים ל־12 משתתפים ומעלה. קבוצה של 5 אפשרית, אבל עדיף עוד קבוצה קטנה (למשל 15 משתתפים: 4, 4, 4, 3 — ולא 5, 5, 5). האתר לא מאפשר לרשום פחות מ־3 או יותר מ־5 בקבוצה. <strong>כדאי לערבב בכל קבוצה גדולים וילדים</strong> — ככה כולם משחקים יחד.</p></details>
 <details><summary>מאיזה גיל אפשר לשחק? מתאים לילדים?</summary><p><strong>כן — זה משחק לכל המשפחה, גם לילדים! 🎉</strong> סבא וסבתא, הורים, נוער וילדים משחקים יחד, ואפילו כדאי לערבב גילאים בכל קבוצה. ילדים מגיל 3 שיכולים להקליט בטלפון נספרים כמשתתפים. ילדים קטנים שעוד לא קוראים משחקים יחד עם הגדולים בקבוצה.</p></details>
 <details><summary>כמה טלפונים צריך?</summary><p>טלפון אחד לכל קבוצה — וזהו. אין מנהל משחק ואין טלפון נוסף. (אפשר גם מחשב עם מצלמה ומיקרופון — אבל טלפון נוח יותר ומומלץ.)</p></details>
 <details><summary>מי מנחה את המשחק?</summary><p>אלקנה החשמונאי — דמות AI: מנחה מצחיק שמופיע בכל הטלפונים ומדבר בקול: מקבל כל קבוצה, מסביר כל שלב בקצרה, מעביר הלאה לבד, מכריז על המנצחים ואומר מה הוא חושב על כל קבוצה. כולם משחקים — אף אחד לא צריך ”לנהל”.</p></details>
@@ -510,16 +513,16 @@ document.addEventListener('DOMContentLoaded', () => {
 <details><summary>האם חייבים מקרן?</summary><p>לא. כל קבוצה רואה ושומעת את אלקנה (דמות AI) בטלפון שלה.</p></details>
 <details><summary>אילו תמונות צריך לצלם?</summary><p>רק בשלב 1: כל משתתף מצטלם בטלפון של הקבוצה — פנים מקרוב — כשהמשחק מבקש. מישהו מהקבוצה מצלם אותו (או סלפי). בשלב 2 התמונות מגיעות מהאתר — לא מצלמים כלום. בשלב 3 לא מצלמים, רק מקליטים.</p></details>
 <details><summary>מה עושים בשלב 2?</summary><p>מקבלים מהאתר תמונה מלאה בפרטים, ומתחתיה שאלות עליה — אחת בכל פעם, עם 4 תשובות לבחירה. למשל: ”מה השעה בשעון?” או ”למי יש יום הולדת היום?”. כל פרט קטן חשוב, ומי שעונה נכון ויותר זריז מקבל יותר נקודות. גם ילדים נהנים מאוד מהשלב הזה 🔍</p></details>
-<details><summary>צריך אינטרנט? זה עובד בטלפון מסונן?</summary><p>כן, צריך אינטרנט: כל טלפון של קבוצה צריך קליטה טובה — וויי־פיי או גלישה. <strong>המשחק נבדק גם במכשירים מסוננים</strong>, אבל כל סינון קצת שונה — לכן כדאי לבדוק מראש כל טלפון שישמש קבוצה. במייל ההזמנה מגיע קישור לבדיקה קצרה — שולחים אותו לכל המשפחה (למשל בוואטסאפ), וכל אחד פותח אותו בטלפון שלו. אם משהו חסום, הבדיקה תגיד בדיוק אילו כתובות לבקש מחברת הסינון לפתוח.</p></details><details><summary>כמה משתתפים אפשר?</summary><p>בין 12 ל־100 משתתפים לאירוע (לפחות 4 קבוצות של 3 עד 5), לפי המספר שרכשתם. כמה שיותר משתתפים — המשחק יותר מעניין, ולכן מומלץ להזמין את כל המשפחה. כשהמכסה מתמלאת, אי־אפשר להוסיף עוד משתתפים או קבוצות.</p></details>
+<details><summary>צריך אינטרנט? זה עובד בטלפון מסונן?</summary><p>כן, צריך אינטרנט: כל טלפון של קבוצה צריך קליטה טובה — וויי־פיי או גלישה. <strong>המשחק נבדק גם במכשירים מסוננים</strong>, אבל כל סינון קצת שונה — לכן כדאי לבדוק מראש כל טלפון שישמש קבוצה. במייל ההזמנה מגיע קישור לבדיקה קצרה — שולחים אותו לכל המשפחה (למשל בוואטסאפ), וכל אחד פותח אותו בטלפון שלו. אם משהו חסום, הבדיקה תגיד בדיוק אילו כתובות לבקש מחברת הסינון לפתוח.</p></details><details><summary>כמה משתתפים אפשר?</summary><p>בין 12 ל־100 משתתפים לאירוע (לפחות 4 קבוצות — הכי כיף 3–4 בכל קבוצה), לפי המספר שרכשתם. כמה שיותר משתתפים — המשחק יותר מעניין, ולכן מומלץ להזמין את כל המשפחה. כשהמכסה מתמלאת, אי־אפשר להוסיף עוד משתתפים או קבוצות.</p></details>
 <details><summary>מה עושים אם קוד ההצטרפות לא עובד?</summary><p>בודקים שהקלדתם את 6 הספרות נכון, ומבקשים את הקישור שוב ממי שרכש. האתר כותב בדיוק מה הבעיה: קוד שגוי, המשחק עוד לא נפתח היום (נפתח רק ביום המשחק מ־6:00), או שהמשחק מלא.</p></details><details><summary>איך משלמים ומקבלים גישה?</summary><p>אחרי שליחת ההזמנה מופיעות הוראות לתשלום בביט. אחרי שהתשלום מתקבל, נשלח אליכם במייל קישור הצטרפות עם קוד — שולחים אותו לכל הקבוצות.</p><p><span class="contact-line" data-contact></span></p></details><details><summary>מתי אפשר לשחק?</summary><p>המשחק פתוח רק בתאריך שבחרתם ברכישה — מ־6:00 בבוקר עד 1:00 בלילה. לפני התאריך ואחריו אי־אפשר להיכנס למשחק.</p></details></section>
 <section class="section buy-cta" id="buyCta"><h2>רוצים לשחק? 🎉</h2><p>בוחרים מספר משתתפים ותאריך — ופרטי הכניסה מגיעים במייל.</p><button class="buy" type="button" onclick="openBuyPage()">🛒 לרכישת המשחק</button></section>
-<section class="section" id="purchase"><div class="buy-top"><button class="game-btn" type="button" onclick="closeBuyPage()">← חזרה לאתר</button><img class="buy-logo" src="logo.png" width="363" height="130" alt="משחק המשפחה"></div><div class="ayelet-note"><strong>היי, אני איילת ❤️</strong><p>תמיד הייתי אחראית על הפעילויות במשפחה, זאת שחושבת איך כולם ייהנו ביחד 😅</p><p>השנה יצרתי בעזרת AI משחק משפחתי אינטראקטיבי ומיוחד לחנוכה, עם חידות, תמונות, משימות והפתעות.</p><p>התחלתי בשביל המשפחה שלי, אבל חשבתי שחבל שרק אנחנו נהנה ממנו!</p><p>אז אם אתם מחפשים פעילות כיפית לכל המשפחה, בלי הכנות מראש – נראה לי שסידרתי לכם את תוכנית חנוכה 😉</p><p>רוצים פרטים? מוזמנים לכתוב לי כאן או בוואטסאפ ❤️</p><a class="wa-btn" data-wa hidden target="_blank" rel="noopener" href="#">💬 לכתוב לאיילת בוואטסאפ<span class="vh"> (נפתח בחלון חדש)</span></a></div><div class="head"><h2>רכישת המשחק</h2><p>בחרו את מספר המשתתפים ואת תאריך המשחק. ביום המשחק מתחלקים במקום לקבוצות של 3 עד 5 (לפחות 4 קבוצות). <strong>🧒 המשחק נבנה במיוחד למשפחות עם ילדים</strong> — הכי כיף כשגדולים וילדים משחקים יחד באותה קבוצה. <strong>👥 כמה שיותר משתתפים — המשחק יותר מעניין!</strong></p></div><p class="smallnote" id="priceNote">מחיר נגיש, עם תקרה של 320 ₪ למשחק.</p>
+<section class="section" id="purchase"><div class="buy-top"><button class="game-btn" type="button" onclick="closeBuyPage()">← חזרה לאתר</button><img class="buy-logo" src="logo.png" width="363" height="130" alt="משחק המשפחה"></div><div class="ayelet-note"><strong>היי, אני איילת ❤️</strong><p>תמיד הייתי אחראית על הפעילויות במשפחה, זאת שחושבת איך כולם ייהנו ביחד 😅</p><p>השנה יצרתי בעזרת AI משחק משפחתי אינטראקטיבי ומיוחד לחנוכה, עם חידות, תמונות, משימות והפתעות.</p><p>התחלתי בשביל המשפחה שלי, אבל חשבתי שחבל שרק אנחנו נהנה ממנו!</p><p>אז אם אתם מחפשים פעילות כיפית לכל המשפחה, בלי הכנות מראש – נראה לי שסידרתי לכם את תוכנית חנוכה 😉</p><p>רוצים פרטים? מוזמנים לכתוב לי כאן או בוואטסאפ ❤️</p><a class="wa-btn" data-wa hidden target="_blank" rel="noopener" href="#">💬 לכתוב לאיילת בוואטסאפ<span class="vh"> (נפתח בחלון חדש)</span></a></div><div class="head"><h2>רכישת המשחק</h2><p>בחרו את מספר המשתתפים ואת תאריך המשחק. ביום המשחק מתחלקים במקום לקבוצות של 3–4 (לפחות 4 קבוצות; 5 אפשר, אבל עדיף עוד קבוצה). <strong>🧒 המשחק נבנה במיוחד למשפחות עם ילדים</strong> — הכי כיף כשגדולים וילדים משחקים יחד באותה קבוצה. <strong>👥 כמה שיותר משתתפים — המשחק יותר מעניין!</strong></p></div><p class="smallnote" id="priceNote">מחיר נגיש, עם תקרה של 320 ₪ למשחק.</p>
 <div class="price-grid" id="priceGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px;margin:18px 0"></div><div class="trust-box">🤝 <strong>קנייה בטוחה:</strong> פרטי הכניסה נשלחים אליכם במייל עד 24 שעות מהתשלום (בדרך כלל הרבה יותר מהר).<br>💬 יש שאלה, או שנוח לכם לדבר לפני שמזמינים? אשמח לעזור — כתבו לי או התקשרו 😊<span class="contact-line" data-contact></span></div><div class="info"><form class="fields" id="orderForm" onsubmit="event.preventDefault();submitOrder()">
 <label for="people"><strong>מספר המשתתפים</strong></label><input id="people" type="number" min="12" max="100" step="1" value="30" required oninput="updateGroups();document.getElementById('countOkN').textContent=this.value||'?'">
 <div class="purchase-summary" id="groupSummary">30 משתתפים</div>
 <div class="purchase-summary" id="phoneSummary" style="background:#dceefa">📱 טלפון אחד לכל קבוצה — וזהו</div>
 <div class="purchase-summary" id="totalSummary">עלות כוללת: 320 ₪</div>
-<p class="smallnote">חשוב לדעת: בין 12 ל־100 משתתפים. מתחלקים במקום לקבוצות של 3 עד 5 (לפחות 4 קבוצות), ו<strong>לכל קבוצה טלפון אחד</strong>.</p>
+<p class="smallnote">חשוב לדעת: בין 12 ל־100 משתתפים. מתחלקים במקום לקבוצות של 3–4 (לפחות 4 קבוצות; עד 5 אפשר, אבל עדיף עוד קבוצה), ו<strong>לכל קבוצה טלפון אחד</strong>.</p>
 <!-- Ayelet 16.11.26 - count exactly: children are participants, and an extra number makes the game wait for people who will not come -->
 <div class="count-tip" role="note" aria-labelledby="countTipTitle"><strong id="countTipTitle">👀 רגע לפני שבוחרים — סופרים בדיוק!</strong><ul>
 <li><strong>🧒 גם הילדים הם משתתפים.</strong> כל ילד שיכול להקליט בטלפון (מגיל 3) נספר. המשחק פתוח בדיוק למספר שרכשתם — מי שלא נספר לא יוכל להצטרף ביום המשחק.</li>
@@ -589,23 +592,22 @@ document.addEventListener('DOMContentLoaded', () => {
 const stages={
 1:{title:'מי זה במשפחה? 🕵️',desc:'כל משתתף מצטלם בטלפון של הקבוצה — ואז, באופן מסתורי, התמונות מקבלות תפנית... 🌀 צריך לזהות מי זה, נגד השעון! כל זיהוי נכון = עד 100 נקודות — ⚡ מי שמהיר יותר מקבל יותר.',steps:['מתי: מיד אחרי שהקבוצה מצטרפת למשחק. מי: כל משתתף בקבוצה, אחד אחרי השני.','איך: כותבים את השם המלא שלו, ומישהו מהקבוצה מצלם אותו מקרוב (או סלפי) בטלפון של הקבוצה — רק את הפנים. התמונה עולה לאתר לבד.','כולם הצטלמו? לוחצים ”העלינו ואנחנו מוכנים” ומחכים לשאר הקבוצות.','כשכולם מוכנים, אלקנה (דמות ה־AI) מפעיל את השעון — והתמונות מקבלות תפנית מסתורית 🌀','🔀 האתר מערבב את התמונות של כל הקבוצות: כל קבוצה מקבלת רק תמונות של בני משפחה מהקבוצות האחרות — אף פעם לא של עצמה. כל קבוצה בטלפון שלה, אבל משחקים עם כולם!','התמונות רצות על המסך ועוצרות — כותבים מי זה.','כל זיהוי נכון = עד 100 נקודות — ⚡ מי שמהיר יותר מקבל יותר. התמונות נמחקות מהאתר יום אחרי המשחק. מה בדיוק קורה? תגלו כשתשחקו 😉']},
 2:{title:'מה ראיתם? 🔍',desc:'3 תמונות מלאות בפרטים, ועל כל תמונה 7–8 שאלות. התמונה נשארת למעלה, ומתחתיה מגיעה שאלה אחת בכל פעם עם 4 תשובות לבחירה. כל פרט קטן חשוב — ומי שעונה נכון ויותר זריז מקבל יותר נקודות!',steps:['כל הקבוצות מקבלות את אותן תמונות מהאתר — לא מצלמים כלום בשלב הזה.','מסתכלים טוב על התמונה: מי יושב איפה, מה כתוב על השלט, מה השעה בשעון… כל פרט קטן יכול להיות שאלה!','מתחת לתמונה מופיעה שאלה עם 4 תשובות. בוחרים תשובה ולוחצים ”הבא” — ומגיעה השאלה הבאה. התמונה נשארת על המסך, לא צריך לגלול.','אחרי השאלה האחרונה — לוחצים ”הבא” ועוברים לתמונה הבאה. כל קבוצה מתקדמת בקצב שלה.','⏱️ יש 6 דקות לכל השלב, ו⚡ המהירות קובעת: כל תשובה נכונה = עד 100 נקודות, וכל שנייה שעוברת היא שווה פחות. תשובה לא נכונה = 0, אז לא כדאי לנחש סתם!','בסוף רואים מי ענה הכי הרבה תשובות נכונות והכי מהר 🥇🥈🥉']},
-3:{title:'מי אמר את זה?! 🎙️',desc:'10 שאלות מצחיקות — למשל ”אם היית יכול לנסוע בזמן, לאן היית נוסע?”. בכל קבוצה, על כל שאלה עונה בקול משתתף אחר (עד 20 שניות). האתר משנה את הקולות ומערבב אותם, וכל קבוצה צריכה לנחש מי אמר מה!',steps:['על כל שאלה עונה משתתף אחד מהקבוצה — כל פעם מישהו אחר. הוא מקליט תשובה של עד 20 שניות, כמו הודעה קולית. השם נשמר בסוד.','מעודדים להיות מקוריים, מצחיקים ומפתיעים — אבל אף אחד לא חייב לספר משהו אישי.','אחרי שכולם ענו, האתר משנה את הקולות ומערבב את ההקלטות של כל הקבוצות 🔀 — כל קבוצה בטלפון שלה, אבל משחקים עם כולם!','לכל שאלה כל קבוצה שומעת הקלטות של הקבוצות האחרות (אף פעם לא של עצמה) וכותבת מי לדעתה אמר כל אחת. כשיש הרבה משתתפים — שומעים מבחר אקראי, כדי שיישאר כיף וקצר.','בסוף — מיד התוצאות: מי אמר מה, כל זיהוי נכון = עד 100 נקודות (⚡ מהר = יותר), וטבלת הניקוד של כל המשחק עם הקבוצה המנצחת! 🏆']}
+3:{title:'מי אמר את זה?! 🎙️',desc:'6 שאלות מצחיקות — למשל ”זכית במיליון דולר — מה הדבר הראשון שתעשה?”. בכל קבוצה, על כל שאלה עונה בקול משתתף אחר (עד 20 שניות). האתר משנה את הקולות ומערבב אותם, וכל קבוצה צריכה לנחש מי אמר מה!',steps:['על כל שאלה עונה משתתף אחד מהקבוצה — כל פעם מישהו אחר. הוא מקליט תשובה של עד 20 שניות, כמו הודעה קולית. השם נשמר בסוד.','מעודדים להיות מקוריים, מצחיקים ומפתיעים — אבל אף אחד לא חייב לספר משהו אישי.','אחרי שכולם ענו, האתר משנה את הקולות ומערבב את ההקלטות של כל הקבוצות 🔀 — כל קבוצה בטלפון שלה, אבל משחקים עם כולם!','לכל שאלה כל קבוצה שומעת הקלטות של הקבוצות האחרות (אף פעם לא של עצמה) וכותבת מי לדעתה אמר כל אחת. כשיש הרבה משתתפים — שומעים מבחר אקראי, כדי שיישאר כיף וקצר.','בסוף — מיד התוצאות: מי אמר מה, כל זיהוי נכון = עד 100 נקודות (⚡ מהר = יותר), וטבלת הניקוד של כל המשחק עם הקבוצה המנצחת! 🏆']}
 };
 // ההסבר המלא של שלב 1 — רק לשחקנים, בתוך המשחק
 const stagesGame={
 1:{title:'מכירים בעיניים 👀',desc:'כל משתתף מצטלם מקרוב וכותב את השם המלא שלו, והמערכת חותכת לבד את העיניים. אחרי ”המשך” עיניים של בני משפחה מקבוצות אחרות רצות מהר על המסך ועוצרות על זוג אחד — בוחרים מהרשימה של מי, ושוב רץ. כל תשובה נכונה = עד 100 נקודות — ⚡ מהר = יותר!',steps:['כל משתתף מצטלם מקרוב במכשיר של הקבוצה — רק הפנים, לא כל הגוף — וכותב שם מלא: שם פרטי ושם משפחה.','כשכל הקבוצה הצטלמה, לוחצים ”העלינו ואנחנו מוכנים”.','כשכל הקבוצות מוכנות — אלקנה (דמות ה־AI) מתחיל והשעון רץ.','עיניים רצות מהר מהר ועוצרות על זוג אחד: מקלידים את תחילת השם, בוחרים מהרשימה של מי, ולוחצים ”הבא”. עד 15 זוגות, אף פעם לא מהקבוצה שלכם.','בסוף לוחצים ”אישור”. כשהקבוצה האחרונה מאשרת — או כשהזמן נגמר — מגלים לכולם מה נכון. כל תשובה נכונה = עד 100 נקודות — ⚡ מהר = יותר.']}
 };
-// עשר השאלות של ”מי אמר את זה?!” (לשלב 3)
+// השאלות של ”מי אמר את זה?!” (לשלב 3)
+/* Ayelet 28.11.26 ("10 questions in stage 3 is too long - let's go down to 6, and the stage-3 time should go down too"): the 6 funniest
+   that fit every family stay. Ayelet chose (same day): עוד 10 שנים + זבוב על הקיר stay instead of כוח־על + החלפת חיים
+   (out: מסע בזמן, הודעה מפתיעה, כוח־על, החלפת חיים). The server has WHO_QUESTIONS = 6 too */
 const WHO_SAID_QUESTIONS=[
- {title:'מסע בזמן',q:'אם היית יכול לנסוע לעבר או לעתיד, לאן היית נוסע ומה הדבר הראשון שהיית עושה שם?'},
- {title:'הודעה מפתיעה',q:'אם המשפחה הייתה מקבלת עכשיו הודעה מפתיעה עליך — איזו הודעה הייתה גורמת לכולם להגיד: ”מה?! דווקא הוא/היא?!”'},
  {title:'מיליון דולר',q:'זכית במיליון דולר, אבל אסור לך לקנות בית, רכב או לתת את הכסף למשפחה. מה הדבר הראשון שתעשה?'},
- {title:'כוח־על',q:'אם היית יכול לקבל כוח־על אחד למשך 24 שעות בלבד, איזה כוח היית בוחר ומה היית עושה איתו?'},
- {title:'החלפת חיים',q:'אם היית צריך להתחלף עם מישהו מהמשפחה למשך שבוע, במי היית בוחר ולמה?'},
- {title:'חוק חדש',q:'אתה ראש הממשלה ליום אחד. איזה חוק מצחיק היית מחוקק שכל המשפחה חייבת לקיים?'},
- {title:'ממציא מטורף',q:'אם היית ממציא מכונה שעושה בשבילך את הדבר שהכי פחות בא לך לעשות בבית — מה היא הייתה עושה, ואיך היית קורא לה?'},
  {title:'עוד 10 שנים',q:'איפה אתה רואה את עצמך בעוד 10 שנים? מה תעשה, ואיך תיראה?'},
  {title:'זבוב על הקיר',q:'אם היית יכול להיות ”זבוב על הקיר” לכמה דקות — באיזה מקום היית רוצה להיות, ומה היית רוצה לראות שם?'},
+ {title:'חוק חדש',q:'אתה ראש הממשלה ליום אחד. איזה חוק מצחיק היית מחוקק שכל המשפחה חייבת לקיים?'},
+ {title:'ממציא מטורף',q:'אם היית ממציא מכונה שעושה בשבילך את הדבר שהכי פחות בא לך לעשות בבית — מה היא הייתה עושה, ואיך היית קורא לה?'},
  {title:'אבוד ביער',q:'נאבדת לבד ביער. מה שלוש המחשבות הראשונות שהיו עוברות לך בראש?'}
 ];
 function enterSite(){document.getElementById('startScreen').hidden=true;document.getElementById('siteContent').hidden=false;window.scrollTo({top:0,behavior:'instant'});if(!(history.state&&history.state.screen==='site'))history.pushState({screen:'site'},'');}
@@ -647,7 +649,7 @@ const clips={
  {art:'⚡',text:'מי שעונה נכון ויותר זריז — מקבל יותר נקודות!',ms:3400},
  {art:'⏱️ <span data-count>360</span>',text:'6 דקות — 3 תמונות, 7–8 שאלות על כל אחת. ⚡ המהירות קובעת!',ms:3600,count:360},
  {art:'🏆 🥈 🥉',text:'בסוף: מי ענה הכי הרבה תשובות נכונות והכי מהר!',ms:3400}],
-3:[{art:'🎙️ 10',text:'עשר שאלות מצחיקות — על כל שאלה עונה משתתף אחר מהקבוצה',ms:4000},
+3:[{art:'🎙️ 6',text:'שש שאלות מצחיקות — על כל שאלה עונה משתתף אחר מהקבוצה',ms:4000},
  {art:'⏳ 🚀',text:'למשל: אם היית יכול לנסוע בזמן — לאן היית נוסע?',ms:4000},
  {art:'🎙️ 🙂',text:'מי שתורו לוחץ ”הקלטה” ועונה בקול — עד 20 שניות',ms:3500},
  {art:'🤖 🔀',text:'האתר משנה את הקולות ומערבב את ההקלטות של כל הקבוצות — כל קבוצה שומעת רק הקלטות של הקבוצות האחרות, אף פעם לא של עצמה',ms:5000},
@@ -783,10 +785,10 @@ function describeGroupSizes(sizes){
 function updateGroups(){
  const people=document.getElementById('people');
  const typed=parseInt(people.value)||0;
- if(typed<MIN_PARTICIPANTS){document.getElementById('groupSummary').textContent='מינימום 12 משתתפים — המשחק מתאים ל־4 קבוצות ומעלה, 3 עד 5 בכל קבוצה';document.getElementById('phoneSummary').textContent='📱 טלפון אחד לכל קבוצה — וזהו';document.getElementById('totalSummary').textContent=`עלות כוללת: ${PRICING.basePrice} ₪ (מחיר מינימום)`;return;}
+ if(typed<MIN_PARTICIPANTS){document.getElementById('groupSummary').textContent='מינימום 12 משתתפים — המשחק מתאים ל־4 קבוצות ומעלה, 3–4 בכל קבוצה';document.getElementById('phoneSummary').textContent='📱 טלפון אחד לכל קבוצה — וזהו';document.getElementById('totalSummary').textContent=`עלות כוללת: ${PRICING.basePrice} ₪ (מחיר מינימום)`;return;}
  if(typed>MAX_PARTICIPANTS){document.getElementById('groupSummary').textContent='אפשר להזמין עד 100 משתתפים לאירוע';document.getElementById('phoneSummary').textContent='📱 טלפון אחד לכל קבוצה — וזהו';document.getElementById('totalSummary').textContent='';return;}
  const n=typed;
- document.getElementById('groupSummary').textContent=n+` משתתפים · מתחלקים במקום לקבוצות של 3 עד 5 — למשל ${describeGroupSizes(getGroupSizes(n,5))}`;
+ document.getElementById('groupSummary').textContent=n+` משתתפים · מתחלקים במקום לקבוצות של 3–4 — למשל ${describeGroupSizes(getGroupSizes(n,4))}`; /* (28.11.26, Ayelet: 3-4 in a group is best, 5 less) */
  document.getElementById('phoneSummary').textContent='📱 טלפון אחד לכל קבוצה — וזהו';
  const total=getTotalPrice(n),final=finalPrice(n,couponPercent);
  document.getElementById('totalSummary').textContent=couponPercent?`עלות כוללת: ${final.toLocaleString('he-IL')} ₪ (במקום ${total.toLocaleString('he-IL')} ₪ — ${couponPercent}% הנחה)`:'עלות כוללת: '+total.toLocaleString('he-IL')+' ₪';
@@ -827,8 +829,9 @@ const EYE_CHARS=[
 function eyeCharFor(uid,i){let h=0;for(const ch of String(uid))h=(h*31+ch.charCodeAt(0))>>>0;return EYE_CHARS[(h+i)%EYE_CHARS.length]}
 /* Ayelet 16.11.26 - black glasses on about a third of the characters (the same ones on the guessing and the results screens),
    so real glasses do not give anyone away. GLASSES_EVERY = 3 -> one in three; 1 -> everyone */
-const GLASSES_EVERY=2; /* Ayelet 25.11.26 ("too hard because of the glasses - glasses on half of the characters only"; was 1 = everyone) */
-function glassesFor(uid,i){let h=0;for(const ch of String(uid))h=(h*31+ch.charCodeAt(0))>>>0;return ((h>>>3)+i*5)%GLASSES_EVERY===0}
+const GLASSES_EVERY=0; /* Ayelet 25.11.26 ("too hard because of the glasses - glasses on half of the characters only"; was 1 = everyone). 28.11.26: 0 = no glasses at all */
+/* Ayelet 28.11.26 ("stage 1 - take the glasses off for everyone"): no glasses on any character */
+function glassesFor(uid,i){if(!GLASSES_EVERY)return false;let h=0;for(const ch of String(uid))h=(h*31+ch.charCodeAt(0))>>>0;return ((h>>>3)+i*5)%GLASSES_EVERY===0}
 const GLASSES_SVG='<svg class="glasses" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><rect x="8" y="14" width="33" height="74" rx="14" fill="#9fd3ff1c" stroke="#111" stroke-width="5"/><rect x="59" y="14" width="33" height="74" rx="14" fill="#9fd3ff1c" stroke="#111" stroke-width="5"/><path d="M41 42 Q50 30 59 42" fill="none" stroke="#111" stroke-width="5"/><line x1="8" y1="36" x2="-6" y2="30" stroke="#111" stroke-width="5"/><line x1="92" y1="36" x2="106" y2="30" stroke="#111" stroke-width="5"/></svg>';
 function charCard(ch,eyesSrc,eyesId,glasses){
  const [cx,cy,d]=ch.e,w=d*(d>100?1.75:2.4),h=w*EYE_H/EYE_W,pc=(v,of)=>(v/of*100).toFixed(2)+'%';
@@ -1168,7 +1171,7 @@ function renderManagerGame(game) {
   clearTimeout(expiryTimer);
   const participants = Number(game.purchasedParticipants);
   const date = formatDateHe(game.gameDate);
-  const purchase = `רכשת ${participants} משתתפים. מתחלקים לקבוצות של 3 עד 5 משתתפים (לפחות 4 קבוצות) — כל קבוצה כותבת כמה משתתפים יש בה. 📱 חובה טלפון אחד לכל קבוצה. 🎬 המכשיר הזה הוא של מנהל המשחק — הוא מפעיל את כל הקבוצות, ולכן לא משתמשים בו כטלפון של קבוצה.`;
+  const purchase = `רכשת ${participants} משתתפים. מתחלקים לקבוצות של 3–4 משתתפים (לפחות 4 קבוצות; 5 אפשר, אבל עדיף עוד קבוצה) — כל קבוצה כותבת כמה משתתפים יש בה. 📱 חובה טלפון אחד לכל קבוצה. 🎬 המכשיר הזה הוא של מנהל המשחק — הוא מפעיל את כל הקבוצות, ולכן לא משתמשים בו כטלפון של קבוצה.`;
   const logout = `<button class="game-btn" type="button" onclick="window.firebaseManagerLogout()">יציאה מהחשבון</button>`;
   const title = document.getElementById('gameAccessTitle'), intro = document.getElementById('gameAccessIntro'), box = document.getElementById('gameAccessContent');
   const state = gameWindow(game);
@@ -1915,7 +1918,7 @@ async function showCred(o, password, title, opening, joinCode) {
   const codePart = joinCode
     ? `👥 הקישור למשחק — שלחו אותו לכל הקבוצות (למשל בוואטסאפ של המשפחה):\n${SITE_URL}#join=${joinCode}\nקוד ההצטרפות: ${joinCode} (אפשר גם להיכנס לאתר ← ”אני רוצה לשחק” ← להקליד את הקוד).`
     : `👥 קוד ההצטרפות יישלח אליכם בנפרד. לשאלות: ${SITE_URL}`;
-  const text = `שלום ${o.buyerName}, ${opening}\n\n📅 יום המשחק: ${formatDateHe(o.gameDate)} — פתוח מ־6:00 בבוקר עד 1:00 בלילה.\n\n${codePart}\n\n🤖 אין מנהל משחק — כולם משחקים! אלקנה החשמונאי, דמות ה־AI שמנחה את המשחק, מופיע בכל הטלפונים: מסביר כל שלב, מעביר הלאה לבד ומכריז על המנצחים.\n\nאיך משחקים ביום המשחק:\n1. מתחלקים לקבוצות של 3 עד 5 משתתפים (לפחות 4 קבוצות). לכל קבוצה טלפון אחד.\n2. כל קבוצה פותחת את הקישור, כותבת שם לקבוצה וכמה משתתפים יש בה.\n3. מצטלמים, לוחצים ”מוכנים” — ואלקנה מתחיל כשכולם מוכנים.\n4. מגבירים את הקול בטלפון כדי לשמוע את אלקנה. 🔊\nלא צריך להכין שום דבר מראש.\n\n📶 לפני יום המשחק: בדקו שכל טלפון שישמש קבוצה מתאים למשחק (חשוב במיוחד בטלפונים מסוננים) — שלחו לכל המשפחה את הקישור הזה:\n${SITE_URL}?check\n\nשיהיה בהצלחה ושיהיה כיף!`;
+  const text = `שלום ${o.buyerName}, ${opening}\n\n📅 יום המשחק: ${formatDateHe(o.gameDate)} — פתוח מ־6:00 בבוקר עד 1:00 בלילה.\n\n${codePart}\n\n🤖 אין מנהל משחק — כולם משחקים! אלקנה החשמונאי, דמות ה־AI שמנחה את המשחק, מופיע בכל הטלפונים: מסביר כל שלב, מעביר הלאה לבד ומכריז על המנצחים.\n\nאיך משחקים ביום המשחק:\n1. מתחלקים לקבוצות של 3–4 משתתפים (לפחות 4 קבוצות; 5 אפשר, אבל עדיף עוד קבוצה). לכל קבוצה טלפון אחד.\n2. כל קבוצה פותחת את הקישור, כותבת שם לקבוצה וכמה משתתפים יש בה.\n3. מצטלמים, לוחצים ”מוכנים” — ואלקנה מתחיל כשכולם מוכנים.\n4. מגבירים את הקול בטלפון כדי לשמוע את אלקנה. 🔊\nלא צריך להכין שום דבר מראש.\n\n📶 לפני יום המשחק: בדקו שכל טלפון שישמש קבוצה מתאים למשחק (חשוב במיוחד בטלפונים מסוננים) — שלחו לכל המשפחה את הקישור הזה:\n${SITE_URL}?check\n\nשיהיה בהצלחה ושיהיה כיף!`;
   window.lastCredText = text;
   const subject = 'פרטי הכניסה למשחק המשפחה';
   window.lastCred = { to: o.email, subject, text };
@@ -2645,7 +2648,22 @@ window.openJoin = function (code) {
   const c = /^\d{6}$/.test(code || '') ? code : '';
   /* (27.11.26) a new version of the site was uploaded while this page was open - take it before joining */
   if ((window.__siteVer || {}).isNew) { location.hash = '#join=' + c; location.reload(); return; }
-  showPlay(`<div class="play-wrap"><h2>הצטרפות למשחק</h2>${nowBox('מה עושים עכשיו?', [c ? 'הקוד כבר ממולא (הגעתם מהקישור).' : 'מקלידים את הקוד בן 6 הספרות שמנהל המשחק נתן.', 'כותבים שם לקבוצה (למשל: הנמרים).', 'כותבים כמה משתתפים יש בקבוצה — עד 5. אתם יותר? מתחלקים לשתי קבוצות.', 'לוחצים ”הצטרפות”.'], c ? 1 : 0, 'טלפון אחד לכל קבוצה — כל הקבוצה משחקת ממנו. את הקוד מקבלים ממנהל המשחק.')}<form class="game-form" onsubmit="event.preventDefault();window.joinGame()"><label>קוד משחק<input id="joinCode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="קוד בן 6 ספרות" value="${c}"></label><label>שם הקבוצה<input id="joinGroupName" maxlength="30" required placeholder="למשל: הנמרים"></label><label>כמה משתתפים בקבוצה?<input id="joinGroupSize" type="number" inputmode="numeric" min="1" max="${MAX_GROUP_SIZE}" required placeholder="למשל: 4"></label><p class="smallnote" style="margin:-4px 0 0">כל משתתף בקבוצה יצטלם — המשחק ימשיך רק אחרי שכולם הצטלמו.</p><button class="buy" type="submit" id="joinBtn">הצטרפות</button><p id="joinMsg" class="smallnote" role="status"></p><button class="game-btn" type="button" onclick="leavePlay()">← חזרה</button></form>${CONN_CHECK_HTML}</div>`);
+  showPlay(`<div class="play-wrap"><h2>הצטרפות למשחק</h2>${nowBox('מה עושים עכשיו?', [c ? 'הקוד כבר ממולא (הגעתם מהקישור).' : 'מקלידים את הקוד בן 6 הספרות שמנהל המשחק נתן.', 'כותבים שם לקבוצה (למשל: הנמרים).', 'כותבים כמה משתתפים יש בקבוצה — הכי כיף 3–4 (עד 5). אתם יותר? מתחלקים לשתי קבוצות.', 'לוחצים ”הצטרפות”.'], c ? 1 : 0, 'טלפון אחד לכל קבוצה — כל הקבוצה משחקת ממנו. את הקוד מקבלים ממנהל המשחק.')}<form class="game-form" onsubmit="event.preventDefault();window.joinGame()"><label>קוד משחק<input id="joinCode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="קוד בן 6 ספרות" value="${c}"></label><label>שם הקבוצה<input id="joinGroupName" maxlength="30" required placeholder="למשל: הנמרים"></label><label>כמה משתתפים בקבוצה?<input id="joinGroupSize" type="number" inputmode="numeric" min="1" max="${MAX_GROUP_SIZE}" required placeholder="למשל: 4"></label><p class="smallnote" style="margin:-4px 0 0">כל משתתף בקבוצה יצטלם — המשחק ימשיך רק אחרי שכולם הצטלמו.</p><button class="buy" type="submit" id="joinBtn">הצטרפות</button><p id="joinMsg" class="smallnote" role="status"></p><button class="game-btn" type="button" onclick="leavePlay()">← חזרה</button></form>${CONN_CHECK_HTML}</div>`);
+  /* Ayelet 28.11.26 ("I had to join again"): this phone is already a group in the game of this code (the link opened again, or a
+     refresh with the link) - straight back to the group, no form */
+  if (c) authReady.then(async user => {
+    let mineId = null; try { mineId = localStorage.getItem(GROUP_KEY); } catch (e) { }
+    if (!user || !user.isAnonymous || !mineId) return;
+    try {
+      const cd = await getDoc(doc(db, 'gameCodes', c));
+      if (!cd.exists() || cd.data().gameId !== mineId) return;
+      if (!(await getDoc(doc(db, 'familyGames', mineId, 'groups', user.uid))).exists()) return;
+      const st = await getDoc(liveDoc(mineId, 'state'));
+      if (st.exists() && st.data().stage === 'final') return;
+      const f = document.getElementById('joinCode'); if (!f || !f.isConnected) return; /* she already left the form */
+      startGroup(mineId);
+    } catch (e) { console.warn('join resume', e); }
+  });
 };
 // תיבת ”מה עושים עכשיו?” — צעדים ממוספרים: מה שבוצע מסומן ✓, והצעד הנוכחי מודגש
 // כותרת חגיגית לפני כל שלב: ”בואו נראה כמה אתם מכירים... בעיניים / בידע / בשמיעה”
@@ -2671,17 +2689,32 @@ function showNameChips(input) {
   /* Ayelet 25.11.26 ("the list of names is not nice, it does not open well"): the whole list is always open under the box, as big
      buttons - tap a name and it is chosen (it stays marked). Typing only narrows the list */
   const q = assocNorm(input.value), box = nameChipsBox(input);
-  const exact = q && names.some(n => assocNorm(n) === q);
+  /* Ayelet 28.11.26 ("a list to choose from, not only typing the start of a name - all the participants, by א־ב"): the names are always
+     in א־ב order, and with more than 8 names there is also a drop-down list of ALL of them (the phone's own picker) above the buttons */
+  const sorted = [...names].sort((a, b) => String(a).localeCompare(String(b), 'he'));
+  const exact = q && sorted.find(n => assocNorm(n) === q);
   // מתאים לפי תחילת מילה: ”י” ← יוסף, יצחק; ”מ כ” ← משה כהן (לא שמות שיש בהם י באמצע)
-  const list = q && !exact ? names.filter(n => { const t = assocNorm(n).split(' '); return q.split(' ').every(w => t.some(x => x.startsWith(w))); }) : names;
+  const match = n => { const t = assocNorm(n).split(' '); return q.split(' ').every(w => t.some(x => x.startsWith(w))); };
+  /* (28.11.26, Ayelet: "no matter how many participants - always a list to choose from"): the drop-down is always there, the buttons
+     show only what was typed (or the chosen name) */
+  const many = sorted.length > 0;
+  const list = !q ? (many ? [] : sorted) : exact ? (many ? [exact] : sorted) : sorted.filter(match);
   input.classList.toggle('bad', !!q && !exact);
   box.classList.add('all');
-  /* Ayelet 26.11.26 ("with many people the open list is needlessly long - not good"): up to 8 names the list is open; more than that -
-     type the first letter and only the matching names appear */
-  if (!q && names.length > 8) { box.classList.remove('all'); box.innerHTML = `<span class="name-warn">✍️ הקלידו את האות הראשונה של השם — והשמות המתאימים יופיעו כאן</span>`; return; }
-  box.innerHTML = (q && !exact ? `<span class="name-warn">${list.length ? '👆 בחרו שם מהרשימה' : '⚠️ אין שם כזה ברשימה — מחקו ונסו תחילת שם אחרת'}</span>` : '')
-    + list.map(n => `<button type="button" class="name-chip${exact && assocNorm(n) === q ? ' on' : ''}" data-name="${esc(n)}">${exact && assocNorm(n) === q ? '✓ ' : ''}${esc(n)}</button>`).join('');
+  const sel = many ? `<select class="name-select" aria-label="בחירת שם מהרשימה"><option value="">📋 ${exact ? 'להחליף? כל השמות' : 'בחירה מהרשימה ▾'}</option>${sorted.map(n => `<option value="${esc(n)}"${exact === n ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select>` : '';
+  const warn = !q ? (many ? '<span class="name-warn">👆 בוחרים מהרשימה — או מקלידים תחילת שם</span>' : '')
+    : !exact ? `<span class="name-warn">${list.length ? '👆 בחרו שם מהרשימה' : '⚠️ אין שם כזה ברשימה — מחקו ונסו תחילת שם אחרת'}</span>` : '';
+  box.innerHTML = sel + warn
+    + list.map(n => `<button type="button" class="name-chip${exact === n ? ' on' : ''}" data-name="${esc(n)}">${exact === n ? '✓ ' : ''}${esc(n)}</button>`).join('');
 }
+/* local check only (localhost): a names list without a game, to see the list */
+if (/^(localhost|127\.)/.test(location.hostname)) window.__nameTest = names => { groupCtx = groupCtx || { nameList: [] }; groupCtx.nameList = names; };
+/* the drop-down: the chosen name goes into the box (like tapping a name button) */
+document.addEventListener('change', e => {
+  const s = e.target; if (!s.matches || !s.matches('.name-select') || !s.value) return;
+  const box = s.parentElement, input = box && box.previousElementSibling; if (!input || input.disabled) return;
+  input.value = s.value; input.dispatchEvent(new Event('input', { bubbles: true }));
+});
 // אפשר לבחור רק שם מהרשימה: מחזיר את השם כפי שהוא ברשימה, '' לתיבה ריקה, או null כשהשם לא ברשימה (בלי רשימה — כל טקסט תקין)
 function nameFromList(v) {
   const names = (groupCtx && groupCtx.nameList) || [], q = assocNorm(v);
@@ -2991,6 +3024,8 @@ function startGroup(gameId) {
     who: { pick: {}, rec: null, pend: null, saving: false, msg: '' }, whoAssign: null, whoUrl: {}, whoLoads: {} };
   showPlay('<div class="play-wrap"><div class="order-head"><h2 id="grpTitle">הקבוצה שלנו</h2><button class="game-btn" type="button" onclick="window.exitGroupGame(false)">← יציאה לאתר</button></div><div id="hostBox" aria-live="polite"></div><div id="hostAgainBox"></div><div id="grpMain"><p>טוענים…</p></div><div id="grpAdd"></div><div id="cropBox"></div><div id="grpStatus"></div></div>');
   /* a history step for the game screen, so the phone's back button leaves the game without losing it (11.11.26) */
+  /* (28.11.26) the joined phone forgets "#join=…" in the address, so a refresh returns to the group and not to the join form */
+  if (location.hash.startsWith('#join=')) history.replaceState(history.state, '', location.pathname);
   if (!(history.state && history.state.screen === 'play')) history.pushState({ screen: 'play' }, '');
   const c = groupCtx, r = () => renderGroup();
   playUnsubs.push(onSnapshot(liveDoc(gameId, 'state'), s => {
@@ -3054,7 +3089,8 @@ function groupProgress(c, field, val) {
   c.lastProgress = k; updateGroupDoc(c, { [field]: val }).catch(() => { c.lastProgress = null; });
 }
 function groupsStatusHtml(c) {
-  const all = c.allGroups || [], st = c.state.stage; if (all.length < 2) return '';
+  const gone = (c.state && c.state.gone) || {}; /* (28.11.26) a group that left before the game started is not on the board */
+  const all = (c.allGroups || []).filter(g => !gone[g.id]), st = c.state.stage; if (all.length < 2) return '';
   const nQ = WHO_SAID_QUESTIONS.length;
   /* Ayelet 26.11.26: everyone photographed but "ready" not pressed yet - not "still photographing" */
   const cfg = st === 'photos' ? { done: g => g.ready, at: 'readyAt', label: ['✓ מוכנה', '⏳ עוד מצטלמים'], what: 'מוכנות',
@@ -3098,7 +3134,7 @@ const tsMs = t => (t && t.toMillis ? t.toMillis() : typeof t === 'number' ? t : 
 function lobbyHtml(c) {
   const lobby = (c.state && c.state.lobby) || {}, since = tsMs(lobby.allReadyAt);
   if (!since) return '';
-  const all = c.allGroups || [], voted = all.filter(g => tsMs(g.startVoteAt) >= since).length, mine = tsMs(c.group.startVoteAt) >= since;
+  const all = (c.allGroups || []).filter(g => !((c.state && c.state.gone) || {})[g.id]), voted = all.filter(g => tsMs(g.startVoteAt) >= since).length, mine = tsMs(c.group.startVoteAt) >= since;
   const autoAt = tsMs(lobby.autoStartAt);
   return `<div class="now-box lobby-box" style="text-align:center"><p style="font-size:20px;margin:0 0 6px"><strong>🙋 כל הקבוצות מוכנות! כולם כאן?</strong></p>`
     + (mine ? (voted >= all.length ? '<p>✅ כולם כאן! מתחילים ברגע שאלקנה מסיים את המשפט 🎙️</p>' : `<p>✅ לחצתם. מחכים לעוד ${all.length - voted === 1 ? 'קבוצה אחת' : (all.length - voted) + ' קבוצות'}.</p>`)
@@ -3182,23 +3218,33 @@ function transitionText(st) {
    a form). After a reload the game comes back by itself (autoResume) */
 const SITE_VER = window.__siteVer = { tag: null, isNew: false };
 async function siteVersion() {
-  try { const r = await fetch(location.pathname + '?vcheck=' + Date.now(), { method: 'HEAD', cache: 'no-store' }); return r.headers.get('etag') || r.headers.get('last-modified') || null; } catch (e) { return null; }
+  /* Ayelet 28.11.26 (family game: "twice everyone was thrown out of the game and had to join again"): the same page comes with
+     ETag W/"x" when the server zips it and "x" when it does not - that looked like a new version and reloaded every phone at a stage
+     change. Now: Last-Modified first, the W/ is ignored, and a new version counts only after two checks in a row agree */
+  try {
+    const r = await fetch(location.pathname + '?vcheck=' + Date.now(), { method: 'HEAD', cache: 'no-store' });
+    if (!r.ok) return null;
+    return r.headers.get('last-modified') || String(r.headers.get('etag') || '').replace(/^W\//, '') || null;
+  } catch (e) { return null; }
 }
 async function siteVersionCheck() {
   if (SITE_VER.isNew) return;
   const v = await siteVersion(); if (!v) return;
   if (!SITE_VER.tag) { SITE_VER.tag = v; return; }
-  if (v !== SITE_VER.tag) SITE_VER.isNew = true; /* never a reload in the middle of a form (an order, the admin) - only when a game starts (openJoin) or at a stage change */
+  /* (28.11.26, Ayelet: "a refresh only if there really is a change") - a date counts only when it is LATER than the open version's */
+  const tOld = Date.parse(SITE_VER.tag), tNew = Date.parse(v);
+  if (v === SITE_VER.tag || (tOld && tNew && tNew <= tOld)) { SITE_VER.seen = null; return; }
+  if (SITE_VER.seen !== v) { SITE_VER.seen = v; setTimeout(siteVersionCheck, 20000); return; } /* check once more before believing it */
+  SITE_VER.isNew = true; /* never a reload in the middle of a form (an order, the admin) or of a game - only before joining (openJoin) */
 }
 if (!/^(localhost|127\.)/.test(location.hostname)) {
   siteVersionCheck(); setInterval(siteVersionCheck, 120000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) siteVersionCheck(); });
 }
-function siteReloadIfNew(c, prevStage) {
-  if (!SITE_VER.isNew || !c || !prevStage || c.state.stage === prevStage || c.state.stage === 'final') return;
-  if (c.who && (c.who.rec || c.who.pend || c.who.saving)) return;
-  setTimeout(() => location.reload(), 300);
-}
+/* Ayelet 28.11.26 ("most important - be sure the refresh that throws you out of the game never happens, it was terrible"): NO reload in
+   the middle of a game at all (this used to reload at a stage change). A new version is taken only before joining (openJoin) - a game
+   is one evening, the next game gets the new version */
+function siteReloadIfNew() { }
 /* (27.11.26) the step on the screen: stage + picture + question + registration open */
 function stateStep(x) { return x ? x.stage + ':' + x.assocRound + ':' + x.whoRound + ':' + !!x.photosOpen : ''; }
 function holdState(c, nd) {
@@ -3370,7 +3416,7 @@ function hostListen(c) {
 const HOST_MOMENT_STAGES = {
   welcome: ['photos'], groupJoined: ['photos'], photosOpen: ['photos'], askAllHere: ['photos'], startSoon: ['photos'], hold: ['photos'],
   everyoneHere: ['photos', 'eyes'], stage1Start: ['photos', 'eyes'],
-  eyesDone: ['eyesDone'], assocIntro: ['assocIntro'], assocJudging: ['assoc', 'assocCheck'], assocStart: ['assoc'], eyesFirst: ['eyes'], recFirst: ['whoRecord'], seeFirst: ['assoc'], seeMinute: ['assoc'], assocDone: ['assocDone'],
+  eyesDone: ['eyesDone'], assocIntro: ['assocIntro'], assocJudging: ['assoc', 'assocCheck'], assocStart: ['assoc'], eyesFirst: ['eyes'], recFirst: ['whoRecord'], recHurry: ['whoRecord'], lastOne: ['photos', 'eyes', 'assoc', 'whoRecord', 'whoGuess'], seeFirst: ['assoc'], seeMinute: ['assoc'], assocDone: ['assocDone'],
   whoIntro: ['whoIntro'], whoGuessStart: ['whoGuess'], whoDone: ['whoDone'],
   final: ['final'], finalIntro: ['final'], finalGroup: ['final'], finalWinners: ['final'], thanks: ['final'],
 };
@@ -3595,7 +3641,7 @@ function showSlot(i, spin) {
   const c = groupCtx, items = c.assignment.items, n = items.length;
   c.cur = i;
   eyesStage().innerHTML = `<div class="slot char-slot" id="slot">${charCard(eyeCharFor(c.uid, i), '', 'slotImg', glassesFor(c.uid, i))}<span class="slot-count">זוג ${i + 1} מתוך ${n}</span></div>
-    <label style="display:block;margin-top:10px"><strong>של מי העיניים שבתוך הדמות? 👀</strong><input id="slotGuess" class="guess" maxlength="40" autocomplete="off" placeholder="מקלידים תחילת שם ובוחרים…" value="${esc(c.guesses[i].guess)}" oninput="window.setGuess(-1,this.value)"></label>
+    <label style="display:block;margin-top:10px"><strong>של מי העיניים שבתוך הדמות? 👀</strong><input id="slotGuess" class="guess" maxlength="40" autocomplete="off" placeholder="בוחרים מהרשימה או מקלידים תחילת שם…" value="${esc(c.guesses[i].guess)}" oninput="window.setGuess(-1,this.value)"></label>
     <div class="order-actions" style="margin-top:10px">${i > 0 ? '<button class="game-btn" type="button" onclick="window.slotStep(-1)">◀ הקודם</button>' : ''}<button class="buy go-pulse" type="button" id="slotNext" onclick="window.slotStep(1)">${i < n - 1 ? 'הבא ▶' : 'סיום — בדיקה ואישור'}</button></div>`;
   const img = document.getElementById('slotImg'), slot = document.getElementById('slot'), input = document.getElementById('slotGuess'), next = document.getElementById('slotNext');
   const land = () => { img.src = items[i].eyes; slot.classList.remove('spinning'); img.classList.remove('landed'); void img.offsetWidth; img.classList.add('landed'); input.disabled = false; next.disabled = false;
@@ -4516,11 +4562,13 @@ window.closeTruth = function () { const ov = document.getElementById('truthOv');
 // live/whoPlan (מנהל בלבד) = { key: rid→שם, sets: קבוצה→[{rid,q,pitch}] }. whoAssign/{uid} = { items, rids } — בלי שמות.
 // whoAnswers/{uid}_{סבב} = { guesses:[{rid,guess}] }. בסוף: live/results.stage3 (כמו stage1)
 const WHO_STAGES = ['whoIntro', 'whoRecord', 'whoGuess', 'whoDone'];
-const WHO_MAX_SECS = 20, WHO_PER_Q = 6, WHO_REC_MINUTES = 40, WHO_GUESS_SECS = 90, WHO_MAX_AUDIO = 690000;
+const WHO_MAX_SECS = 20, WHO_PER_Q = 6, WHO_REC_MINUTES = 12, WHO_GUESS_SECS = 90, WHO_MAX_AUDIO = 690000;
 const WHO_MIC_DENIED = 'צריך לאשר גישה למיקרופון: לוחצים על 🔒 ליד הכתובת למעלה ← מיקרופון ← אפשר, ומנסים שוב. אם זה לא מסתדר — אפשר לדלג, והמשחק ימשיך בלי ההקלטות מהמכשיר הזה.';
 const ridPid = rid => rid.slice(0, rid.lastIndexOf('_')), ridQ = rid => Number(rid.slice(rid.lastIndexOf('_') + 1));
-function whoRecEndMs(st) { return st && st.whoRecordStartedAt ? st.whoRecordStartedAt.toMillis() + (st.whoRecordSeconds || WHO_REC_MINUTES * 60) * 1000 : 0; }
-function whoEndMs(st) { return st && st.whoStartedAt ? st.whoStartedAt.toMillis() + (st.whoPace ? (st.whoTotalSecs || 180) : (st.whoSeconds || WHO_GUESS_SECS)) * 1000 : 0; /* (27.11.26) own pace = one clock for all the guessing */ }
+/* (28.11.26) whoRecHurryEnd / whoHurryEnd: half of the groups finished -> the others got a few more minutes (the server's clock) */
+const hurryMs = (end, h) => (h && h.toMillis ? Math.min(end, h.toMillis()) : end);
+function whoRecEndMs(st) { return st && st.whoRecordStartedAt ? hurryMs(st.whoRecordStartedAt.toMillis() + (st.whoRecordSeconds || WHO_REC_MINUTES * 60) * 1000, st.whoRecHurryEnd) : 0; }
+function whoEndMs(st) { return st && st.whoStartedAt ? hurryMs(st.whoStartedAt.toMillis() + (st.whoPace ? (st.whoTotalSecs || 180) : (st.whoSeconds || WHO_GUESS_SECS)) * 1000, st.whoPace ? st.whoHurryEnd : null) : 0; /* (27.11.26) own pace = one clock for all the guessing */ }
 function whoTick(st) {
   const rec = st.stage === 'whoRecord', left = (rec ? whoRecEndMs(st) : whoEndMs(st)) - Date.now();
   document.querySelectorAll('[data-countdown]').forEach(el => { el.textContent = fmtClock(left); el.closest('.timer-bar')?.classList.toggle('urgent', left < (rec ? 120000 : 15000)); });
@@ -4549,18 +4597,19 @@ function whoProblem(recs) {
 function whoBuildPlan(m) {
   const recs = whoRecList(m), used = {}, sets = Object.fromEntries(m.groups.map(gr => [gr.id, []])), key = {}, questions = [], pitch = {};
   const pitchOf = rid => pitch[rid] || (pitch[rid] = Math.random() < 0.5 ? Math.round((1.10 + Math.random() * 0.06) * 100) / 100 : Math.round((0.88 + Math.random() * 0.04) * 100) / 100);
+  /* Ayelet 28.11.26 - one recording per question for every group, never a person the group already heard (same as the server) */
+  /* (28.11.26, later) 2 per question; new people first, never a person heard in the question just before (same as the server) */
+  const lastPos = Object.fromEntries(m.groups.map(gr => [gr.id, {}]));
   WHO_SAID_QUESTIONS.forEach((_, q) => {
-    const all = recs.filter(r => r.q === q);
-    const n = Math.min(WHO_PER_Q, ...m.groups.map(gr => all.filter(r => r.gid !== gr.id).length));
-    if (!m.groups.length || n < 1) return;
+    const all = recs.filter(r => r.q === q), pos = questions.length;
+    const candsOf = gr => all.filter(r => r.gid !== gr.id && lastPos[gr.id][r.pid] !== pos - 1);
+    const n = m.groups.length ? Math.min(3, ...m.groups.map(gr => candsOf(gr).length)) : 0; /* (28.11.26) 3 per question, like the server */
+    if (n < 1) return;
     shuffle(m.groups.slice()).forEach(gr => {
-      const cands = shuffle(all.filter(r => r.gid !== gr.id)), perGroup = {}, sel = [];
-      while (sel.length < n) {
-        cands.sort((a, b) => (perGroup[a.gid] || 0) - (perGroup[b.gid] || 0) || (used[a.pid] || 0) - (used[b.pid] || 0));
-        const r = cands.shift(); sel.push(r); used[r.pid] = (used[r.pid] || 0) + 1; perGroup[r.gid] = (perGroup[r.gid] || 0) + 1;
-      }
-      sel.forEach(r => { key[r.rid] = r.name; });
-      sets[gr.id].push(...shuffle(sel).map(r => ({ rid: r.rid, q, pitch: pitchOf(r.rid) })));
+      const isNew = r => lastPos[gr.id][r.pid] === undefined;
+      const sel = shuffle(candsOf(gr)).sort((a, b) => (isNew(b) - isNew(a)) || ((used[a.pid] || 0) - (used[b.pid] || 0))).slice(0, n);
+      sel.forEach(r => { used[r.pid] = (used[r.pid] || 0) + 1; lastPos[gr.id][r.pid] = pos; key[r.rid] = r.name; });
+      sets[gr.id].push(...sel.map(r => ({ rid: r.rid, q, pitch: pitchOf(r.rid) })));
     });
     questions.push(q);
   });
@@ -4740,10 +4789,14 @@ function renderGroupWho(main) {
     return;
   }
   if (st.stage === 'whoRecord') {
-    if (c.whoBuilt !== 'rec' || !document.getElementById('whoRec')) {
-      c.whoBuilt = 'rec';
-      /* no clock for the recordings (11.11.26, Ayelet): every group records at its own pace and presses "סיימנו" */
-      main.innerHTML = `<div class="now-box" style="text-align:center;margin-bottom:8px"><strong>🎙️ מקליטים בקצב שלכם — בלי שעון.</strong> עד 20 שניות לכל תשובה. כשסיימתם — לוחצים ”סיימנו”.</div><div id="whoRec"></div>`;
+    const hurry = !!st.whoRecHurryEnd && !(c.group && c.group.whoDone);
+    if (c.whoBuilt !== 'rec' + hurry || !document.getElementById('whoRec')) {
+      c.whoBuilt = 'rec' + hurry;
+      /* no clock for the recordings (11.11.26, Ayelet): every group records at its own pace and presses "סיימנו".
+         (28.11.26) once half of the groups finished, the others see a clock: a few more minutes, then the game goes on */
+      main.innerHTML = (hurry
+        ? `${timerBar(fmtClock(whoRecEndMs(st) - Date.now()), 'רוב הקבוצות כבר סיימו — זה הזמן שנשאר לכם')}<div class="now-box" style="text-align:center;margin-bottom:8px"><strong>⏰ רוב הקבוצות סיימו להקליט!</strong> הקליטו מה שאתם יכולים ולחצו ”סיימנו”. כשהשעון נגמר — ממשיכים עם מה שהוקלט.</div>`
+        : `<div class="now-box" style="text-align:center;margin-bottom:8px"><strong>🎙️ מקליטים בקצב שלכם — בלי שעון.</strong> עד 20 שניות לכל תשובה. כשסיימתם — לוחצים ”סיימנו”.</div>`) + '<div id="whoRec"></div>';
       return renderWhoRec(true);
     }
     return renderWhoRec(false);
@@ -4785,7 +4838,7 @@ function renderWhoRec(force) {
   if (!force && (w.rec || w.pend || w.saving || c.whoPlaying)) return;
   const done = whoDoneCount(c), total = WHO_SAID_QUESTIONS.length;
   if (c.group.whoDone) {
-    box.innerHTML = nowBox('מה עושים עכשיו?', ['הקלטתם את התשובות.', 'לחצתם ”סיימנו להקליט”.', 'מחכים לשאר הקבוצות. כשכולן יסיימו — מתחילים לנחש מי אמר מה!'], 2, `⏱️ בניחוש יהיו לכם עד ${secsText(c.state.whoGuessSecsPlan || WHO_GUESS_SECS)} לכל שאלה. לא צריך לרענן ולא לסגור את המסך.`)
+    box.innerHTML = nowBox('מה עושים עכשיו?', ['הקלטתם את התשובות.', 'לחצתם ”סיימנו להקליט”.', 'מחכים לשאר הקבוצות. כשכולן יסיימו — מתחילים לנחש מי אמר מה!'], 2, '🎧 בניחוש — כל קבוצה בקצב שלה. לא צריך לרענן ולא לסגור את המסך.')
       + `<p class="who-progress">✅ הקלטתם <strong>${done} מתוך ${total}</strong> שאלות</p>`;
     /* Ayelet 26.11.26 ("after 'we finished' I can go back, but if everyone already finished it does not let me - confusing"):
        no "back" button - "סיימנו להקליט" asks first, and after it the recordings are final */
@@ -4843,6 +4896,11 @@ window.whoRecStart = async function (q) {
   whoStopAudio(); w.pend = null; w.msg = '';
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined') { w.msg = 'המכשיר הזה לא יכול להקליט. אפשר להקליט מטלפון אחר של הקבוצה (באייפון — לעדכן את המערכת), או לדלג.'; return renderWhoRec(true); }
   w.starting = true;
+  /* Ayelet 28.11.26 ("when I recorded in stage 3 there was no sound when I pressed"): the beep came only after the microphone opened -
+     a phone (iPhone mostly) plays very quietly while the microphone is open, and the sound was not in the tap itself. Now a clear beep
+     right at the tap (still in the tap, so the phone allows the sound), and a louder one when the recording really starts */
+  try { if (dzAudio()) { dzTone(660, 0, .1, 'sine', .3); dzTone(660, .14, .1, 'sine', .3); } } catch (e) { }
+  try { navigator.vibrate && navigator.vibrate(60); } catch (e) { }
   let stream;
   try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
   catch (e) { console.warn(e); w.starting = false; w.msg = WHO_MIC_DENIED; return renderWhoRec(true); }
@@ -4863,15 +4921,15 @@ window.whoRecStart = async function (q) {
     if (secs < 1.2 || blob.size < 1000) { w.msg = '⚠️ ההקלטה לא נקלטה — היא קצרה מדי. לוחצים 🎙️, מחכים לצפצוף, מדברים, ורק אז ⏹ עצירה'; return renderWhoRec(true); }
     const data = await blobToDataUrl(blob, type);
     if (data.length > WHO_MAX_AUDIO) { w.msg = 'ההקלטה גדולה מדי. נסו שוב — קצת יותר קצר.'; return renderWhoRec(true); }
-    w.pend = { q, pid, data, url: URL.createObjectURL(blob) };
+    w.pend = { q, pid, data, url: URL.createObjectURL(blob), secs: Math.round(Math.min(secs, 60) * 10) / 10 };
     renderWhoRec(true);
   };
   w.rec = rec;
   mr.start();
   /* (27.11.26) a short beep + a buzz = "talk now" - so nobody talks before the microphone is really on (also when it started by itself
      after Elkana finished his line) */
-  try { if (dzAudio()) dzTone(880, 0, .12, 'sine', .16); } catch (e) { }
-  try { navigator.vibrate && navigator.vibrate(120); } catch (e) { }
+  try { if (dzAudio()) dzTone(988, 0, .25, 'sine', .45); } catch (e) { }
+  try { navigator.vibrate && navigator.vibrate(150); } catch (e) { }
   rec.timer = setInterval(() => { const el = document.getElementById('whoRecClock'); if (el) el.textContent = fmtClock(WHO_MAX_SECS * 1000 - (Date.now() - rec.started)); }, 250);
   rec.cap = setTimeout(() => window.whoRecStop(), WHO_MAX_SECS * 1000 + 200);
   renderWhoRec(true);
@@ -4893,7 +4951,7 @@ window.whoSave = async function () {
   w.saving = true; renderWhoRec(true);
   try {
     const batch = writeBatch(db);
-    batch.set(doc(db, 'familyGames', c.gameId, 'recordings', rid), { pid: p.pid, q: p.q, audio: p.data, createdAt: serverTimestamp() });
+    batch.set(doc(db, 'familyGames', c.gameId, 'recordings', rid), { pid: p.pid, q: p.q, audio: p.data, ...(p.secs > 0 ? { secs: p.secs } : {}), createdAt: serverTimestamp() }); /* secs (28.11.26): the server prefers the recordings where people really talked */
     batch.update(doc(db, 'familyGames', c.gameId, 'groups', c.uid), { whoRecs: recs });
     await withTimeout(batch.commit(), 30000);
     c.whoUrl[rid] = p.url; w.pend = null; delete w.pick[p.q];
@@ -4951,7 +5009,7 @@ function renderWhoPace(main) {
     ${clock}
     <p style="text-align:center;margin:6px 0"><strong>שאלה ${wp.pos + 1} מתוך ${rounds.length}</strong></p>
     <div class="who-q active"><strong>🎙️ ${esc(Q.title || '')}</strong><p>${esc(Q.q || '')}</p></div>
-    <div id="whoGuessBox">${items.map((it, i) => `<div class="who-item"><button class="game-btn who-play" type="button" data-label="▶ שמע הקלטה ${items.length > 1 ? i + 1 : ''}" onclick="window.whoPlay('${esc(it.rid)}', ${Number(it.pitch) || 1}, this)">▶ שמע הקלטה ${items.length > 1 ? i + 1 : ''}</button><label class="who-guess">✍️ מי אמר את ${items.length > 1 ? 'הקלטה ' + (i + 1) : 'זה'}?<input data-rid="${esc(it.rid)}" maxlength="40" autocomplete="off" placeholder="מקלידים תחילת שם ובוחרים…" oninput="window.whoGuessInput()"></label><p class="who-picked" data-picked="${esc(it.rid)}" aria-live="polite"></p></div>`).join('')}</div>
+    <div id="whoGuessBox">${items.map((it, i) => `<div class="who-item"><button class="game-btn who-play" type="button" data-label="▶ שמע הקלטה ${items.length > 1 ? i + 1 : ''}" onclick="window.whoPlay('${esc(it.rid)}', ${Number(it.pitch) || 1}, this)">▶ שמע הקלטה ${items.length > 1 ? i + 1 : ''}</button>${whoHintHtml(it)}<label class="who-guess">✍️ מי אמר את ${items.length > 1 ? 'הקלטה ' + (i + 1) : 'זה'}?<input data-rid="${esc(it.rid)}" maxlength="40" autocomplete="off" placeholder="בוחרים מהרשימה או מקלידים תחילת שם…" oninput="window.whoGuessInput()"></label><p class="who-picked" data-picked="${esc(it.rid)}" aria-live="polite"></p></div>`).join('')}</div>
     <button class="buy see-next" type="button" id="whoNextBtn" onclick="window.whoPaceNext()" disabled>${last ? 'סיימנו ✓' : 'השאלה הבאה ◀'}</button>
     <p class="smallnote" id="whoHint" style="text-align:center;margin:6px 0 0"></p>`;
   document.querySelectorAll('#whoGuessBox input[data-rid]').forEach(inp => { try { showNameChips(inp); } catch (e) { } });
@@ -4967,6 +5025,12 @@ function renderWhoPace(main) {
   const nextQ = rounds[wp.pos + 1] != null ? qs[rounds[wp.pos + 1]] : undefined;
   Promise.allSettled(items.map(it => whoLoad(it.rid))).then(() => { if (nextQ !== undefined) whoItemsFor(c, nextQ).forEach(it => whoLoad(it.rid).catch(() => { })); });
   whoGuessGroupTick();
+}
+/* Ayelet 28.11.26 - a hint above the guess box: "the voice is from one of the groups: …" (the server picks them: the speaker's group +
+   1-2 others; no hint with 4 groups or fewer) */
+function whoHintHtml(it) {
+  const h = (it && Array.isArray(it.hint) ? it.hint : []).filter(Boolean);
+  return h.length ? `<p class="who-hint">💡 <strong>הכוונה:</strong> הקול הוא מאחת הקבוצות: ${h.map(n => `<strong>${esc(n)}</strong>`).join(' · ')}</p>` : '';
 }
 /* under every recording, big and clear: "✅ בחרתם: דינה"; "השאלה הבאה" lights up when every recording has a name */
 function whoPaceMark(c) {
@@ -5013,7 +5077,7 @@ function renderGroupWhoGuess(main) {
     <p style="text-align:center;margin:6px 0"><strong>שאלה ${r + 1} מתוך ${qs.length}</strong></p>
     <div class="who-q active"><strong>🎙️ ${esc(Q.title || '')}</strong><p>${esc(Q.q || '')}</p></div>
     ${timerBar(fmtClock(whoEndMs(st) - Date.now()), `עד ${secsText(st.whoSeconds || WHO_GUESS_SECS)} לשאלה הזו`)}
-    <div id="whoGuessBox">${items.length ? items.map((it, i) => `<div class="who-item"><button class="game-btn who-play" type="button" data-label="▶ שמע הקלטה ${i + 1}" onclick="window.whoPlay('${esc(it.rid)}', ${Number(it.pitch) || 1}, this)">▶ שמע הקלטה ${i + 1}</button><label class="who-guess">✍️ מי אמר את הקלטה ${i + 1}?<input data-rid="${esc(it.rid)}" maxlength="40" autocomplete="off" placeholder="מקלידים תחילת שם ובוחרים…" oninput="window.whoGuessInput()"></label></div>`).join('')
+    <div id="whoGuessBox">${items.length ? items.map((it, i) => `<div class="who-item"><button class="game-btn who-play" type="button" data-label="▶ שמע הקלטה ${i + 1}" onclick="window.whoPlay('${esc(it.rid)}', ${Number(it.pitch) || 1}, this)">▶ שמע הקלטה ${i + 1}</button>${whoHintHtml(it)}<label class="who-guess">✍️ מי אמר את הקלטה ${i + 1}?<input data-rid="${esc(it.rid)}" maxlength="40" autocomplete="off" placeholder="בוחרים מהרשימה או מקלידים תחילת שם…" oninput="window.whoGuessInput()"></label></div>`).join('')
       : '<div class="now-box"><p style="margin:0"><strong>בשאלה הזו אין לכם הקלטות לנחש</strong> — כל ההקלטות שנבחרו הן של הקבוצה שלכם 🙂 מחכים לשאלה הבאה.</p></div>'}</div>
     <p class="smallnote" id="whoHint" style="text-align:center"></p>`;
   if (!items.length) { groupProgress(c, 'whoGot', { r, n: 0, of: 0 }); return; } /* (27.11.26) nothing to guess = finished, on the board */
